@@ -1,4 +1,4 @@
-# [PROJECT NAME] — Failure Log
+# Retailer Deduction Recovery — Failure Log
 
 What was attempted that didn't work, why it didn't work, and what was
 tried next.
