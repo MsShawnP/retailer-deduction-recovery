@@ -33,9 +33,10 @@ views for each feature before moving to the next.
       and deduction codes for Walmart, Costco, Whole Foods, UNFI, KeHE,
       and representative regional chains
       (Wegmans, Sprouts) — see `research/retailers/`
-- [ ] Design deduction data schema — deduction records, EDI
+- [x] Design deduction data schema — deduction records, EDI
       requirements, pack/ship records, dispute records, retailer
       rules, remittance data (including vague/undecodable entries)
+      — see `data/schema.md`
 - [ ] Build Python scripts to extend the cinderhaven-data SQLite
       database with deduction-specific tables
 - [ ] Generate synthetic deduction data — realistic mix of types
