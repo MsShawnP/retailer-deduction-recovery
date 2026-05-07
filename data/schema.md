@@ -207,7 +207,7 @@ Dispute attempts. **NULL row possible per deduction** — if Cinderhaven never f
 | `evidence_quality` | TEXT NOT NULL | `digital_complete`, `digital_partial`, `handwritten_only`, `none` |
 | `submitted_evidence_count` | INTEGER NOT NULL | How many artifacts were attached |
 | `was_within_deadline` | BOOLEAN | NULL if no published deadline; TRUE/FALSE otherwise |
-| `outcome` | TEXT NOT NULL | `pending`, `won_full`, `won_partial`, `lost_evidence`, `lost_deadline`, `lost_other`, `abandoned` |
+| `outcome` | TEXT NOT NULL | `pending`, `won_full`, `won_partial`, `lost_evidence`, `lost_deadline`, `lost_no_response`, `lost_other`, `abandoned` |
 | `recovered_amount` | REAL | Dollar amount actually recovered. 0 if lost/abandoned |
 | `closed_date` | DATE | Date outcome was finalized |
 | `labor_hours` | REAL NOT NULL | Synthetic time spent gathering evidence + filing — drives cost-to-dispute |
@@ -313,16 +313,16 @@ For the 18-month window (Dec 2024 → May 2026), aiming for:
 | order_lines | 15,000–30,000 | 3–5 lines per order avg |
 | shipments | 4,000–6,000 | 1:1 with orders for V1 |
 | pack_records | 4,000–6,000 | 1:1 with orders |
-| deductions | 1,500–3,500 | Roughly 25–45% of orders generate ≥1 deduction; some generate 2–3 |
-| disputes | 800–2,000 | Cinderhaven only files disputes when someone has time → 50–60% of deductions get a filing attempt |
-| dispute_evidence | 1,500–4,000 | 1–3 evidence items per dispute |
+| deductions | 3,000–6,000 | Roughly 35–55% of orders generate ≥1 deduction; deducted orders average ~2 deductions (short ship + label fine, etc.) |
+| disputes | 1,500–3,600 | Cinderhaven only files disputes when someone has time → 50–60% of deductions get a filing attempt |
+| dispute_evidence | 3,000–10,000 | 1–3 evidence items per dispute |
 | remittances | 200–400 | Weekly to biweekly per retailer × 18 months |
 | edi_requirements | 30–50 | 4–8 requirements per retailer |
 | post_audit_claims | 30–80 | Walmart APL + KeHE pass-throughs over 18 months |
 | retailer_rules | ~50 | 7 retailers × ~7 deduction types |
 | deduction_codes | 30–60 | Walmart 12, KeHE 8, others inferred placeholders |
 
-Total deduction dollar volume target: **$300K–$500K annualized**, materially larger than the base `chargebacks` table's $55–75K. This is intentional — the base captures defect-driven chargebacks only; this project models the full deduction picture (operational, compliance, OTIF, post-audit, vague). The base $55–75K should remain a recognizable subset of the new total.
+Total deduction dollar volume target: **$750K–$1.2M annualized** (3–5% of $25M wholesale revenue, consistent with industry reports for specialty food brands). Materially larger than the base `chargebacks` table's $55–75K. This is intentional — the base captures defect-driven chargebacks only; this project models the full deduction picture (operational, compliance, OTIF, post-audit, vague). The base $55–75K should remain a recognizable subset of the new total.
 
 ---
 
