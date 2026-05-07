@@ -60,3 +60,25 @@ removed before it informs the schema.
 task 2).
 
 ---
+
+## 2026-05-07 19:48
+
+**What changed:** Designed deduction data schema (data/schema.md) —
+13 new tables extending cinderhaven-data without replacing the base
+chargebacks table; volume target $750K–$1.2M annualized.
+
+**Why:** Phase 1 task 2. Schema feeds the next task (Python data
+generation). Decisions and tradeoffs documented in data/schema.md
+"Design choices" section.
+
+**State:** Schema spec committed (0e7221a + 6664365). PLAN.md task 2
+checked. whole-foods.md trimmed to WFM-only earlier (b8ae067). Base
+`chargebacks` table preserved; new tables layer on with order-grain.
+No code yet.
+
+**Next:** Phase 1 task 3 — build Python scripts to extend the
+cinderhaven-data SQLite database with the new tables. Start with
+static seeds (retailers, retailer_rules, deduction_codes,
+edi_requirements) before generating orders/shipments/deductions.
+
+---
