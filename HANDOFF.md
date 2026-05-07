@@ -37,3 +37,26 @@ research retailer-specific dispute processes, deadlines, portals,
 and deduction codes.
 
 ---
+
+## 2026-05-07 19:16
+
+**What changed:** Added research/retailers/ notes for Walmart, Costco,
+Whole Foods, UNFI, KeHE, Wegmans, Sprouts; checked off first Phase 1
+task in PLAN.md.
+
+**Why:** First Phase 1 task. Research grounds the deduction data
+schema (next task) in real retailer behavior, with explicit
+verification gaps so synthetic-data choices flag confirmed vs.
+inferred.
+
+**State:** Seven retailer research files committed (e9534ec) with
+citations and verification gaps. whole-foods.md currently includes
+Amazon Vendor Central context, but Cinderhaven sells into WFM
+directly, not as a 1P Amazon vendor — that file needs Amazon scope
+removed before it informs the schema.
+
+**Next:** Trim Amazon Vendor Central content from whole-foods.md
+(WFM-only scope); then design the deduction data schema (Phase 1
+task 2).
+
+---
