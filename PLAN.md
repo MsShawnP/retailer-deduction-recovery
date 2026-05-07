@@ -29,9 +29,10 @@ views for each feature before moving to the next.
 
 ### Phase 1: Data foundation
 
-- [ ] Research retailer-specific dispute processes, deadlines, portals,
+- [x] Research retailer-specific dispute processes, deadlines, portals,
       and deduction codes for Walmart, Costco, Whole Foods, UNFI, KeHE,
       and representative regional chains
+      (Wegmans, Sprouts) — see `research/retailers/`
 - [ ] Design deduction data schema — deduction records, EDI
       requirements, pack/ship records, dispute records, retailer
       rules, remittance data (including vague/undecodable entries)
