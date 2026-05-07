@@ -37,8 +37,12 @@ views for each feature before moving to the next.
       requirements, pack/ship records, dispute records, retailer
       rules, remittance data (including vague/undecodable entries)
       — see `data/schema.md`
-- [ ] Build Python scripts to extend the cinderhaven-data SQLite
-      database with deduction-specific tables
+- [x] Build Python scripts to extend the cinderhaven-data SQLite
+      database with deduction-specific tables — schema DDL + static
+      seeds (retailers, retailer_rules, deduction_codes,
+      edi_requirements) via `scripts/build_deductions_db.py`. Dynamic
+      generators (orders, deductions, disputes, etc.) are the next
+      tasks below.
 - [ ] Generate synthetic deduction data — realistic mix of types
       (short ship, labeling fines, pallet noncompliance, promo
       disputes, damaged product, late delivery, vague codes)
