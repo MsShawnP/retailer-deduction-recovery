@@ -56,8 +56,10 @@ views for each feature before moving to the next.
       packed, and labeled per order — 5,838 pack_records and 5,838
       shipments, encoding generic-label / paper-only / lost-evidence
       reality
-- [ ] Build JSON export script — transform SQLite into the JSON
-      structures the React app needs
+- [x] Build JSON export script — transform SQLite into the JSON
+      structures the React app needs — `scripts/20_export_json.py`
+      writes summary.json (5KB), deductions.json (4.8MB compact,
+      3,333 denormalized records), retailers.json (47KB)
 - [ ] Validate synthetic data — deduction volumes and dollar amounts
       feel realistic for a ~$25M manufacturer
 

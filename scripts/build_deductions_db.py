@@ -46,6 +46,7 @@ DYNAMIC_PIPELINE = [
     "13b_generate_post_audit_claims.py",
     "14_generate_remittances.py",
     "15_generate_disputes.py",
+    "20_export_json.py",
 ]
 
 

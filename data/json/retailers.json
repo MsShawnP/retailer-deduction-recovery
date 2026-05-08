@@ -1,0 +1,1640 @@
+{
+  "costco": {
+    "name": "Costco",
+    "channel_type": "retailer",
+    "dispute_portal_name": "Costco Vendor Portal",
+    "dispute_portal_url": "https://fssts.costco.com/",
+    "dispute_method": "portal",
+    "notes": "Lower-tech than Walmart; depot cross-dock model",
+    "rules": {
+      "short_ship": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Windows not published; inferred industry norm"
+      },
+      "label_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "label_scan"
+        ],
+        "typical_recovery_rate": 0.2,
+        "notes": "GS1-128/SSCC; not published"
+      },
+      "pallet_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "photo"
+        ],
+        "typical_recovery_rate": 0.2,
+        "notes": "Lean/overhang/underhang; not published"
+      },
+      "damaged": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.5,
+        "notes": "Inferred"
+      },
+      "late_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pod"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "30-min grace at depot then refusal"
+      },
+      "promo_billback": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "promo_agreement"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Inferred"
+      },
+      "vague": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.1,
+        "notes": "Inferred"
+      }
+    },
+    "codes": [
+      {
+        "code_id": "costco_damaged",
+        "code": "DMG",
+        "name": "Damaged at receiving",
+        "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_late_delivery",
+        "code": "LATE",
+        "name": "Late or refused delivery",
+        "deduction_type": "late_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_label_fine",
+        "code": "LBL",
+        "name": "Labeling noncompliance",
+        "deduction_type": "label_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_vague",
+        "code": "MISC",
+        "name": "Miscellaneous deduction",
+        "deduction_type": "vague",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_pallet_fine",
+        "code": "PALT",
+        "name": "Pallet noncompliance",
+        "deduction_type": "pallet_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_promo_billback",
+        "code": "PROMO",
+        "name": "Promotional allowance",
+        "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_short_ship",
+        "code": "SHRT",
+        "name": "Shortage at receiving",
+        "deduction_type": "short_ship",
+        "is_published": false
+      }
+    ],
+    "edi_requirements": [
+      {
+        "category": "appointment",
+        "requirement": "Scheduled appointment window; 30-minute grace then refusal",
+        "penalty_if_violated": "Refused delivery → reduced future allocation",
+        "is_verified": true,
+        "source_url": "https://www.chep.com/files/download/costco-delivery-driver-guidelines-kemps-creek-depot-july-21.pdf"
+      },
+      {
+        "category": "asn",
+        "requirement": "EDI 856 via SPS Commerce VAN",
+        "penalty_if_violated": "$50–$200 per incident (inferred)",
+        "is_verified": false,
+        "source_url": "https://www.orderease.com/community/the-2025-guide-to-costco-edi-compliance-automation-chargeback-prevention"
+      },
+      {
+        "category": "carton",
+        "requirement": "50 lb max if hand-lifted; 1500 lbs crush <750lb load, 2500 lbs ≥750lb load",
+        "penalty_if_violated": "Non-compliant packaging 2% chargeback",
+        "is_verified": true,
+        "source_url": "https://www.clubstorepackaging.com/post/costco-packaging-specifications-requirements"
+      },
+      {
+        "category": "label",
+        "requirement": "GS1-128/SSCC, on two adjacent sides; vendor#, PO, item, qty, weight, destination",
+        "penalty_if_violated": "$50–$150/carton (inferred)",
+        "is_verified": false,
+        "source_url": "https://www.orderease.com/community/the-2025-guide-to-costco-edi-compliance-automation-chargeback-prevention"
+      },
+      {
+        "category": "pallet",
+        "requirement": "48x40 footprint; 58 inch max height; iGPS/PECO/CHEP only — no GMA #1 stringer",
+        "penalty_if_violated": "Lean/overhang/underhang chargeback",
+        "is_verified": true,
+        "source_url": "https://www.clubstorepackaging.com/post/costco-packaging-specifications-requirements"
+      }
+    ]
+  },
+  "dtc": {
+    "name": "DTC",
+    "channel_type": "dtc",
+    "dispute_portal_name": null,
+    "dispute_portal_url": null,
+    "dispute_method": null,
+    "notes": "Direct-to-consumer; no deduction model",
+    "rules": {},
+    "codes": [],
+    "edi_requirements": []
+  },
+  "green_basket_market": {
+    "name": "Green Basket Market",
+    "channel_type": "retailer",
+    "dispute_portal_name": "AP email",
+    "dispute_portal_url": null,
+    "dispute_method": "email_buyer",
+    "notes": "Sprouts-archetype: natural/reset-driven; many deductions arrive via UNFI/KeHE statements",
+    "rules": {
+      "short_ship": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Many deductions arrive via UNFI/KeHE statements"
+      },
+      "label_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "label_scan"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "GS1-128 required"
+      },
+      "pallet_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "photo"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Inferred"
+      },
+      "damaged": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Inferred"
+      },
+      "late_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Inferred"
+      },
+      "promo_billback": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "promo_agreement"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Free Fill + Fair Share via reset calendar"
+      },
+      "vague": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.1,
+        "notes": "Inferred"
+      }
+    },
+    "codes": [
+      {
+        "code_id": "green_basket_market_damaged",
+        "code": "DMG",
+        "name": "Damaged",
+        "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_fairshare",
+        "code": "FAIR",
+        "name": "Fair Share reset billback",
+        "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_freefill",
+        "code": "FFL",
+        "name": "Free Fill new-item billback",
+        "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_late_delivery",
+        "code": "LATE",
+        "name": "Late delivery",
+        "deduction_type": "late_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_label_fine",
+        "code": "LBL",
+        "name": "Label fine",
+        "deduction_type": "label_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_vague",
+        "code": "MISC",
+        "name": "Miscellaneous",
+        "deduction_type": "vague",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_pallet_fine",
+        "code": "PALT",
+        "name": "Pallet fine",
+        "deduction_type": "pallet_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_short_ship",
+        "code": "SHRT",
+        "name": "Shortage",
+        "deduction_type": "short_ship",
+        "is_published": false
+      }
+    ],
+    "edi_requirements": [
+      {
+        "category": "appointment",
+        "requirement": "Refresh / category-reset calendar drives placement timing",
+        "penalty_if_violated": "Free Fill / Fair Share billbacks per reset",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "asn",
+        "requirement": "EDI 850/855/860/856/810/812/997 mandatory",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "carton",
+        "requirement": "Standard carton requirements",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "label",
+        "requirement": "GS1-128 (UCC-128) shipping labels required",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      }
+    ]
+  },
+  "harbor_fresh": {
+    "name": "Harbor Fresh",
+    "channel_type": "retailer",
+    "dispute_portal_name": "AP email",
+    "dispute_portal_url": null,
+    "dispute_method": "email_buyer",
+    "notes": "Generic regional; slightly higher recovery — relationship-driven",
+    "rules": {
+      "short_ship": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Slightly higher recovery — relationship-driven"
+      },
+      "label_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "label_scan"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Inferred"
+      },
+      "pallet_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "photo"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Inferred"
+      },
+      "damaged": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.5,
+        "notes": "Inferred"
+      },
+      "late_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Inferred"
+      },
+      "promo_billback": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "promo_agreement"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Inferred"
+      },
+      "vague": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.15,
+        "notes": "Inferred"
+      }
+    },
+    "codes": [
+      {
+        "code_id": "harbor_fresh_damaged",
+        "code": "DMG",
+        "name": "Damaged",
+        "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_late_delivery",
+        "code": "LATE",
+        "name": "Late delivery",
+        "deduction_type": "late_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_label_fine",
+        "code": "LBL",
+        "name": "Label fine",
+        "deduction_type": "label_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_vague",
+        "code": "MISC",
+        "name": "Miscellaneous",
+        "deduction_type": "vague",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_pallet_fine",
+        "code": "PALT",
+        "name": "Pallet fine",
+        "deduction_type": "pallet_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_promo_billback",
+        "code": "PROMO",
+        "name": "Promo billback",
+        "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_short_ship",
+        "code": "SHRT",
+        "name": "Shortage",
+        "deduction_type": "short_ship",
+        "is_published": false
+      }
+    ],
+    "edi_requirements": [
+      {
+        "category": "asn",
+        "requirement": "EDI 856 expected",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "carton",
+        "requirement": "Standard carton requirements",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "label",
+        "requirement": "Standard grocery GS1-128",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "pallet",
+        "requirement": "Standard pallet condition",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      }
+    ]
+  },
+  "kehe": {
+    "name": "KeHE",
+    "channel_type": "distributor",
+    "dispute_portal_name": "K-Solve in KeHE CONNECT Supplier",
+    "dispute_portal_url": "https://connectsupplier.kehe.com/",
+    "dispute_method": "portal",
+    "notes": "180-day cap (newly strict); 48-hour UDR response window. Not in base stores; orders generated against natural-foods-compatible SKU set",
+    "rules": {
+      "short_ship": {
+        "dispute_window_days": 2,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "48-hour UDR window — locks fast"
+      },
+      "label_fine": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "label_scan"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "K-Solve 180-day cap, newly strict"
+      },
+      "pallet_fine": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "photo"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "K-Solve"
+      },
+      "damaged": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "K-Solve; UDR for damage at receipt"
+      },
+      "late_delivery": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pod"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "K-Solve"
+      },
+      "promo_billback": {
+        "dispute_window_days": 180,
+        "auto_deduct": false,
+        "evidence_required": [
+          "promo_agreement"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "MCB + 8% admin fee + $65/DC minimum"
+      },
+      "vague": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.1,
+        "notes": "Connect BI fee 2% of sales falls here"
+      }
+    },
+    "codes": [
+      {
+        "code_id": "kehe_bi",
+        "code": "BI",
+        "name": "Connect BI fee (2% of sales)",
+        "deduction_type": "vague",
+        "is_published": true
+      },
+      {
+        "code_id": "kehe_ep",
+        "code": "EP",
+        "name": "Event Promotion fee",
+        "deduction_type": "promo_billback",
+        "is_published": true
+      },
+      {
+        "code_id": "kehe_freight",
+        "code": "FRT",
+        "name": "Freight allowance",
+        "deduction_type": "vague",
+        "is_published": true
+      },
+      {
+        "code_id": "kehe_late",
+        "code": "LATE",
+        "name": "Late delivery",
+        "deduction_type": "late_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "kehe_label",
+        "code": "LBL",
+        "name": "Labeling noncompliance",
+        "deduction_type": "label_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "kehe_mcb",
+        "code": "MCB",
+        "name": "Manufacturer Chargeback (promo)",
+        "deduction_type": "promo_billback",
+        "is_published": true
+      },
+      {
+        "code_id": "kehe_mcb_fee",
+        "code": "MCBF",
+        "name": "MCB admin fee (8%, $65/DC min)",
+        "deduction_type": "promo_billback",
+        "is_published": true
+      },
+      {
+        "code_id": "kehe_udr",
+        "code": "UDR",
+        "name": "Unloading Discrepancy (shortage/over/damage)",
+        "deduction_type": "short_ship",
+        "is_published": true
+      }
+    ],
+    "edi_requirements": [
+      {
+        "category": "asn",
+        "requirement": "EDI 856 required pre-arrival",
+        "penalty_if_violated": "ASN late = chargeback",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "carton",
+        "requirement": "Standard carton requirements",
+        "penalty_if_violated": "Connect BI fee 2% of sales",
+        "is_verified": true,
+        "source_url": "https://tryintercept.com/blog/kehe-deductions"
+      },
+      {
+        "category": "label",
+        "requirement": "GS1-128 standard with required fields",
+        "penalty_if_violated": "Label fines via K-Solve",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "otif",
+        "requirement": "On-time delivery; UDR triggers on shortage/over/damage at receipt",
+        "penalty_if_violated": "48-hour UDR response window",
+        "is_verified": true,
+        "source_url": "https://tryintercept.com/blog/kehe-deductions"
+      }
+    ]
+  },
+  "mountain_pantry_co": {
+    "name": "Mountain Pantry Co",
+    "channel_type": "retailer",
+    "dispute_portal_name": "AP email",
+    "dispute_portal_url": null,
+    "dispute_method": "email_buyer",
+    "notes": "Generic regional; inferred norms",
+    "rules": {
+      "short_ship": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Inferred norms"
+      },
+      "label_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "label_scan"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Inferred"
+      },
+      "pallet_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "photo"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Inferred"
+      },
+      "damaged": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Inferred"
+      },
+      "late_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Inferred"
+      },
+      "promo_billback": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "promo_agreement"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Inferred"
+      },
+      "vague": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.1,
+        "notes": "Inferred"
+      }
+    },
+    "codes": [
+      {
+        "code_id": "mountain_pantry_co_damaged",
+        "code": "DMG",
+        "name": "Damaged",
+        "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_late_delivery",
+        "code": "LATE",
+        "name": "Late delivery",
+        "deduction_type": "late_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_label_fine",
+        "code": "LBL",
+        "name": "Label fine",
+        "deduction_type": "label_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_vague",
+        "code": "MISC",
+        "name": "Miscellaneous",
+        "deduction_type": "vague",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_pallet_fine",
+        "code": "PALT",
+        "name": "Pallet fine",
+        "deduction_type": "pallet_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_promo_billback",
+        "code": "PROMO",
+        "name": "Promo billback",
+        "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_short_ship",
+        "code": "SHRT",
+        "name": "Shortage",
+        "deduction_type": "short_ship",
+        "is_published": false
+      }
+    ],
+    "edi_requirements": [
+      {
+        "category": "asn",
+        "requirement": "EDI 856 expected",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "carton",
+        "requirement": "Standard carton requirements",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "label",
+        "requirement": "Standard grocery GS1-128",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "pallet",
+        "requirement": "Standard pallet condition",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      }
+    ]
+  },
+  "prairie_provisions": {
+    "name": "Prairie Provisions",
+    "channel_type": "retailer",
+    "dispute_portal_name": "AP email",
+    "dispute_portal_url": null,
+    "dispute_method": "email_buyer",
+    "notes": "Generic regional; inferred norms",
+    "rules": {
+      "short_ship": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Inferred norms; no published windows"
+      },
+      "label_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "label_scan"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Inferred"
+      },
+      "pallet_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "photo"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Inferred"
+      },
+      "damaged": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Inferred"
+      },
+      "late_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Inferred"
+      },
+      "promo_billback": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "promo_agreement"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Inferred"
+      },
+      "vague": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.1,
+        "notes": "Inferred"
+      }
+    },
+    "codes": [
+      {
+        "code_id": "prairie_provisions_damaged",
+        "code": "DMG",
+        "name": "Damaged",
+        "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_late_delivery",
+        "code": "LATE",
+        "name": "Late delivery",
+        "deduction_type": "late_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_label_fine",
+        "code": "LBL",
+        "name": "Label fine",
+        "deduction_type": "label_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_vague",
+        "code": "MISC",
+        "name": "Miscellaneous",
+        "deduction_type": "vague",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_pallet_fine",
+        "code": "PALT",
+        "name": "Pallet fine",
+        "deduction_type": "pallet_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_promo_billback",
+        "code": "PROMO",
+        "name": "Promo billback",
+        "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_short_ship",
+        "code": "SHRT",
+        "name": "Shortage",
+        "deduction_type": "short_ship",
+        "is_published": false
+      }
+    ],
+    "edi_requirements": [
+      {
+        "category": "asn",
+        "requirement": "EDI 856 expected",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "carton",
+        "requirement": "Standard carton requirements",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "label",
+        "requirement": "Standard grocery GS1-128",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "pallet",
+        "requirement": "Standard pallet condition",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      }
+    ]
+  },
+  "southside_grocers": {
+    "name": "Southside Grocers",
+    "channel_type": "retailer",
+    "dispute_portal_name": "Buyer email + AP",
+    "dispute_portal_url": null,
+    "dispute_method": "email_buyer",
+    "notes": "Wegmans-archetype: specialty/local-supplier friendly, buyer-relationship dispute path, no published windows",
+    "rules": {
+      "short_ship": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.5,
+        "notes": "No published window; specialty-friendly buyer-relationship dispute path"
+      },
+      "label_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "label_scan"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "GS1-128 inferred from packaging guide"
+      },
+      "pallet_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "photo"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "4-way pallet standards inferred"
+      },
+      "damaged": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.55,
+        "notes": "No published window"
+      },
+      "late_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "No published OTIF"
+      },
+      "promo_billback": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "promo_agreement"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "No published"
+      },
+      "vague": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.15,
+        "notes": "Specialty-friendly buyer relationship"
+      }
+    },
+    "codes": [
+      {
+        "code_id": "southside_grocers_damaged",
+        "code": "DMG",
+        "name": "Damaged",
+        "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_late_delivery",
+        "code": "LATE",
+        "name": "Late delivery",
+        "deduction_type": "late_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_label_fine",
+        "code": "LBL",
+        "name": "Label fine",
+        "deduction_type": "label_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_vague",
+        "code": "MISC",
+        "name": "Miscellaneous",
+        "deduction_type": "vague",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_pallet_fine",
+        "code": "PALT",
+        "name": "Pallet fine",
+        "deduction_type": "pallet_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_promo_billback",
+        "code": "PROMO",
+        "name": "Promo billback",
+        "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_short_ship",
+        "code": "SHRT",
+        "name": "Shortage",
+        "deduction_type": "short_ship",
+        "is_published": false
+      }
+    ],
+    "edi_requirements": [
+      {
+        "category": "asn",
+        "requirement": "EDI 850/855/810/997; ASN entry via supplier portal",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "carton",
+        "requirement": "Carton size/weight limits, one-PO-per-carton",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "label",
+        "requirement": "GS1-128 case labels with lot/catch weight/expiration; SSCC pallet labels two per pallet",
+        "penalty_if_violated": "Routing-guide inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "pallet",
+        "requirement": "4-way pallet condition standards",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      }
+    ]
+  },
+  "unfi": {
+    "name": "UNFI",
+    "channel_type": "distributor",
+    "dispute_portal_name": "Email + Excel template (Natural)",
+    "dispute_portal_url": null,
+    "dispute_method": "email_excel",
+    "notes": "Natural side: Deductions@unfi.com — .xlsb only, PDFs/screenshots rejected",
+    "rules": {
+      "short_ship": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "30–60 day practical window; Excel-only dispute form"
+      },
+      "label_fine": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "label_scan"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Inferred"
+      },
+      "pallet_fine": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "photo"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Inferred"
+      },
+      "damaged": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Includes unsaleables"
+      },
+      "late_delivery": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pod"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "$250+ late, $500 no-show, $300 short-notice reschedule"
+      },
+      "promo_billback": {
+        "dispute_window_days": 60,
+        "auto_deduct": false,
+        "evidence_required": [
+          "promo_agreement"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "MCB disputes common; unsubstantiated promo backups"
+      },
+      "vague": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.1,
+        "notes": "Vague chargebacks routine; PDFs/screenshots rejected on dispute form"
+      }
+    },
+    "codes": [
+      {
+        "code_id": "unfi_dmg",
+        "code": "DMG",
+        "name": "Damaged product / unsaleable",
+        "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_lat",
+        "code": "LAT",
+        "name": "Late delivery",
+        "deduction_type": "late_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_lbl",
+        "code": "LBL",
+        "name": "Labeling fine",
+        "deduction_type": "label_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_mcb",
+        "code": "MCB",
+        "name": "Manufacturer chargeback (promo)",
+        "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_msc",
+        "code": "MSC",
+        "name": "Miscellaneous deduction",
+        "deduction_type": "vague",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_plt",
+        "code": "PLT",
+        "name": "Pallet noncompliance",
+        "deduction_type": "pallet_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_sht",
+        "code": "SHT",
+        "name": "Shortage",
+        "deduction_type": "short_ship",
+        "is_published": false
+      }
+    ],
+    "edi_requirements": [
+      {
+        "category": "appointment",
+        "requirement": "Natural side: 1 day notice; Conventional: 3 days",
+        "penalty_if_violated": "$300 short-notice reschedule, $500 no-show",
+        "is_verified": true,
+        "source_url": "https://www.spscommerce.com/community/articles/how-natural-suppliers-dispute-unfi-deductions"
+      },
+      {
+        "category": "asn",
+        "requirement": "EDI 856 required",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "label",
+        "requirement": "Standard grocery GS1-128 with UPC/lot/best-by",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "otif",
+        "requirement": "95% fill-rate; service-level fine if missed two consecutive weeks",
+        "penalty_if_violated": "3% service-level fine",
+        "is_verified": true,
+        "source_url": "https://www.spscommerce.com/community/articles/how-natural-suppliers-dispute-unfi-deductions"
+      }
+    ]
+  },
+  "walmart": {
+    "name": "Walmart",
+    "channel_type": "retailer",
+    "dispute_portal_name": "Retail Link / APDP / HighRadius",
+    "dispute_portal_url": "https://retaillink.wal-mart.com/",
+    "dispute_method": "portal",
+    "notes": "Multiple systems by deduction type — APDP for AP shortages/allowances, HighRadius for AR/OTIF",
+    "rules": {
+      "short_ship": {
+        "dispute_window_days": 365,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "pod",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Verified — APDP 12-month window for codes 21–28"
+      },
+      "label_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "label_scan",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.2,
+        "notes": "SQEP fines; window not separately published"
+      },
+      "pallet_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "photo",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.2,
+        "notes": "SQEP Phase 3; $200 admin + $4/pallet"
+      },
+      "damaged": {
+        "dispute_window_days": 365,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.55,
+        "notes": "Code 28; same APDP window as shortage"
+      },
+      "late_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pod",
+          "asn_confirmation"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "OTIF; 3% of COGS; HighRadius dispute window not verified"
+      },
+      "promo_billback": {
+        "dispute_window_days": 730,
+        "auto_deduct": false,
+        "evidence_required": [
+          "promo_agreement"
+        ],
+        "typical_recovery_rate": 0.5,
+        "notes": "Allowance — 24-month APDP window"
+      },
+      "vague": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.1,
+        "notes": "Code 87 catch-all"
+      }
+    },
+    "codes": [
+      {
+        "code_id": "walmart_11",
+        "code": "11",
+        "name": "Price Difference Between PO & Invoice",
+        "deduction_type": "promo_billback",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_13",
+        "code": "13",
+        "name": "Substitution Overcharge",
+        "deduction_type": "short_ship",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_21",
+        "code": "21",
+        "name": "Concealed Shortage",
+        "deduction_type": "short_ship",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_22",
+        "code": "22",
+        "name": "Merchandise Billed Not Shipped",
+        "deduction_type": "short_ship",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_24",
+        "code": "24",
+        "name": "Carton Shortage / Freight Bill Signed Short",
+        "deduction_type": "short_ship",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_25",
+        "code": "25",
+        "name": "No Merchandise Received for Invoice",
+        "deduction_type": "short_ship",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_28",
+        "code": "28",
+        "name": "Carton Damage – Freight Bill Signed Damaged",
+        "deduction_type": "damaged",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_30",
+        "code": "30",
+        "name": "Duplicate Billing",
+        "deduction_type": "vague",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_51",
+        "code": "51",
+        "name": "Promotional Allowance",
+        "deduction_type": "promo_billback",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_59",
+        "code": "59",
+        "name": "Defective Merchandise Allowance",
+        "deduction_type": "damaged",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_87",
+        "code": "87",
+        "name": "Other",
+        "deduction_type": "vague",
+        "is_published": true
+      },
+      {
+        "code_id": "walmart_99",
+        "code": "99",
+        "name": "OTIF",
+        "deduction_type": "late_delivery",
+        "is_published": true
+      }
+    ],
+    "edi_requirements": [
+      {
+        "category": "asn",
+        "requirement": "EDI 856 ASN required before shipment arrives",
+        "penalty_if_violated": "$25/PO if not downloaded (SQEP Phase 1, non-DSDC)",
+        "is_verified": true,
+        "source_url": "https://supplierwiki.supplypike.com/articles/calculating-sqep-fines-by-defect"
+      },
+      {
+        "category": "carton",
+        "requirement": "Walmart-spec carton dimensions and labeling",
+        "penalty_if_violated": "Code 22 perceived shortage if not scannable",
+        "is_verified": true,
+        "source_url": "https://www.8thandwalton.com/blog/walmart-deduction-codes/"
+      },
+      {
+        "category": "label",
+        "requirement": "GS1-128 case labels with Walmart-required fields, two per case",
+        "penalty_if_violated": "$200 admin + $1/case (SQEP Phase 2)",
+        "is_verified": true,
+        "source_url": "https://supplierwiki.supplypike.com/articles/calculating-sqep-fines-by-defect"
+      },
+      {
+        "category": "otif",
+        "requirement": "Prepaid 90% / Collect 98% on-time, 95% in-full",
+        "penalty_if_violated": "3% of COGS on non-compliant cases",
+        "is_verified": true,
+        "source_url": "https://vendormint.com/walmart-on-time-in-full-otif-compliance/"
+      },
+      {
+        "category": "pallet",
+        "requirement": "Walmart pallet spec, slip-sheet/wrap, height limits",
+        "penalty_if_violated": "$200 admin + $4/pallet (SQEP Phase 3)",
+        "is_verified": true,
+        "source_url": "https://supplierwiki.supplypike.com/articles/calculating-sqep-fines-by-defect"
+      }
+    ]
+  },
+  "whole_foods": {
+    "name": "Whole Foods",
+    "channel_type": "retailer",
+    "dispute_portal_name": "VIP / Smartsheet",
+    "dispute_portal_url": "https://vip.wholefoods.com",
+    "dispute_method": "email_excel",
+    "notes": "Pay-by-PO program gates dispute access; regional fragmentation",
+    "rules": {
+      "short_ship": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Not published; Pay-by-PO program required"
+      },
+      "label_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "label_scan"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Not published"
+      },
+      "pallet_fine": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "photo"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Not published"
+      },
+      "damaged": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.5,
+        "notes": "Not published"
+      },
+      "late_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "No published OTIF program"
+      },
+      "promo_billback": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "promo_agreement"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Regional fragmentation — different practices per region"
+      },
+      "vague": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.1,
+        "notes": "Cost-feed mismatches drive opaque deductions"
+      }
+    },
+    "codes": [
+      {
+        "code_id": "wholefoods_damaged",
+        "code": "DMG",
+        "name": "Damaged product",
+        "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_late_delivery",
+        "code": "LATE",
+        "name": "Late delivery",
+        "deduction_type": "late_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_label_fine",
+        "code": "LBL",
+        "name": "Labeling fine",
+        "deduction_type": "label_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_vague",
+        "code": "MISC",
+        "name": "Miscellaneous",
+        "deduction_type": "vague",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_pallet_fine",
+        "code": "PALT",
+        "name": "Pallet fine",
+        "deduction_type": "pallet_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_promo_billback",
+        "code": "PROMO",
+        "name": "Promo billback",
+        "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_short_ship",
+        "code": "SHRT",
+        "name": "Shortage",
+        "deduction_type": "short_ship",
+        "is_published": false
+      }
+    ],
+    "edi_requirements": [
+      {
+        "category": "asn",
+        "requirement": "EDI 850/855/810/856/997",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "carton",
+        "requirement": "Category-specific (Center Store, Perishable, Adult Beverage, Culinary)",
+        "penalty_if_violated": "Inferred",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "label",
+        "requirement": "GS1-128, regional spec varies",
+        "penalty_if_violated": "Regional fragmentation — opaque deductions",
+        "is_verified": false,
+        "source_url": "https://www.spscommerce.com/community/articles/how-to-navigate-the-whole-foods-supplier-portal"
+      },
+      {
+        "category": "otif",
+        "requirement": "No published OTIF program",
+        "penalty_if_violated": null,
+        "is_verified": false,
+        "source_url": null
+      }
+    ]
+  }
+}
