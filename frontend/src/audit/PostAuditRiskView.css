@@ -1,0 +1,302 @@
+.audit {
+  margin-top: 36px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+.audit h2 {
+  border: none;
+  padding-bottom: 0;
+  margin-bottom: 4px;
+}
+
+.audit-context {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 16px;
+  margin: 0;
+  max-width: 720px;
+}
+
+.audit-empty {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 16px;
+  padding: 32px;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+}
+
+.audit-header {
+  margin-bottom: 18px;
+}
+
+.audit-headline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--accent-red);
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  font-family: var(--serif);
+}
+
+.audit-headline-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.audit-headline-num {
+  font-size: 44px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-red);
+  line-height: 1.05;
+  margin-bottom: 4px;
+}
+
+.audit-headline-sub {
+  font-size: 15px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.audit-headline-delta {
+  font-size: 15px;
+  color: var(--accent-green);
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+.audit-toggle {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  align-items: start;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.audit-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  accent-color: var(--accent-green);
+  cursor: pointer;
+}
+
+.audit-toggle span {
+  font-size: 15px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.audit-toggle span strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.audit-realized,
+.audit-by-retailer,
+.audit-by-evidence {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-family: var(--serif);
+}
+
+.audit-section-head {
+  margin-bottom: 14px;
+}
+
+.audit-section-head h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--serif);
+}
+
+.audit-section-desc {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 15px;
+  margin: 0;
+  max-width: 720px;
+  line-height: 1.5;
+}
+
+.audit-realized-empty {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 15px;
+  padding: 12px 0;
+}
+
+.audit-realized-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.audit-stat {
+  background: #fafafa;
+  border: 1px solid var(--rule);
+  padding: 12px 14px;
+}
+
+.audit-stat-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.audit-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+  line-height: 1.1;
+}
+
+.audit-realized-auditor {
+  font-size: 15px;
+  color: var(--ink);
+  font-style: italic;
+  margin: 0 0 12px;
+}
+
+.audit-realized-auditor strong {
+  font-style: normal;
+  font-weight: 700;
+}
+
+.audit-realized-table,
+.audit-retailer-table,
+.audit-evidence-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-family: var(--serif);
+}
+
+.audit-realized-table th,
+.audit-realized-table td,
+.audit-retailer-table th,
+.audit-retailer-table td,
+.audit-evidence-table th,
+.audit-evidence-table td {
+  text-align: left;
+  padding: 9px 14px;
+  border-bottom: 1px solid #eef0f2;
+}
+
+.audit-realized-table th,
+.audit-retailer-table th,
+.audit-evidence-table th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+  background: #f1f2f4;
+  border-bottom: 1px solid var(--rule);
+}
+
+.audit-realized-table .num,
+.audit-retailer-table .num,
+.audit-evidence-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.audit-realized-table tr:last-child td,
+.audit-retailer-table tr:last-child td,
+.audit-evidence-table tr:last-child td {
+  border-bottom: none;
+}
+
+.audit-id {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.audit-retailer-name {
+  font-weight: 700;
+}
+
+.audit-profile {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--ink-soft);
+  max-width: 360px;
+}
+
+.audit-high {
+  color: var(--accent-red);
+  font-weight: 700;
+}
+
+.audit-evidence-marker {
+  display: inline-block;
+  font-size: 16px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.audit-evidence-marker.marker-digital {
+  color: var(--accent-green);
+}
+
+.audit-evidence-marker.marker-paper {
+  color: var(--accent-gold);
+}
+
+.audit-evidence-marker.marker-missing {
+  color: var(--accent-red);
+}
+
+.evidence-paper td,
+.evidence-missing td {
+  background: #fff;
+}
+
+.evidence-missing {
+  background: #fff5f5;
+}
+
+.audit-trace-btn {
+  font-family: var(--serif);
+  font-size: 14px;
+  background: var(--panel);
+  border: 1px solid var(--accent-red);
+  color: var(--accent-red);
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.audit-trace-btn:hover {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .audit-headline {
+    grid-template-columns: 1fr;
+  }
+  .audit-realized-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

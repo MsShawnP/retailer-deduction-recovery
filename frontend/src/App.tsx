@@ -8,6 +8,7 @@ import RecoverySimulationView from "./simulation/RecoverySimulationView";
 import CostToDisputeView from "./cost/CostToDisputeView";
 import DisputeBuilderView from "./builder/DisputeBuilderView";
 import TimelinePressureView from "./pressure/TimelinePressureView";
+import PostAuditRiskView from "./audit/PostAuditRiskView";
 import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
@@ -177,6 +178,11 @@ export default function App() {
       />
 
       <TimelinePressureView
+        cohort={filteredDeductions ?? deductions}
+        onTrace={setTracedDeductionId}
+      />
+
+      <PostAuditRiskView
         cohort={filteredDeductions ?? deductions}
         onTrace={setTracedDeductionId}
       />

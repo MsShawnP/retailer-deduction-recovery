@@ -145,8 +145,17 @@ views for each feature before moving to the next.
       compounding story (urgent + paper/missing cells highlighted
       red). Selectable bucket cards drive a top-25 urgent-first
       table with a Trace cross-link.
-- [ ] Post-audit risk exposure — based on current evidence gaps,
-      calculate and visualize retroactive clawback vulnerability
+- [x] Post-audit risk exposure — based on current evidence gaps,
+      calculate and visualize retroactive clawback vulnerability —
+      `PostAuditRiskView` runs an evidence-quality risk model
+      (digital 10% / paper 60% / missing 85% probability of
+      successful clawback) against forward-looking (non-post-audit)
+      deductions in the cohort. Headline exposure number, "project
+      with digital evidence" toggle showing the reduction delta,
+      "already happened" panel with stats and a top-10 table of
+      realized post-audit claims, exposure-by-retailer table with
+      hardcoded retailer audit profiles, and exposure-by-evidence-
+      bucket breakdown. Trace cross-link on realized claims.
 - [ ] Retailer scorecard — deduction patterns, dispute acceptance
       rates, deadline strictness, aggressiveness by retailer
 - [ ] Root cause clustering by origin point — deductions grouped by

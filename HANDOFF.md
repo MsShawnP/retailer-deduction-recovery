@@ -403,3 +403,36 @@ deduction type, and evidence quality, and contrast against the
 post-audit deductions already in the dataset.
 
 ---
+
+## 2026-05-08 13:00
+
+**What changed:** Phase 3 task 7 — post-audit risk exposure landed.
+`PostAuditRiskView` runs an evidence-quality clawback model over
+forward-looking deductions and pairs it with the 37 realized
+post-audit claims already in the dataset.
+
+**Why:** Seventh Phase 3 feature. Names the hidden threat — money
+the supplier thought was settled — and ties the exposure number to
+the same digital-pack lever the simulation surfaces.
+
+**State:** Headline tile: $714K exposure (62.2% of $1.15M forward
+portfolio); digital-evidence projection drops it to $115K, a $600K
+reduction. Realized panel: 37 claims / $183K / avg 18.9-month
+lookback / top auditor Audit Partners Limited at $87K. Retailer
+breakdown merges forward exposure with realized claims — Walmart
+$324K exposed, 14 historical claims already taken; UNFI $135K, 10
+claims; KeHE $87K, 7 claims; Costco $35K, 6 claims; Whole Foods
+$68K with no realized claims yet. Hardcoded retailer audit profiles
+explain why. Evidence breakdown: $535K paper exposure, $174K missing
+exposure, only $5K digital exposure. Trace cross-link on top-10
+realized claims. `screenshot-audit.mjs` green; zero JS errors. Build
+passes. PLAN.md Phase 3 task 7 checked off. 2 Phase 3 features
+remaining (retailer scorecard, origin clustering).
+
+**Next:** Phase 3 task 8 — retailer scorecard. Per-retailer view of
+deduction patterns, dispute acceptance rates, deadline strictness,
+deduction-type mix, and aggressiveness. Plugs into the same cohort.
+Pull together the retailer-side numbers that have been ambient
+across other views into one comparable scorecard.
+
+---
