@@ -214,3 +214,30 @@ deduction's six layers in parallel; causation tracing shows one
 order's life sequentially.
 
 ---
+
+## 2026-05-07 22:43 — /wrap
+
+**Started from:** Project just initialized, no code or data.
+
+**Did:** Built end-to-end. Phase 1 (research, schema, generation
+pipeline, JSON export, validator) → Phase 2 (Vite/React/TS scaffold,
+d3-sankey 6-layer flow, click-to-zoom, Economist palette + serif
+typography, dropdown filter, retailer/distributor table split,
+selection-state architecture wiring KPIs and tables) → Phase 3 task 1
+(deduction explorer with 3-col 6-card drill-down, prev/next/random
+nav, root-cause prose).
+
+**State:** Local DB rebuildable end-to-end via
+`python scripts/build_deductions_db.py --full` (36 PASS / 0 FAIL).
+React app at http://localhost:5173/: KPIs / dropdown / Sankey /
+explorer / 3 tables, all driven off a single `selection` state.
+Origin/master fast-forwarded with ~25 commits since init. Phases 1
+and 2 done; Phase 3 task 1 done; 8 Phase 3 features remaining.
+
+**Next:** Phase 3 task 2 — causation tracing. Sequential timeline
+of one order: PO → pack → label decision → ship → BOL → receiving
+→ deduction → dispute → outcome. Likely a new component (different
+framing than the explorer's parallel cards); plug into the same
+`selection` state. Source data already in JSON.
+
+---

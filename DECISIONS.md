@@ -54,6 +54,38 @@ Each entry:
 - **Do not:** modify the cinderhaven-data repo directly from this
   project
 
+### 2026-05-07 — Layer on base `chargebacks` table; do not replace it
+- **Why:** The base cinderhaven-data `chargebacks` table is shared
+  across portfolio projects (short-ship-cost, others). Replacing it
+  with this project's richer `deductions` table would break sibling
+  projects that read it. Promoting `chargebacks` to a view derived
+  from `deductions` was considered and rejected as too high-cost
+  for V1 scope. The new `deductions` table aggregates to
+  chargebacks-equivalent monthly totals; both can coexist.
+- **Scope:** data pipeline — schema choice
+- **Do not:** modify, drop, or restructure the base `chargebacks`
+  table from this repo's pipeline. New deduction modeling goes
+  into the new tables; the base stays untouched.
+
+### 2026-05-07 — Single `selection` state in App.tsx is the wiring backbone
+- **Why:** The whole app — Sankey, dropdown filter, deduction
+  explorer, KPIs, and tables — derives its filtered view from one
+  `selection: Selection | null` value lifted into App.tsx. Adding
+  the explorer required zero changes to the Sankey or tables; the
+  remaining 8 Phase 3 feature views (causation tracing, simulation,
+  cost-to-dispute, dispute builder, timeline pressure, post-audit
+  risk, retailer scorecard, origin clustering) plug into the same
+  signal. Per-view local state was considered and rejected because
+  cross-view synchronization (clicking the Sankey updates the
+  dropdown, the explorer pivots, the tables filter) is a core
+  product requirement, not an optional nicety.
+- **Scope:** global — frontend architecture
+- **Do not:** introduce per-view selection state or duplicate
+  filter logic. New feature views read from `selection`, write via
+  `setSelection`, and let App.tsx coordinate. Filter recomputation
+  on the deductions array stays in App.tsx (`filteredDeductions`)
+  so every consumer sees the same cohort.
+
 ---
 
 ## Data & Schema
