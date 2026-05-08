@@ -43,14 +43,19 @@ views for each feature before moving to the next.
       edi_requirements) via `scripts/build_deductions_db.py`. Dynamic
       generators (orders, deductions, disputes, etc.) are the next
       tasks below.
-- [ ] Generate synthetic deduction data — realistic mix of types
+- [x] Generate synthetic deduction data — realistic mix of types
       (short ship, labeling fines, pallet noncompliance, promo
-      disputes, damaged product, late delivery, vague codes)
-- [ ] Generate synthetic dispute data — timelines, evidence submitted
+      disputes, damaged product, late delivery, vague codes) — 3,333
+      deductions, $1.4M including post-audit claims, distribution
+      across all 7 types
+- [x] Generate synthetic dispute data — timelines, evidence submitted
       (handwritten notes vs. digital records), outcomes, missed
-      deadlines
-- [ ] Generate synthetic pack/ship records — what was actually picked,
-      packed, and labeled per order
+      deadlines — 1,505 disputes (45% file rate), $99K recovered
+      (8.6%), 75% handwritten-only evidence
+- [x] Generate synthetic pack/ship records — what was actually picked,
+      packed, and labeled per order — 5,838 pack_records and 5,838
+      shipments, encoding generic-label / paper-only / lost-evidence
+      reality
 - [ ] Build JSON export script — transform SQLite into the JSON
       structures the React app needs
 - [ ] Validate synthetic data — deduction volumes and dollar amounts
