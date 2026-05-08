@@ -51,7 +51,11 @@
   transition: opacity 0.15s ease;
 }
 
-.sankey-nodes rect {
+.sankey-node-rect {
   cursor: pointer;
   transition: opacity 0.15s ease;
+}
+
+.sankey-svg {
+  cursor: default;
 }

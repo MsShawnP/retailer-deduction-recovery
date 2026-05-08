@@ -166,3 +166,81 @@ export const LAYER_TITLES = [
   "Dispute timeliness",
   "Outcome",
 ];
+
+// ---- Path helpers for click-to-zoom and table filtering ----
+
+export function pathIds(d: Deduction): string[] {
+  const t  = TYPE_LABELS[d.deduction_type] || d.deduction_type;
+  const rc = rootCauseFor(d);
+  const eq = evidenceQualityFor(d);
+  const ac = accessibilityFor(d);
+  const tm = timelinessFor(d);
+  const oc = outcomeFor(d);
+  return [
+    `0:${t}`,
+    `1:${rc}`,
+    `2:${eq}`,
+    `3:${ac}`,
+    `4:${tm}`,
+    `5:${oc}`,
+  ];
+}
+
+export type Selection =
+  | { kind: "node"; nodeId: string }
+  | { kind: "link"; source: string; target: string };
+
+export function isOnSelectedPath(d: Deduction, sel: Selection | null): boolean {
+  if (!sel) return true;
+  const ids = pathIds(d);
+  if (sel.kind === "node") return ids.includes(sel.nodeId);
+  const layer = parseInt(sel.source.split(":")[0], 10);
+  return ids[layer] === sel.source && ids[layer + 1] === sel.target;
+}
+
+export function highlightedLinkSet(selectedDeductions: Deduction[]): Set<string> {
+  const out = new Set<string>();
+  for (const d of selectedDeductions) {
+    const ids = pathIds(d);
+    for (let i = 0; i < ids.length - 1; i++) {
+      out.add(`${ids[i]}>>${ids[i + 1]}`);
+    }
+  }
+  return out;
+}
+
+export function highlightedNodeSet(selectedDeductions: Deduction[]): Set<string> {
+  const out = new Set<string>();
+  for (const d of selectedDeductions) {
+    for (const id of pathIds(d)) out.add(id);
+  }
+  return out;
+}
+
+// Human-readable label for a selection — used in the filter chip.
+export function selectionLabel(sel: Selection | null): string {
+  if (!sel) return "";
+  if (sel.kind === "node") {
+    const [layerStr, ...rest] = sel.nodeId.split(":");
+    const layer = parseInt(layerStr, 10);
+    return `${LAYER_TITLES[layer]} = ${rest.join(":")}`;
+  }
+  const [, ...srcRest] = sel.source.split(":");
+  const [, ...tgtRest] = sel.target.split(":");
+  return `${srcRest.join(":")} → ${tgtRest.join(":")}`;
+}
+
+// Outcome-specific colors. Layer 5 nodes need hue-distinct shades for
+// the four lost_* outcomes so a color-blind viewer can tell them apart.
+// Lost variants vary in HUE, not just lightness.
+export const OUTCOME_COLORS: Record<string, string> = {
+  "Won full":           "#2a6f4d",  // deep green
+  "Won partial":        "#6aa07c",  // light green
+  Pending:              "#6e8aa7",  // slate blue
+  Abandoned:            "#b08a3a",  // mustard
+  "Lost — evidence":    "#94221f",  // deep red — biggest cause
+  "Lost — deadline":    "#d97a1a",  // amber — time-based
+  "Lost — no response": "#5a4a8c",  // slate purple
+  "Lost — other":       "#6a6a6a",  // gray
+  "Never filed":        "#2a2a2a",  // charcoal
+};

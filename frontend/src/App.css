@@ -140,6 +140,77 @@ tr:last-child td { border-bottom: 0; }
   color: var(--ink);
 }
 
+.selection-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: #fff8e6;
+  border: 1px solid #d4b04a;
+  border-left: 3px solid #b08a3a;
+  font-size: 13px;
+}
+
+.selection-label {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.selection-value {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.selection-count {
+  margin-left: auto;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.selection-clear {
+  background: transparent;
+  border: 1px solid var(--rule);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--ink-soft);
+  padding: 0;
+}
+
+.selection-clear:hover {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.filtered-tag {
+  margin-left: 10px;
+  padding: 2px 8px;
+  background: #b08a3a;
+  color: #fff;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.empty {
+  text-align: center !important;
+  font-style: italic;
+  color: var(--ink-faint);
+  padding: 24px !important;
+}
+
 .loading, .error {
   padding: 64px 28px;
   text-align: center;

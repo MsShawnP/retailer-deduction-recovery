@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import type { Deduction, Summary } from "./types";
+import { useEffect, useMemo, useState } from "react";
+import type { ByRetailer, ByType, Deduction, Summary } from "./types";
 import { loadDeductions, loadSummary, formatDollars, formatPercent, formatCount } from "./data";
 import SankeyView from "./sankey/SankeyView";
+import { isOnSelectedPath, selectionLabel, type Selection } from "./sankey/data";
 import "./App.css";
 
 export default function App() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [deductions, setDeductions] = useState<Deduction[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selection, setSelection] = useState<Selection | null>(null);
 
   useEffect(() => {
     Promise.all([loadSummary(), loadDeductions()])
@@ -18,10 +20,40 @@ export default function App() {
       .catch((e) => setError(String(e)));
   }, []);
 
+  // Filter deductions and re-aggregate when a Sankey path is selected.
+  const filteredDeductions = useMemo(() => {
+    if (!deductions || !selection) return deductions;
+    return deductions.filter((d) => isOnSelectedPath(d, selection));
+  }, [deductions, selection]);
+
+  const byType: ByType[] = useMemo(() => {
+    if (!filteredDeductions || !summary) return [];
+    if (!selection) return summary.by_type;
+    return aggregateByType(filteredDeductions);
+  }, [filteredDeductions, selection, summary]);
+
+  const byRetailer: ByRetailer[] = useMemo(() => {
+    if (!filteredDeductions || !summary) return [];
+    if (!selection) return summary.by_retailer;
+    return aggregateByRetailer(filteredDeductions);
+  }, [filteredDeductions, selection, summary]);
+
   if (error) return <div className="error">Error loading data: {error}</div>;
   if (!summary || !deductions) return <div className="loading">Loading…</div>;
 
-  const { totals, by_type, by_retailer } = summary;
+  const { totals } = summary;
+
+  // KPIs reflect filtered selection when active
+  const filteredKpis = selection && filteredDeductions ? computeKpis(filteredDeductions) : null;
+  const kpiCount = filteredKpis?.count ?? totals.deductions_count;
+  const kpiDollar = filteredKpis?.dollar ?? totals.deductions_dollar;
+  const kpiAnnualized = filteredKpis ? (kpiDollar * 12 / summary.window.months) : totals.annualized_dollar;
+  const kpiRecovered = filteredKpis?.recovered ?? totals.disputes_recovered;
+  const kpiRecoveryRate = kpiDollar ? kpiRecovered / kpiDollar : 0;
+  const kpiNoDisputeCount = filteredKpis?.noDisputeCount ?? totals.deductions_no_dispute_count;
+  const kpiNoDisputeDollar = filteredKpis?.noDisputeDollar ?? totals.deductions_no_dispute_dollar;
+  const kpiLaborHours = filteredKpis?.laborHours ?? totals.labor_hours;
+  const kpiFte = kpiLaborHours / 2080;
 
   return (
     <div className="app">
@@ -32,17 +64,26 @@ export default function App() {
         </p>
       </header>
 
+      {selection && (
+        <div className="selection-chip">
+          <span className="selection-label">Filter:</span>
+          <span className="selection-value">{selectionLabel(selection)}</span>
+          <span className="selection-count">{formatCount(kpiCount)} deductions • {formatDollars(kpiDollar)}</span>
+          <button onClick={() => setSelection(null)} className="selection-clear">×</button>
+        </div>
+      )}
+
       <section className="kpi-row">
-        <Kpi label="Annualized deductions" value={formatDollars(totals.annualized_dollar)} sub="against ~$25M wholesale" />
-        <Kpi label="Recovery rate" value={formatPercent(totals.recovery_rate)} sub={`${formatDollars(totals.disputes_recovered)} recovered`} />
-        <Kpi label="Labor on disputes" value={`${formatCount(totals.labor_hours)} hrs`} sub={`~${totals.fte_equivalent.toFixed(1)} FTE`} />
-        <Kpi label="Undisputed losses" value={formatDollars(totals.deductions_no_dispute_dollar)} sub={`${formatCount(totals.deductions_no_dispute_count)} deductions never filed`} />
+        <Kpi label="Annualized deductions" value={formatDollars(kpiAnnualized)} sub="against ~$25M wholesale" />
+        <Kpi label="Recovery rate" value={formatPercent(kpiRecoveryRate)} sub={`${formatDollars(kpiRecovered)} recovered`} />
+        <Kpi label="Labor on disputes" value={`${formatCount(Math.round(kpiLaborHours))} hrs`} sub={`~${kpiFte.toFixed(1)} FTE`} />
+        <Kpi label="Undisputed losses" value={formatDollars(kpiNoDisputeDollar)} sub={`${formatCount(kpiNoDisputeCount)} deductions never filed`} />
       </section>
 
-      <SankeyView deductions={deductions} />
+      <SankeyView deductions={deductions} selection={selection} onSelect={setSelection} />
 
       <section className="break">
-        <h2>By deduction type</h2>
+        <h2>By deduction type{selection && <span className="filtered-tag">filtered</span>}</h2>
         <table>
           <thead>
             <tr>
@@ -54,7 +95,7 @@ export default function App() {
             </tr>
           </thead>
           <tbody>
-            {by_type.map((t) => (
+            {byType.map((t) => (
               <tr key={t.deduction_type}>
                 <td>{t.deduction_type.replace(/_/g, " ")}</td>
                 <td className="num">{formatCount(t.count)}</td>
@@ -63,12 +104,17 @@ export default function App() {
                 <td className="num">{formatPercent(t.pct_dollars)}</td>
               </tr>
             ))}
+            {byType.length === 0 && (
+              <tr>
+                <td colSpan={5} className="empty">No deductions match this selection.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </section>
 
       <section className="break">
-        <h2>By retailer</h2>
+        <h2>By retailer{selection && <span className="filtered-tag">filtered</span>}</h2>
         <table>
           <thead>
             <tr>
@@ -80,7 +126,7 @@ export default function App() {
             </tr>
           </thead>
           <tbody>
-            {by_retailer.map((r) => (
+            {byRetailer.map((r) => (
               <tr key={r.retailer_id}>
                 <td>{r.name}</td>
                 <td className="num">{formatCount(r.deductions)}</td>
@@ -89,6 +135,11 @@ export default function App() {
                 <td className="num">{formatPercent(r.recovery_rate)}</td>
               </tr>
             ))}
+            {byRetailer.length === 0 && (
+              <tr>
+                <td colSpan={5} className="empty">No deductions match this selection.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </section>
@@ -104,4 +155,79 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub: string 
       <div className="kpi-sub">{sub}</div>
     </div>
   );
+}
+
+function computeKpis(ds: Deduction[]) {
+  let dollar = 0;
+  let recovered = 0;
+  let noDisputeCount = 0;
+  let noDisputeDollar = 0;
+  let laborHours = 0;
+  for (const d of ds) {
+    dollar += d.amount;
+    if (d.dispute) {
+      recovered += d.dispute.recovered_amount || 0;
+      laborHours += d.dispute.labor_hours || 0;
+    } else {
+      noDisputeCount++;
+      noDisputeDollar += d.amount;
+    }
+  }
+  return {
+    count: ds.length,
+    dollar,
+    recovered,
+    noDisputeCount,
+    noDisputeDollar,
+    laborHours,
+  };
+}
+
+function aggregateByType(ds: Deduction[]): ByType[] {
+  const totalCount = ds.length;
+  const totalDollars = ds.reduce((s, d) => s + d.amount, 0);
+  const acc: Record<string, { count: number; dollar: number }> = {};
+  for (const d of ds) {
+    const k = d.deduction_type;
+    acc[k] = acc[k] || { count: 0, dollar: 0 };
+    acc[k].count += 1;
+    acc[k].dollar += d.amount;
+  }
+  return Object.entries(acc)
+    .map(([k, v]) => ({
+      deduction_type: k,
+      count: v.count,
+      dollar: v.dollar,
+      pct_count: totalCount ? v.count / totalCount : 0,
+      pct_dollars: totalDollars ? v.dollar / totalDollars : 0,
+    }))
+    .sort((a, b) => b.dollar - a.dollar);
+}
+
+function aggregateByRetailer(ds: Deduction[]): ByRetailer[] {
+  const acc: Record<string, { name: string; channel_type: string; deductions: number; dollar: number; recovered: number }> = {};
+  for (const d of ds) {
+    const id = d.retailer.id ?? d.retailer.name.toLowerCase();
+    acc[id] = acc[id] || {
+      name: d.retailer.name,
+      channel_type: d.retailer.channel_type,
+      deductions: 0,
+      dollar: 0,
+      recovered: 0,
+    };
+    acc[id].deductions += 1;
+    acc[id].dollar += d.amount;
+    acc[id].recovered += d.dispute?.recovered_amount || 0;
+  }
+  return Object.entries(acc)
+    .map(([retailer_id, v]) => ({
+      retailer_id,
+      name: v.name,
+      channel_type: v.channel_type,
+      deductions: v.deductions,
+      dollar: v.dollar,
+      recovered: v.recovered,
+      recovery_rate: v.dollar ? v.recovered / v.dollar : 0,
+    }))
+    .sort((a, b) => b.dollar - a.dollar);
 }
