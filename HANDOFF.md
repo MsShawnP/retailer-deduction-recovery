@@ -159,3 +159,31 @@ cause, evidence quality, accessibility, timeliness) plus its order /
 shipment / pack record / dispute chain.
 
 ---
+
+## 2026-05-07 22:16
+
+**What changed:** Phase 2 polish landed — Economist palette, serif
+typography at 18/16/15px minimums, table split into retailer +
+distributor, full-bleed Sankey with reversed teal gradient,
+simplified outcome colors (red/green/gray), and a deduction-type
+dropdown bidirectionally synced with the Sankey selection.
+
+**Why:** Locked in the visual language and interaction pattern
+before nine Phase 3 features inherit them. Cheaper to fix the
+foundation now than to repaint nine views later.
+
+**State:** Landing page is the centerpiece — KPIs, dropdown filter,
+full-bleed Sankey with click-to-zoom, and three tables (by type,
+by retailer, by distributor) all driven off a single `selection`
+state. Hover and click both work; tables and KPIs recompute from the
+filtered cohort. Playwright screenshot scripts in `frontend/`
+(default, click, dropdown) verify behavior visually. Phase 3 not
+started.
+
+**Next:** Phase 3 task 1 — deduction explorer. Build a six-layer
+drill-down view below the Sankey that surfaces, for the currently
+selected cohort, the deduction itself / visibility-pattern / root
+cause / evidence quality / accessibility / timeliness. Plugs into
+the same `selection` state — no architectural change needed.
+
+---
