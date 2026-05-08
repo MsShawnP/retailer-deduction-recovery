@@ -2,20 +2,29 @@
 -- Loads retailers, retailer_rules, deduction_codes, edi_requirements.
 -- Run after seed_deduction_schema.sql.
 --
+-- Retailer set matches the base cinderhaven-data fictional chain
+-- names (Southside Grocers, Green Basket Market, Prairie Provisions,
+-- Mountain Pantry Co, Harbor Fresh) plus KeHE as a separate
+-- distributor channel. Wegmans/Sprouts research (research/retailers/)
+-- is the source for archetype behaviors but is not used as chain
+-- names — see memory/project_regional_chain_archetypes.md.
+--
 -- Recovery rates and inferred values are calibration choices for
--- synthetic data; flagged in `notes` where unverified. See
--- research/retailers/<slug>.md for sources.
+-- synthetic data; flagged in `notes` where unverified.
 
 -- ---------- retailers ----------
 INSERT INTO retailers (retailer_id, name, channel_type, dispute_portal_name, dispute_portal_url, dispute_method, notes) VALUES
-  ('walmart',     'Walmart',                'retailer',    'Retail Link / APDP / HighRadius',     'https://retaillink.wal-mart.com/',     'portal',       'Multiple systems by deduction type — APDP for AP shortages/allowances, HighRadius for AR/OTIF'),
-  ('costco',      'Costco',                 'retailer',    'Costco Vendor Portal',                'https://fssts.costco.com/',            'portal',       'Lower-tech than Walmart; depot cross-dock model'),
-  ('whole_foods', 'Whole Foods',            'retailer',    'VIP / Smartsheet',                    'https://vip.wholefoods.com',           'email_excel',  'Pay-by-PO program gates dispute access; regional fragmentation'),
-  ('unfi',        'UNFI',                   'distributor', 'Email + Excel template (Natural)',    NULL,                                   'email_excel',  'Natural side: Deductions@unfi.com — .xlsb only, PDFs/screenshots rejected'),
-  ('kehe',        'KeHE',                   'distributor', 'K-Solve in KeHE CONNECT Supplier',    'https://connectsupplier.kehe.com/',    'portal',       '180-day cap (newly strict); 48-hour UDR response window'),
-  ('wegmans',     'Wegmans',                'retailer',    'Email + buyer relationship',          NULL,                                   'email_buyer',  'AccountsPayable@wegmans.com or category buyer; specialty-friendly'),
-  ('sprouts',     'Sprouts Farmers Market', 'retailer',    'Workday Supplier Portal',             'https://vendors.sprouts.com',          'mixed',        'Workday for AP; many deductions arrive via UNFI/KeHE statements'),
-  ('dtc',         'DTC',                    'dtc',         NULL,                                  NULL,                                   NULL,           'Direct-to-consumer; no deduction model');
+  ('walmart',             'Walmart',                 'retailer',    'Retail Link / APDP / HighRadius',  'https://retaillink.wal-mart.com/',     'portal',       'Multiple systems by deduction type — APDP for AP shortages/allowances, HighRadius for AR/OTIF'),
+  ('costco',              'Costco',                  'retailer',    'Costco Vendor Portal',             'https://fssts.costco.com/',            'portal',       'Lower-tech than Walmart; depot cross-dock model'),
+  ('whole_foods',         'Whole Foods',             'retailer',    'VIP / Smartsheet',                 'https://vip.wholefoods.com',           'email_excel',  'Pay-by-PO program gates dispute access; regional fragmentation'),
+  ('unfi',                'UNFI',                    'distributor', 'Email + Excel template (Natural)', NULL,                                   'email_excel',  'Natural side: Deductions@unfi.com — .xlsb only, PDFs/screenshots rejected'),
+  ('kehe',                'KeHE',                    'distributor', 'K-Solve in KeHE CONNECT Supplier', 'https://connectsupplier.kehe.com/',    'portal',       '180-day cap (newly strict); 48-hour UDR response window. Not in base stores; orders generated against natural-foods-compatible SKU set'),
+  ('southside_grocers',   'Southside Grocers',       'retailer',    'Buyer email + AP',                 NULL,                                   'email_buyer',  'Wegmans-archetype: specialty/local-supplier friendly, buyer-relationship dispute path, no published windows'),
+  ('green_basket_market', 'Green Basket Market',     'retailer',    'AP email',                         NULL,                                   'email_buyer',  'Sprouts-archetype: natural/reset-driven; many deductions arrive via UNFI/KeHE statements'),
+  ('prairie_provisions',  'Prairie Provisions',      'retailer',    'AP email',                         NULL,                                   'email_buyer',  'Generic regional; inferred norms'),
+  ('mountain_pantry_co',  'Mountain Pantry Co',      'retailer',    'AP email',                         NULL,                                   'email_buyer',  'Generic regional; inferred norms'),
+  ('harbor_fresh',        'Harbor Fresh',            'retailer',    'AP email',                         NULL,                                   'email_buyer',  'Generic regional; slightly higher recovery — relationship-driven'),
+  ('dtc',                 'DTC',                     'dtc',         NULL,                               NULL,                                   NULL,           'Direct-to-consumer; no deduction model');
 
 -- ---------- retailer_rules ----------
 -- 7 deduction_types per retailer (DTC excluded). dispute_window_days NULL where not published.
@@ -63,26 +72,50 @@ INSERT INTO retailer_rules (retailer_id, deduction_type, dispute_window_days, au
   ('kehe', 'late_delivery',  180,  1, 'pod',                                0.30, 'K-Solve'),
   ('kehe', 'promo_billback', 180,  0, 'promo_agreement',                    0.40, 'MCB + 8% admin fee + $65/DC minimum'),
   ('kehe', 'vague',          180,  1, 'pack_log',                           0.10, 'Connect BI fee 2% of sales falls here'),
-  -- Wegmans
-  ('wegmans', 'short_ship',     NULL, 0, 'signed_bol,pack_log',             0.50, 'No published window; buyer-relationship dispute path'),
-  ('wegmans', 'label_fine',     NULL, 0, 'label_scan',                      0.30, 'GS1-128 inferred from packaging guide'),
-  ('wegmans', 'pallet_fine',    NULL, 0, 'photo',                           0.30, '4-way pallet standards inferred'),
-  ('wegmans', 'damaged',        NULL, 0, 'signed_bol,photo',                0.55, 'No published window'),
-  ('wegmans', 'late_delivery',  NULL, 0, 'pod',                             0.40, 'No published OTIF'),
-  ('wegmans', 'promo_billback', NULL, 0, 'promo_agreement',                 0.45, 'No published'),
-  ('wegmans', 'vague',          NULL, 0, 'pack_log',                        0.15, 'Specialty-friendly buyer relationship'),
-  -- Sprouts
-  ('sprouts', 'short_ship',     NULL, 0, 'signed_bol,pack_log',             0.40, 'Many deductions arrive via UNFI/KeHE statements'),
-  ('sprouts', 'label_fine',     NULL, 0, 'label_scan',                      0.25, 'GS1-128 required'),
-  ('sprouts', 'pallet_fine',    NULL, 0, 'photo',                           0.25, 'Inferred'),
-  ('sprouts', 'damaged',        NULL, 0, 'signed_bol,photo',                0.45, 'Inferred'),
-  ('sprouts', 'late_delivery',  NULL, 0, 'pod',                             0.30, 'Inferred'),
-  ('sprouts', 'promo_billback', NULL, 0, 'promo_agreement',                 0.40, 'Free Fill + Fair Share via BILLBACK MANAGER'),
-  ('sprouts', 'vague',          NULL, 0, 'pack_log',                        0.10, 'Inferred');
+  -- Southside Grocers (Wegmans archetype)
+  ('southside_grocers', 'short_ship',     NULL, 0, 'signed_bol,pack_log',   0.50, 'No published window; specialty-friendly buyer-relationship dispute path'),
+  ('southside_grocers', 'label_fine',     NULL, 0, 'label_scan',            0.30, 'GS1-128 inferred from packaging guide'),
+  ('southside_grocers', 'pallet_fine',    NULL, 0, 'photo',                 0.30, '4-way pallet standards inferred'),
+  ('southside_grocers', 'damaged',        NULL, 0, 'signed_bol,photo',      0.55, 'No published window'),
+  ('southside_grocers', 'late_delivery',  NULL, 0, 'pod',                   0.40, 'No published OTIF'),
+  ('southside_grocers', 'promo_billback', NULL, 0, 'promo_agreement',       0.45, 'No published'),
+  ('southside_grocers', 'vague',          NULL, 0, 'pack_log',              0.15, 'Specialty-friendly buyer relationship'),
+  -- Green Basket Market (Sprouts archetype)
+  ('green_basket_market', 'short_ship',     NULL, 0, 'signed_bol,pack_log', 0.40, 'Many deductions arrive via UNFI/KeHE statements'),
+  ('green_basket_market', 'label_fine',     NULL, 0, 'label_scan',          0.25, 'GS1-128 required'),
+  ('green_basket_market', 'pallet_fine',    NULL, 0, 'photo',               0.25, 'Inferred'),
+  ('green_basket_market', 'damaged',        NULL, 0, 'signed_bol,photo',    0.45, 'Inferred'),
+  ('green_basket_market', 'late_delivery',  NULL, 0, 'pod',                 0.30, 'Inferred'),
+  ('green_basket_market', 'promo_billback', NULL, 0, 'promo_agreement',     0.40, 'Free Fill + Fair Share via reset calendar'),
+  ('green_basket_market', 'vague',          NULL, 0, 'pack_log',            0.10, 'Inferred'),
+  -- Prairie Provisions (generic regional)
+  ('prairie_provisions', 'short_ship',     NULL, 0, 'signed_bol,pack_log',  0.40, 'Inferred norms; no published windows'),
+  ('prairie_provisions', 'label_fine',     NULL, 0, 'label_scan',           0.25, 'Inferred'),
+  ('prairie_provisions', 'pallet_fine',    NULL, 0, 'photo',                0.25, 'Inferred'),
+  ('prairie_provisions', 'damaged',        NULL, 0, 'signed_bol,photo',     0.45, 'Inferred'),
+  ('prairie_provisions', 'late_delivery',  NULL, 0, 'pod',                  0.30, 'Inferred'),
+  ('prairie_provisions', 'promo_billback', NULL, 0, 'promo_agreement',      0.40, 'Inferred'),
+  ('prairie_provisions', 'vague',          NULL, 0, 'pack_log',             0.10, 'Inferred'),
+  -- Mountain Pantry Co (generic regional)
+  ('mountain_pantry_co', 'short_ship',     NULL, 0, 'signed_bol,pack_log',  0.40, 'Inferred norms'),
+  ('mountain_pantry_co', 'label_fine',     NULL, 0, 'label_scan',           0.25, 'Inferred'),
+  ('mountain_pantry_co', 'pallet_fine',    NULL, 0, 'photo',                0.25, 'Inferred'),
+  ('mountain_pantry_co', 'damaged',        NULL, 0, 'signed_bol,photo',     0.45, 'Inferred'),
+  ('mountain_pantry_co', 'late_delivery',  NULL, 0, 'pod',                  0.30, 'Inferred'),
+  ('mountain_pantry_co', 'promo_billback', NULL, 0, 'promo_agreement',      0.40, 'Inferred'),
+  ('mountain_pantry_co', 'vague',          NULL, 0, 'pack_log',             0.10, 'Inferred'),
+  -- Harbor Fresh (generic regional, relationship-driven)
+  ('harbor_fresh', 'short_ship',     NULL, 0, 'signed_bol,pack_log',        0.45, 'Slightly higher recovery — relationship-driven'),
+  ('harbor_fresh', 'label_fine',     NULL, 0, 'label_scan',                 0.30, 'Inferred'),
+  ('harbor_fresh', 'pallet_fine',    NULL, 0, 'photo',                      0.30, 'Inferred'),
+  ('harbor_fresh', 'damaged',        NULL, 0, 'signed_bol,photo',           0.50, 'Inferred'),
+  ('harbor_fresh', 'late_delivery',  NULL, 0, 'pod',                        0.35, 'Inferred'),
+  ('harbor_fresh', 'promo_billback', NULL, 0, 'promo_agreement',            0.45, 'Inferred'),
+  ('harbor_fresh', 'vague',          NULL, 0, 'pack_log',                   0.15, 'Inferred');
 
 -- ---------- deduction_codes ----------
 -- Walmart codes are publicly documented; KeHE codes mostly documented;
--- Costco / WFM / Wegmans / Sprouts codes inferred (is_published=0) since
+-- Costco / WFM / regional codes inferred (is_published=0) since
 -- canonical lists aren't public. UNFI uses 3-letter codes that aren't
 -- fully published — representative codes flagged unpublished.
 
@@ -115,7 +148,7 @@ INSERT INTO deduction_codes (code_id, retailer_id, code, name, deduction_type, i
   ('wholefoods_damaged',        'whole_foods', 'DMG',   'Damaged product',       'damaged',        0),
   ('wholefoods_late_delivery',  'whole_foods', 'LATE',  'Late delivery',         'late_delivery',  0),
   ('wholefoods_promo_billback', 'whole_foods', 'PROMO', 'Promo billback',        'promo_billback', 0),
-  ('wholefoods_vague',          'whole_foods', 'MISC', 'Miscellaneous',          'vague',          0),
+  ('wholefoods_vague',          'whole_foods', 'MISC',  'Miscellaneous',         'vague',          0),
   -- UNFI (3-letter codes, partially inferred)
   ('unfi_sht', 'unfi', 'SHT', 'Shortage',                                   'short_ship',     0),
   ('unfi_lbl', 'unfi', 'LBL', 'Labeling fine',                              'label_fine',     0),
@@ -133,23 +166,47 @@ INSERT INTO deduction_codes (code_id, retailer_id, code, name, deduction_type, i
   ('kehe_freight',  'kehe', 'FRT',   'Freight allowance',                            'vague',          1),
   ('kehe_label',    'kehe', 'LBL',   'Labeling noncompliance',                       'label_fine',     0),
   ('kehe_late',     'kehe', 'LATE',  'Late delivery',                                'late_delivery',  0),
-  -- Wegmans (inferred)
-  ('wegmans_short_ship',     'wegmans', 'SHRT',  'Shortage',         'short_ship',     0),
-  ('wegmans_label_fine',     'wegmans', 'LBL',   'Label fine',       'label_fine',     0),
-  ('wegmans_pallet_fine',    'wegmans', 'PALT',  'Pallet fine',      'pallet_fine',    0),
-  ('wegmans_damaged',        'wegmans', 'DMG',   'Damaged',          'damaged',        0),
-  ('wegmans_late_delivery',  'wegmans', 'LATE',  'Late delivery',    'late_delivery',  0),
-  ('wegmans_promo_billback', 'wegmans', 'PROMO', 'Promo billback',   'promo_billback', 0),
-  ('wegmans_vague',          'wegmans', 'MISC',  'Miscellaneous',    'vague',          0),
-  -- Sprouts (inferred + named billback codes)
-  ('sprouts_short_ship',     'sprouts', 'SHRT', 'Shortage',                       'short_ship',     0),
-  ('sprouts_label_fine',     'sprouts', 'LBL',  'Label fine',                     'label_fine',     0),
-  ('sprouts_pallet_fine',    'sprouts', 'PALT', 'Pallet fine',                    'pallet_fine',    0),
-  ('sprouts_damaged',        'sprouts', 'DMG',  'Damaged',                        'damaged',        0),
-  ('sprouts_late_delivery',  'sprouts', 'LATE', 'Late delivery',                  'late_delivery',  0),
-  ('sprouts_freefill',       'sprouts', 'FFL',  'Free Fill new-item billback',    'promo_billback', 0),
-  ('sprouts_fairshare',      'sprouts', 'FAIR', 'Fair Share reset billback',      'promo_billback', 0),
-  ('sprouts_vague',          'sprouts', 'MISC', 'Miscellaneous',                  'vague',          0);
+  -- Southside Grocers (Wegmans archetype, inferred)
+  ('southside_grocers_short_ship',     'southside_grocers', 'SHRT',  'Shortage',         'short_ship',     0),
+  ('southside_grocers_label_fine',     'southside_grocers', 'LBL',   'Label fine',       'label_fine',     0),
+  ('southside_grocers_pallet_fine',    'southside_grocers', 'PALT',  'Pallet fine',      'pallet_fine',    0),
+  ('southside_grocers_damaged',        'southside_grocers', 'DMG',   'Damaged',          'damaged',        0),
+  ('southside_grocers_late_delivery',  'southside_grocers', 'LATE',  'Late delivery',    'late_delivery',  0),
+  ('southside_grocers_promo_billback', 'southside_grocers', 'PROMO', 'Promo billback',   'promo_billback', 0),
+  ('southside_grocers_vague',          'southside_grocers', 'MISC',  'Miscellaneous',    'vague',          0),
+  -- Green Basket Market (Sprouts archetype with named billbacks)
+  ('green_basket_market_short_ship',     'green_basket_market', 'SHRT', 'Shortage',                    'short_ship',     0),
+  ('green_basket_market_label_fine',     'green_basket_market', 'LBL',  'Label fine',                  'label_fine',     0),
+  ('green_basket_market_pallet_fine',    'green_basket_market', 'PALT', 'Pallet fine',                 'pallet_fine',    0),
+  ('green_basket_market_damaged',        'green_basket_market', 'DMG',  'Damaged',                     'damaged',        0),
+  ('green_basket_market_late_delivery',  'green_basket_market', 'LATE', 'Late delivery',               'late_delivery',  0),
+  ('green_basket_market_freefill',       'green_basket_market', 'FFL',  'Free Fill new-item billback', 'promo_billback', 0),
+  ('green_basket_market_fairshare',      'green_basket_market', 'FAIR', 'Fair Share reset billback',   'promo_billback', 0),
+  ('green_basket_market_vague',          'green_basket_market', 'MISC', 'Miscellaneous',               'vague',          0),
+  -- Prairie Provisions (generic regional)
+  ('prairie_provisions_short_ship',     'prairie_provisions', 'SHRT',  'Shortage',         'short_ship',     0),
+  ('prairie_provisions_label_fine',     'prairie_provisions', 'LBL',   'Label fine',       'label_fine',     0),
+  ('prairie_provisions_pallet_fine',    'prairie_provisions', 'PALT',  'Pallet fine',      'pallet_fine',    0),
+  ('prairie_provisions_damaged',        'prairie_provisions', 'DMG',   'Damaged',          'damaged',        0),
+  ('prairie_provisions_late_delivery',  'prairie_provisions', 'LATE',  'Late delivery',    'late_delivery',  0),
+  ('prairie_provisions_promo_billback', 'prairie_provisions', 'PROMO', 'Promo billback',   'promo_billback', 0),
+  ('prairie_provisions_vague',          'prairie_provisions', 'MISC',  'Miscellaneous',    'vague',          0),
+  -- Mountain Pantry Co (generic regional)
+  ('mountain_pantry_co_short_ship',     'mountain_pantry_co', 'SHRT',  'Shortage',         'short_ship',     0),
+  ('mountain_pantry_co_label_fine',     'mountain_pantry_co', 'LBL',   'Label fine',       'label_fine',     0),
+  ('mountain_pantry_co_pallet_fine',    'mountain_pantry_co', 'PALT',  'Pallet fine',      'pallet_fine',    0),
+  ('mountain_pantry_co_damaged',        'mountain_pantry_co', 'DMG',   'Damaged',          'damaged',        0),
+  ('mountain_pantry_co_late_delivery',  'mountain_pantry_co', 'LATE',  'Late delivery',    'late_delivery',  0),
+  ('mountain_pantry_co_promo_billback', 'mountain_pantry_co', 'PROMO', 'Promo billback',   'promo_billback', 0),
+  ('mountain_pantry_co_vague',          'mountain_pantry_co', 'MISC',  'Miscellaneous',    'vague',          0),
+  -- Harbor Fresh (generic regional)
+  ('harbor_fresh_short_ship',     'harbor_fresh', 'SHRT',  'Shortage',         'short_ship',     0),
+  ('harbor_fresh_label_fine',     'harbor_fresh', 'LBL',   'Label fine',       'label_fine',     0),
+  ('harbor_fresh_pallet_fine',    'harbor_fresh', 'PALT',  'Pallet fine',      'pallet_fine',    0),
+  ('harbor_fresh_damaged',        'harbor_fresh', 'DMG',   'Damaged',          'damaged',        0),
+  ('harbor_fresh_late_delivery',  'harbor_fresh', 'LATE',  'Late delivery',    'late_delivery',  0),
+  ('harbor_fresh_promo_billback', 'harbor_fresh', 'PROMO', 'Promo billback',   'promo_billback', 0),
+  ('harbor_fresh_vague',          'harbor_fresh', 'MISC',  'Miscellaneous',    'vague',          0);
 
 -- ---------- edi_requirements ----------
 -- Compliance specs per retailer. Used to render retailer-rule cards in the UI
@@ -183,13 +240,28 @@ INSERT INTO edi_requirements (retailer_id, category, requirement, penalty_if_vio
   ('kehe', 'asn',    'EDI 856 required pre-arrival',                                                                        'ASN late = chargeback',                                0, NULL),
   ('kehe', 'otif',   'On-time delivery; UDR triggers on shortage/over/damage at receipt',                                   '48-hour UDR response window',                          1, 'https://tryintercept.com/blog/kehe-deductions'),
   ('kehe', 'carton', 'Standard carton requirements',                                                                        'Connect BI fee 2% of sales',                           1, 'https://tryintercept.com/blog/kehe-deductions'),
-  -- Wegmans
-  ('wegmans', 'label',  'GS1-128 case labels with lot/catch weight/expiration/CoO; SSCC pallet labels two per pallet',      'Routing-guide inferred',                               1, 'https://www.retailerhub.ai/retailer-compliance/wegmans-packaging-guidelines'),
-  ('wegmans', 'pallet', '4-way pallet condition standards',                                                                 'Inferred',                                             1, 'https://www.retailerhub.ai/retailer-compliance/wegmans-packaging-guidelines'),
-  ('wegmans', 'asn',    'EDI 850/855/810/997; ASN entry via supplier portal',                                               'Inferred',                                             0, 'https://www.wegmans.com/service/for-our-suppliers'),
-  ('wegmans', 'carton', 'Carton size/weight limits, one-PO-per-carton',                                                     'Inferred',                                             1, 'https://www.wegmans.com/service/for-our-suppliers/additional-shipment-information'),
-  -- Sprouts
-  ('sprouts', 'label',       'GS1-128 (UCC-128) shipping labels required',                                                  'Inferred',                                             1, 'https://www.ezcomsoftware.com/retailer-edi/sprouts-farmers-market-edi/'),
-  ('sprouts', 'asn',         'EDI 850/855/860/856/810/812/997 mandatory',                                                   'Inferred',                                             1, 'https://www.ezcomsoftware.com/retailer-edi/sprouts-farmers-market-edi/'),
-  ('sprouts', 'carton',      'Standard carton requirements',                                                                'Inferred',                                             0, NULL),
-  ('sprouts', 'appointment', 'Refresh / category-reset calendar drives placement timing',                                   'Free Fill / Fair Share billbacks per reset',           1, 'https://about.sprouts.com/full-reset-calendar/');
+  -- Southside Grocers (Wegmans archetype)
+  ('southside_grocers', 'label',  'GS1-128 case labels with lot/catch weight/expiration; SSCC pallet labels two per pallet','Routing-guide inferred',                               0, NULL),
+  ('southside_grocers', 'pallet', '4-way pallet condition standards',                                                       'Inferred',                                             0, NULL),
+  ('southside_grocers', 'asn',    'EDI 850/855/810/997; ASN entry via supplier portal',                                     'Inferred',                                             0, NULL),
+  ('southside_grocers', 'carton', 'Carton size/weight limits, one-PO-per-carton',                                           'Inferred',                                             0, NULL),
+  -- Green Basket Market (Sprouts archetype)
+  ('green_basket_market', 'label',       'GS1-128 (UCC-128) shipping labels required',                                      'Inferred',                                             0, NULL),
+  ('green_basket_market', 'asn',         'EDI 850/855/860/856/810/812/997 mandatory',                                       'Inferred',                                             0, NULL),
+  ('green_basket_market', 'carton',      'Standard carton requirements',                                                    'Inferred',                                             0, NULL),
+  ('green_basket_market', 'appointment', 'Refresh / category-reset calendar drives placement timing',                       'Free Fill / Fair Share billbacks per reset',           0, NULL),
+  -- Prairie Provisions (generic regional)
+  ('prairie_provisions', 'label',  'Standard grocery GS1-128',                                                              'Inferred',                                             0, NULL),
+  ('prairie_provisions', 'asn',    'EDI 856 expected',                                                                      'Inferred',                                             0, NULL),
+  ('prairie_provisions', 'pallet', 'Standard pallet condition',                                                             'Inferred',                                             0, NULL),
+  ('prairie_provisions', 'carton', 'Standard carton requirements',                                                          'Inferred',                                             0, NULL),
+  -- Mountain Pantry Co (generic regional)
+  ('mountain_pantry_co', 'label',  'Standard grocery GS1-128',                                                              'Inferred',                                             0, NULL),
+  ('mountain_pantry_co', 'asn',    'EDI 856 expected',                                                                      'Inferred',                                             0, NULL),
+  ('mountain_pantry_co', 'pallet', 'Standard pallet condition',                                                             'Inferred',                                             0, NULL),
+  ('mountain_pantry_co', 'carton', 'Standard carton requirements',                                                          'Inferred',                                             0, NULL),
+  -- Harbor Fresh (generic regional)
+  ('harbor_fresh', 'label',  'Standard grocery GS1-128',                                                                    'Inferred',                                             0, NULL),
+  ('harbor_fresh', 'asn',    'EDI 856 expected',                                                                            'Inferred',                                             0, NULL),
+  ('harbor_fresh', 'pallet', 'Standard pallet condition',                                                                   'Inferred',                                             0, NULL),
+  ('harbor_fresh', 'carton', 'Standard carton requirements',                                                                'Inferred',                                             0, NULL);
