@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
-import type { Summary } from "./types";
-import { loadSummary, formatDollars, formatPercent, formatCount } from "./data";
+import type { Deduction, Summary } from "./types";
+import { loadDeductions, loadSummary, formatDollars, formatPercent, formatCount } from "./data";
+import SankeyView from "./sankey/SankeyView";
 import "./App.css";
 
 export default function App() {
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [deductions, setDeductions] = useState<Deduction[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadSummary()
-      .then(setSummary)
+    Promise.all([loadSummary(), loadDeductions()])
+      .then(([s, d]) => {
+        setSummary(s);
+        setDeductions(d);
+      })
       .catch((e) => setError(String(e)));
   }, []);
 
   if (error) return <div className="error">Error loading data: {error}</div>;
-  if (!summary) return <div className="loading">Loading…</div>;
+  if (!summary || !deductions) return <div className="loading">Loading…</div>;
 
   const { totals, by_type, by_retailer } = summary;
 
@@ -33,6 +38,8 @@ export default function App() {
         <Kpi label="Labor on disputes" value={`${formatCount(totals.labor_hours)} hrs`} sub={`~${totals.fte_equivalent.toFixed(1)} FTE`} />
         <Kpi label="Undisputed losses" value={formatDollars(totals.deductions_no_dispute_dollar)} sub={`${formatCount(totals.deductions_no_dispute_count)} deductions never filed`} />
       </section>
+
+      <SankeyView deductions={deductions} />
 
       <section className="break">
         <h2>By deduction type</h2>
@@ -84,11 +91,6 @@ export default function App() {
             ))}
           </tbody>
         </table>
-      </section>
-
-      <section className="placeholder">
-        <h2>Coming next</h2>
-        <p>Sankey flow + connected views (deduction explorer, causation tracing, recovery simulation, timeline pressure, retailer scorecard).</p>
       </section>
     </div>
   );

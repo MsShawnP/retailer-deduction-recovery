@@ -1,0 +1,57 @@
+.sankey {
+  margin-top: 32px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+.sankey h2 {
+  border: none;
+  padding-bottom: 0;
+  margin-bottom: 4px;
+}
+
+.sankey-sub {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin: 0 0 16px;
+}
+
+.sankey-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+}
+
+.sankey-layer-title {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  fill: var(--ink-soft);
+  font-weight: 700;
+}
+
+.sankey-node-label {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+  fill: var(--ink);
+  pointer-events: none;
+}
+
+.sankey-node-value {
+  fill: var(--ink-faint);
+  font-size: 10px;
+}
+
+.sankey-links path {
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.sankey-nodes rect {
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}

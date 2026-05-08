@@ -1,0 +1,168 @@
+// Compute the 6-layer Sankey data from the denormalized deductions array.
+//
+// Layers (in order):
+//   0. type            — deduction_type (short_ship, label_fine, etc.)
+//   1. root_cause      — derived from pack/ship signals (non-scannable
+//                         label, real shortage, generic label, etc.)
+//   2. evidence_quality — from dispute.evidence_quality, or "Never filed"
+//   3. accessibility   — pack_record.evidence_location label, or "n/a"
+//   4. timeliness      — was_within_deadline, with NULL and never-filed
+//                         buckets
+//   5. outcome         — dispute.outcome, or "Never filed"
+//
+// Link value = sum of deduction.amount. Each deduction contributes one
+// path through all six layers, so total value flowing OUT of the type
+// layer equals total deductions value.
+
+import type { Deduction } from "../types";
+
+export interface SankeyNode {
+  id: string;
+  layer: number;
+  label: string;
+  value?: number;  // populated by d3-sankey at layout time
+}
+
+export interface SankeyLink {
+  source: string;
+  target: string;
+  value: number;
+}
+
+export interface SankeyData {
+  nodes: SankeyNode[];
+  links: SankeyLink[];
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  short_ship: "Short ship",
+  label_fine: "Label fine",
+  pallet_fine: "Pallet fine",
+  damaged: "Damaged",
+  late_delivery: "Late delivery",
+  promo_billback: "Promo billback",
+  vague: "Vague",
+};
+
+const OUTCOME_LABELS: Record<string, string> = {
+  won_full: "Won full",
+  won_partial: "Won partial",
+  pending: "Pending",
+  lost_evidence: "Lost — evidence",
+  lost_deadline: "Lost — deadline",
+  lost_no_response: "Lost — no response",
+  lost_other: "Lost — other",
+  abandoned: "Abandoned",
+};
+
+const EVIDENCE_QUALITY_LABELS: Record<string, string> = {
+  digital_complete: "Digital, complete",
+  digital_partial: "Digital, partial",
+  handwritten_only: "Handwritten only",
+  none: "No evidence",
+};
+
+const LOCATION_LABELS: Record<string, string> = {
+  system: "Digital system",
+  warehouse_clipboard: "Warehouse clipboard",
+  office_filing_cabinet: "Filing cabinet",
+  lost: "Lost",
+};
+
+function rootCauseFor(d: Deduction): string {
+  if (d.is_post_audit) return "Post-audit clawback";
+
+  if (d.deduction_type === "short_ship") {
+    if (d.pack_record?.label_scannable === false) return "Non-scannable label";
+    if (d.shipment?.bol_signed_short) return "BOL signed short";
+    if (d.pack_record && d.pack_record.units_pick_pack_match === false) return "Pack/pick mismatch";
+    return "Other shortage";
+  }
+  if (d.deduction_type === "label_fine") {
+    if (d.pack_record?.label_type_used === "generic") return "Generic label";
+    return "Other label issue";
+  }
+  if (d.deduction_type === "pallet_fine") return "Pallet noncompliance";
+  if (d.deduction_type === "damaged") return "Damage at receiving";
+  if (d.deduction_type === "late_delivery") return "Delivery missed window";
+  if (d.deduction_type === "promo_billback") return "Promo program";
+  if (d.deduction_type === "vague") return "Opaque remittance";
+  return "Other";
+}
+
+function evidenceQualityFor(d: Deduction): string {
+  if (!d.dispute) return "Never filed";
+  return EVIDENCE_QUALITY_LABELS[d.dispute.evidence_quality] || d.dispute.evidence_quality;
+}
+
+function accessibilityFor(d: Deduction): string {
+  if (!d.dispute) return "n/a — never filed";
+  if (!d.pack_record?.evidence_location) return "No verification";
+  return LOCATION_LABELS[d.pack_record.evidence_location] || d.pack_record.evidence_location;
+}
+
+function timelinessFor(d: Deduction): string {
+  if (!d.dispute) return "Never filed";
+  if (d.dispute.was_within_deadline === true) return "On time";
+  if (d.dispute.was_within_deadline === false) return "Past deadline";
+  return "No published deadline";
+}
+
+function outcomeFor(d: Deduction): string {
+  if (!d.dispute) return "Never filed";
+  return OUTCOME_LABELS[d.dispute.outcome] || d.dispute.outcome;
+}
+
+export function buildSankeyData(deductions: Deduction[]): SankeyData {
+  // Aggregate (sourceLayer, sourceLabel, targetLayer, targetLabel) -> $
+  const linkAcc = new Map<string, number>();
+  const nodeIds = new Set<string>();
+
+  function addEdge(sourceLayer: number, sourceLabel: string,
+                   targetLayer: number, targetLabel: string,
+                   value: number) {
+    const sourceId = `${sourceLayer}:${sourceLabel}`;
+    const targetId = `${targetLayer}:${targetLabel}`;
+    nodeIds.add(sourceId);
+    nodeIds.add(targetId);
+    const key = `${sourceId}>>${targetId}`;
+    linkAcc.set(key, (linkAcc.get(key) || 0) + value);
+  }
+
+  for (const d of deductions) {
+    if (d.amount <= 0) continue;
+    const t  = TYPE_LABELS[d.deduction_type] || d.deduction_type;
+    const rc = rootCauseFor(d);
+    const eq = evidenceQualityFor(d);
+    const ac = accessibilityFor(d);
+    const tm = timelinessFor(d);
+    const oc = outcomeFor(d);
+
+    addEdge(0, t,  1, rc, d.amount);
+    addEdge(1, rc, 2, eq, d.amount);
+    addEdge(2, eq, 3, ac, d.amount);
+    addEdge(3, ac, 4, tm, d.amount);
+    addEdge(4, tm, 5, oc, d.amount);
+  }
+
+  const nodes: SankeyNode[] = [...nodeIds].map((id) => {
+    const [layerStr, ...rest] = id.split(":");
+    return { id, layer: parseInt(layerStr, 10), label: rest.join(":") };
+  });
+
+  const links: SankeyLink[] = [...linkAcc.entries()].map(([key, value]) => {
+    const [source, target] = key.split(">>");
+    return { source, target, value };
+  });
+
+  return { nodes, links };
+}
+
+export const LAYER_TITLES = [
+  "Deduction type",
+  "Root cause",
+  "Evidence quality",
+  "Evidence accessibility",
+  "Dispute timeliness",
+  "Outcome",
+];
