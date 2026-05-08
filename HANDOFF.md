@@ -500,3 +500,35 @@ any rough edges; fix what's worth fixing before the responsive
 check.
 
 ---
+
+## 2026-05-08 14:02
+
+**What changed:** Phase 4 polish landed — three bug fixes (sort,
+sticky cohort bar, time range filter) plus end-to-end cross-view
+nav verification and responsive pass at iPad / laptop / wide.
+
+**Why:** Get the demo presentable before Netlify deploy. The polish
+items came from a visual review and the two existing PLAN tasks
+gated on them.
+
+**State:** Scorecard sort renamed Recovery rate → Worst recovery
+(ASC) so the visible-reorder works (Green Basket Market top, not
+Walmart). `CohortBar` replaces the conditional selection-chip —
+sticky top:0, always-visible, shows combined filter + time range.
+`TimeRangeSelector` added next to the type dropdown (6mo / 1yr /
+All + custom from-to). filteredDeductions, kpiCount, byType,
+byChannel all gated on "any active filter" so date-range-only
+filters propagate. Combined Short-ship + Last 6 mo → 395 / $91K.
+Origin tables wrapped in scroll containers and body overflow-x
+hidden — iPad portrait was overflowing at 1094px, now matches
+viewport. `screenshot-crossview.mjs` and `screenshot-responsive.mjs`
+verify; zero JS errors. Build passes. PLAN.md Phase 4 tasks 1 and 2
+checked off; task 3 (deploy) and task 4 (friend preview) remain.
+
+**Next:** Phase 4 task 3 — deploy to Netlify. The Netlify config is
+already in place (root netlify.toml points the build at
+frontend/dist/); confirm `netlify deploy --prod` works against the
+linked site, then capture the live URL for the friend preview hand-
+off.
+
+---

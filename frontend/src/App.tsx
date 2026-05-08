@@ -14,12 +14,35 @@ import OriginClusteringView from "./origin/OriginClusteringView";
 import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
+type DateRangePreset = "6mo" | "1yr" | "custom";
+
+interface DateRangeValue {
+  start: string;
+  end: string;
+  preset: DateRangePreset;
+}
+
+type DateRange = DateRangeValue | null;
+
+function addMonthsISO(dateStr: string, months: number): string {
+  const d = new Date(dateStr + "T00:00:00Z");
+  d.setUTCMonth(d.getUTCMonth() + months);
+  return d.toISOString().slice(0, 10);
+}
+
+function dateRangeLabel(r: DateRangeValue): string {
+  if (r.preset === "6mo") return "Last 6 months";
+  if (r.preset === "1yr") return "Last 1 year";
+  return `${r.start} → ${r.end}`;
+}
+
 export default function App() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [deductions, setDeductions] = useState<Deduction[] | null>(null);
   const [retailers, setRetailers] = useState<RetailersById | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selection, setSelection] = useState<Selection | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange>(null);
   const [tracedDeductionId, setTracedDeductionId] = useState<string | null>(null);
   const traceRef = useRef<HTMLDivElement>(null);
 
@@ -33,11 +56,20 @@ export default function App() {
       .catch((e) => setError(String(e)));
   }, []);
 
-  // Filter deductions and re-aggregate when a Sankey path is selected.
+  // Filter deductions: Sankey/dropdown selection AND time range compose.
+  // Either (or both) may be active at once; the cohort respects both.
   const filteredDeductions = useMemo(() => {
-    if (!deductions || !selection) return deductions;
-    return deductions.filter((d) => isOnSelectedPath(d, selection));
-  }, [deductions, selection]);
+    if (!deductions) return deductions;
+    if (!selection && !dateRange) return deductions;
+    return deductions.filter((d) => {
+      if (selection && !isOnSelectedPath(d, selection)) return false;
+      if (dateRange) {
+        if (d.deduction_date < dateRange.start) return false;
+        if (d.deduction_date > dateRange.end) return false;
+      }
+      return true;
+    });
+  }, [deductions, selection, dateRange]);
 
   // If the cohort changes and the traced deduction is no longer in it,
   // clear the trace so the view doesn't show a stale anchor.
@@ -61,15 +93,15 @@ export default function App() {
 
   const byType: ByType[] = useMemo(() => {
     if (!filteredDeductions || !summary) return [];
-    if (!selection) return summary.by_type;
+    if (!selection && !dateRange) return summary.by_type;
     return aggregateByType(filteredDeductions);
-  }, [filteredDeductions, selection, summary]);
+  }, [filteredDeductions, selection, dateRange, summary]);
 
   const byChannel: ByRetailer[] = useMemo(() => {
     if (!filteredDeductions || !summary) return [];
-    if (!selection) return summary.by_retailer;
+    if (!selection && !dateRange) return summary.by_retailer;
     return aggregateByRetailer(filteredDeductions);
-  }, [filteredDeductions, selection, summary]);
+  }, [filteredDeductions, selection, dateRange, summary]);
 
   const byRetailer = byChannel.filter((r) => r.channel_type === "retailer");
   const byDistributor = byChannel.filter((r) => r.channel_type === "distributor");
@@ -95,8 +127,9 @@ export default function App() {
 
   const { totals } = summary;
 
-  // KPIs reflect filtered selection when active
-  const filteredKpis = selection && filteredDeductions ? computeKpis(filteredDeductions) : null;
+  // KPIs reflect any active filter (Sankey/dropdown selection OR time range).
+  const anyFilter = !!(selection || dateRange);
+  const filteredKpis = anyFilter && filteredDeductions ? computeKpis(filteredDeductions) : null;
   const kpiCount = filteredKpis?.count ?? totals.deductions_count;
   const kpiDollar = filteredKpis?.dollar ?? totals.deductions_dollar;
   const kpiAnnualized = filteredKpis ? (kpiDollar * 12 / summary.window.months) : totals.annualized_dollar;
@@ -116,21 +149,17 @@ export default function App() {
         </p>
       </header>
 
-      {selection && (
-        <div className="selection-chip">
-          <span className="selection-label">Filter:</span>
-          <span className="selection-value">
-            {selectionLabel(
-              selection,
-              selection.kind === "retailer"
-                ? retailers?.[selection.retailerId]?.name
-                : undefined
-            )}
-          </span>
-          <span className="selection-count">{formatCount(kpiCount)} deductions • {formatDollars(kpiDollar)}</span>
-          <button onClick={() => setSelection(null)} className="selection-clear">×</button>
-        </div>
-      )}
+      <CohortBar
+        selection={selection}
+        retailers={retailers}
+        dateRange={dateRange}
+        kpiCount={kpiCount}
+        kpiDollar={kpiDollar}
+        onClear={() => {
+          setSelection(null);
+          setDateRange(null);
+        }}
+      />
 
       <section className="kpi-row">
         <Kpi label="Annualized deductions" value={formatDollars(kpiAnnualized)} sub="against ~$25M wholesale" />
@@ -139,20 +168,28 @@ export default function App() {
         <Kpi label="Undisputed losses" value={formatDollars(kpiNoDisputeDollar)} sub={`${formatCount(kpiNoDisputeCount)} deductions never filed`} negative />
       </section>
 
-      <div className="type-selector">
-        <label htmlFor="type-filter">Filter by deduction type:</label>
-        <select
-          id="type-filter"
-          value={dropdownValue}
-          onChange={(e) => onDropdownChange(e.target.value)}
-        >
-          <option value="all">All deductions</option>
-          {TYPE_OPTIONS.map((label) => (
-            <option key={label} value={label}>
-              {label}
-            </option>
-          ))}
-        </select>
+      <div className="filter-row">
+        <div className="type-selector">
+          <label htmlFor="type-filter">Filter by deduction type</label>
+          <select
+            id="type-filter"
+            value={dropdownValue}
+            onChange={(e) => onDropdownChange(e.target.value)}
+          >
+            <option value="all">All deductions</option>
+            {TYPE_OPTIONS.map((label) => (
+              <option key={label} value={label}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <TimeRangeSelector
+          windowStart={summary.window.start}
+          windowEnd={summary.window.end}
+          value={dateRange}
+          onChange={setDateRange}
+        />
       </div>
 
       <SankeyView deductions={deductions} selection={selection} onSelect={setSelection} />
@@ -334,6 +371,144 @@ function Kpi({ label, value, sub, negative }: { label: string; value: string; su
       <div className="kpi-label">{label}</div>
       <div className="kpi-value">{value}</div>
       <div className="kpi-sub">{sub}</div>
+    </div>
+  );
+}
+
+interface CohortBarProps {
+  selection: Selection | null;
+  retailers: RetailersById | null;
+  dateRange: DateRange;
+  kpiCount: number;
+  kpiDollar: number;
+  onClear: () => void;
+}
+
+function CohortBar({
+  selection,
+  retailers,
+  dateRange,
+  kpiCount,
+  kpiDollar,
+  onClear,
+}: CohortBarProps) {
+  const filterText = selection
+    ? selectionLabel(
+        selection,
+        selection.kind === "retailer"
+          ? retailers?.[selection.retailerId]?.name
+          : undefined
+      )
+    : null;
+  const rangeText = dateRange ? dateRangeLabel(dateRange) : null;
+  const isFiltered = !!(filterText || rangeText);
+
+  const parts: string[] = [];
+  if (filterText) parts.push(filterText);
+  if (rangeText) parts.push(rangeText);
+  const cohortLabel = parts.length ? parts.join(" · ") : "All deductions, all time";
+
+  return (
+    <div className={isFiltered ? "cohort-bar active" : "cohort-bar"}>
+      <span className="cohort-bar-label">Cohort</span>
+      <span className="cohort-bar-value">{cohortLabel}</span>
+      <span className="cohort-bar-count">
+        {formatCount(kpiCount)} deductions • {formatDollars(kpiDollar)}
+      </span>
+      {isFiltered && (
+        <button onClick={onClear} className="cohort-bar-clear" title="Clear all filters">
+          × Clear
+        </button>
+      )}
+    </div>
+  );
+}
+
+interface TimeRangeSelectorProps {
+  windowStart: string;
+  windowEnd: string;
+  value: DateRange;
+  onChange: (r: DateRange) => void;
+}
+
+function TimeRangeSelector({
+  windowStart,
+  windowEnd,
+  value,
+  onChange,
+}: TimeRangeSelectorProps) {
+  function applyPreset(preset: DateRangePreset) {
+    if (preset === "6mo") {
+      onChange({ start: addMonthsISO(windowEnd, -6), end: windowEnd, preset });
+    } else if (preset === "1yr") {
+      onChange({ start: addMonthsISO(windowEnd, -12), end: windowEnd, preset });
+    }
+  }
+
+  function clearRange() {
+    onChange(null);
+  }
+
+  function setCustomStart(start: string) {
+    onChange({
+      start,
+      end: value?.end ?? windowEnd,
+      preset: "custom",
+    });
+  }
+
+  function setCustomEnd(end: string) {
+    onChange({
+      start: value?.start ?? windowStart,
+      end,
+      preset: "custom",
+    });
+  }
+
+  const activePreset = value?.preset ?? null;
+
+  return (
+    <div className="time-range">
+      <span className="time-range-label">Time range</span>
+      <div className="time-range-buttons">
+        <button
+          className={activePreset === "6mo" ? "active" : ""}
+          onClick={() => applyPreset("6mo")}
+        >
+          Last 6 mo
+        </button>
+        <button
+          className={activePreset === "1yr" ? "active" : ""}
+          onClick={() => applyPreset("1yr")}
+        >
+          Last 1 yr
+        </button>
+        <button
+          className={activePreset === null ? "active" : ""}
+          onClick={clearRange}
+        >
+          All
+        </button>
+      </div>
+      <div className="time-range-custom">
+        <input
+          type="date"
+          aria-label="Custom start date"
+          min={windowStart}
+          max={windowEnd}
+          value={value?.start ?? ""}
+          onChange={(e) => e.target.value && setCustomStart(e.target.value)}
+        />
+        <span className="time-range-arrow">→</span>
+        <input
+          type="date"
+          aria-label="Custom end date"
+          min={windowStart}
+          max={windowEnd}
+          value={value?.end ?? ""}
+          onChange={(e) => e.target.value && setCustomEnd(e.target.value)}
+        />
+      </div>
     </div>
   );
 }

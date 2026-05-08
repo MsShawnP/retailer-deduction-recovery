@@ -182,10 +182,26 @@ views for each feature before moving to the next.
 
 ### Phase 4: Polish + deploy
 
-- [ ] Cross-view navigation — verify all views are connected, click
-      paths work end to end
-- [ ] Responsive design check — verify it works on the devices the
-      CEO would use
+- [x] Cross-view navigation — verify all views are connected, click
+      paths work end to end — `screenshot-crossview.mjs` walks every
+      filter / drill-down / trace path through all 9 feature views
+      (dropdown, Sankey, retailer scorecard click-to-filter, origin
+      cluster click-to-filter, time range presets + custom dates,
+      trace cross-link from cost view); zero JS errors. Three polish
+      improvements landed alongside: (a) retailer scorecard sort
+      switched to Worst recovery so the order visibly changes, (b)
+      cohort bar always renders, sticky-positioned, shows combined
+      filter + time range, (c) time range filter (6mo / 1yr / All /
+      custom) added next to the type dropdown, composes with all
+      other filters via `filteredDeductions`. KPI / aggregation
+      gating fixed so dateRange-only filters propagate.
+- [x] Responsive design check — verify it works on the devices the
+      CEO would use — `screenshot-responsive.mjs` checks iPad
+      portrait (768), MacBook (1366), wide (1680). Found and fixed
+      origin-section overflow at 768 (wrapped both origin tables in
+      scroll containers like the cost view), added
+      `overflow-x: hidden` on body as defense. All three viewports
+      now match document width to viewport.
 - [ ] Deploy to Netlify
 - [ ] Friend preview — hand off for feedback
 

@@ -183,7 +183,8 @@ export default function OriginClusteringView({
             those resets most of the portfolio.
           </p>
         </header>
-        <table className="origin-summary-table">
+        <div className="origin-table-scroll">
+          <table className="origin-summary-table">
           <thead>
             <tr>
               <th>Dimension</th>
@@ -231,6 +232,7 @@ export default function OriginClusteringView({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       <div className="origin-detail">
@@ -258,7 +260,8 @@ export default function OriginClusteringView({
             </button>
           ))}
         </div>
-        <table className="origin-cluster-table">
+        <div className="origin-table-scroll">
+          <table className="origin-cluster-table">
           <thead>
             <tr>
               <th>Cluster</th>
@@ -357,6 +360,7 @@ export default function OriginClusteringView({
             })}
           </tbody>
         </table>
+        </div>
       </div>
     </section>
   );

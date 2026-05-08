@@ -61,6 +61,10 @@
   line-height: 1.5;
 }
 
+.origin-table-scroll {
+  overflow-x: auto;
+}
+
 .origin-summary-table,
 .origin-cluster-table {
   width: 100%;

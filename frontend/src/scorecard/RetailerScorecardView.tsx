@@ -51,12 +51,12 @@ const RETAILER_PROFILE: Record<string, string> = {
     "Sprouts-style buyer relationship; informal but documentable; promo deductions often vague.",
 };
 
-type Sort = "net_loss" | "dollars" | "recovery";
+type Sort = "net_loss" | "dollars" | "worst_recovery";
 
 const SORT_LABEL: Record<Sort, string> = {
   net_loss: "Net loss",
   dollars: "Volume",
-  recovery: "Recovery rate",
+  worst_recovery: "Worst recovery",
 };
 
 function compute(
@@ -177,8 +177,9 @@ export default function RetailerScorecardView({
     return [...cards].sort((a, b) => {
       if (sort === "net_loss") return b.netLoss - a.netLoss;
       if (sort === "dollars") return b.dollars - a.dollars;
-      // recovery: higher rate first (best retailer to dispute against)
-      return b.recoveryRate - a.recoveryRate;
+      // worst_recovery: lowest recovery rate first — the most painful
+      // retailers (Cinderhaven gets least back from them) at the top.
+      return a.recoveryRate - b.recoveryRate;
     });
   }, [cohort, retailers, sort]);
 
