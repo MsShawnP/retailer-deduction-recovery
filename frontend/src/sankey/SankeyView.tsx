@@ -21,19 +21,18 @@ const WIDTH = 1600;
 const HEIGHT = 1200;
 const MARGIN = { top: 44, right: 260, bottom: 20, left: 32 };
 
-// Single-hue teal gradient across the six layers, darkest at Deduction
-// Type and lightest at Outcome. Outcome nodes are overridden per-bucket
+// Single-hue teal gradient that DARKENS L→R, so the darkest teal
+// (Timeliness, layer 4) sits adjacent to the categorical outcome
+// column for maximum contrast. Outcome nodes are overridden per-bucket
 // by OUTCOME_COLORS — red for losses, green for wins, gray for pending.
-// One color family carries the flow; categorical hues call out the
-// terminal verdicts.
 const LAYER_COLORS = [
-  "#053D52", // type            — darkest teal
-  "#125F77",
-  "#26829A",
-  "#43A4B5",
+  "#9CD7D4", // type        — lightest teal
   "#6BBFC8",
-  "#9CD7D4", // outcome         — lightest (only visible on layer 5
-              //                   nodes that fall outside OUTCOME_COLORS)
+  "#43A4B5",
+  "#26829A",
+  "#125F77", // timeliness  — darkest teal, abuts outcome
+  "#053D52", // outcome     — placeholder; layer 5 is rendered via
+              //               OUTCOME_COLORS, so this value is unused
 ];
 
 function dollarsCompact(n: number): string {
