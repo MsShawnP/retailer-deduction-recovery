@@ -1,0 +1,157 @@
+/* Sober, data-forward — Economist style. */
+
+:root {
+  --ink: #1a1a1a;
+  --ink-soft: #4a4a4a;
+  --ink-faint: #888;
+  --rule: #d8d8d8;
+  --bg: #fafaf7;
+  --panel: #ffffff;
+  --accent: #94221f;
+  --pos: #2a6f4d;
+  --neg: #94221f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 28px 96px;
+}
+
+header {
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 12px;
+  margin-bottom: 28px;
+}
+
+header h1 {
+  font-size: 30px;
+  margin: 0 0 4px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  color: var(--ink-faint);
+  margin: 0;
+  font-size: 14px;
+  font-style: italic;
+}
+
+h2 {
+  font-size: 18px;
+  margin: 32px 0 12px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 6px;
+}
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.kpi {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: 16px 18px;
+}
+
+.kpi-label {
+  font-size: 12px;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}
+
+.kpi-value {
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.kpi-sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+}
+
+th, td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+th {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  background: #f4f3ee;
+}
+
+tr:last-child td { border-bottom: 0; }
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.placeholder {
+  margin-top: 40px;
+  padding: 16px 18px;
+  background: #f4f3ee;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-style: italic;
+  border-left: 3px solid var(--rule);
+}
+
+.placeholder h2 {
+  border: none;
+  padding: 0;
+  margin: 0 0 6px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+}
+
+.loading, .error {
+  padding: 64px 28px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.error {
+  color: var(--neg);
+  font-weight: 700;
+}
+
+@media (max-width: 800px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+}

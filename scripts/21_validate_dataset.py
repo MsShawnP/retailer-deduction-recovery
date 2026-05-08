@@ -28,7 +28,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DB_PATH = ROOT / "data" / "cinderhaven_deductions.db"
-JSON_DIR = ROOT / "data" / "json"
+JSON_DIR = ROOT / "frontend" / "public" / "json"
 
 # Target ranges from data/schema.md
 TARGETS = {

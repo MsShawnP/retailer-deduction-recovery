@@ -68,7 +68,12 @@ views for each feature before moving to the next.
 
 ### Phase 2: React app scaffold + Sankey
 
-- [ ] Set up React project, build system, Netlify deployment config
+- [x] Set up React project, build system, Netlify deployment config —
+      Vite + React + TypeScript scaffold under `frontend/`, JSON
+      export now lands at `frontend/public/json/`, root `netlify.toml`
+      points the build at `frontend/dist/`. Minimal landing page
+      renders KPIs, by-type, and by-retailer tables from summary.json.
+      Build passes; runtime data fetches verified via dev server.
 - [ ] Build Sankey flow — full deduction view on landing, all branch
       points (type → root cause → evidence quality → accessibility →
       timeliness → outcome)

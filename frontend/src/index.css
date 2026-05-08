@@ -1,0 +1,10 @@
+/* Reset / base — App.css carries the styling. */
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  min-height: 100vh;
+}

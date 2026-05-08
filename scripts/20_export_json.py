@@ -24,7 +24,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DB_PATH = ROOT / "data" / "cinderhaven_deductions.db"
-OUT_DIR = ROOT / "data" / "json"
+OUT_DIR = ROOT / "frontend" / "public" / "json"
 
 
 def dict_factory(cursor, row):
