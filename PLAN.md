@@ -123,8 +123,17 @@ views for each feature before moving to the next.
       labor (hours by evidence quality × rate). Selectable bucket
       cards drive a sortable top-25 table with a cross-link to the
       causation trace.
-- [ ] Dispute builder — evidence readiness view showing what exists
-      vs. what's needed for each deduction, mock dispute package
+- [x] Dispute builder — evidence readiness view showing what exists
+      vs. what's needed for each deduction, mock dispute package —
+      `DisputeBuilderView` reads retailer rules from `retailers.json`,
+      assesses each required evidence item against dispute.evidence /
+      pack_record / shipment chain, scores each deduction as ready /
+      needs work / not disputable. Filter tabs by readiness, prev/
+      next/random nav, two-column layout (requirements gap analysis +
+      mock dispute package), cross-link "View causation trace →" that
+      drives `tracedDeductionId`. Builder syncs to that anchor when
+      set externally so explorer/cost-view entries land on the same
+      deduction.
 - [ ] Timeline pressure view — deductions mapped against
       retailer-specific dispute deadlines, showing what's still
       in window, what's expiring, what's already dead

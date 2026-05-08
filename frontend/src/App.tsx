@@ -1,27 +1,30 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ByRetailer, ByType, Deduction, Summary } from "./types";
-import { loadDeductions, loadSummary, formatDollars, formatPercent, formatCount } from "./data";
+import type { ByRetailer, ByType, Deduction, RetailersById, Summary } from "./types";
+import { loadDeductions, loadRetailers, loadSummary, formatDollars, formatPercent, formatCount } from "./data";
 import SankeyView from "./sankey/SankeyView";
 import ExplorerView from "./explorer/ExplorerView";
 import CausationTraceView from "./causation/CausationTraceView";
 import RecoverySimulationView from "./simulation/RecoverySimulationView";
 import CostToDisputeView from "./cost/CostToDisputeView";
+import DisputeBuilderView from "./builder/DisputeBuilderView";
 import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
 export default function App() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [deductions, setDeductions] = useState<Deduction[] | null>(null);
+  const [retailers, setRetailers] = useState<RetailersById | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [tracedDeductionId, setTracedDeductionId] = useState<string | null>(null);
   const traceRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    Promise.all([loadSummary(), loadDeductions()])
-      .then(([s, d]) => {
+    Promise.all([loadSummary(), loadDeductions(), loadRetailers()])
+      .then(([s, d, r]) => {
         setSummary(s);
         setDeductions(d);
+        setRetailers(r);
       })
       .catch((e) => setError(String(e)));
   }, []);
@@ -162,6 +165,13 @@ export default function App() {
 
       <CostToDisputeView
         cohort={filteredDeductions ?? deductions}
+        onTrace={setTracedDeductionId}
+      />
+
+      <DisputeBuilderView
+        cohort={filteredDeductions ?? deductions}
+        retailers={retailers}
+        tracedDeductionId={tracedDeductionId}
         onTrace={setTracedDeductionId}
       />
 

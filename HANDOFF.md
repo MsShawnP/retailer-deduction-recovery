@@ -338,3 +338,36 @@ the existing tracedDeductionId so the user can hop from triage to
 dispute prep on one click.
 
 ---
+
+## 2026-05-08 12:28
+
+**What changed:** Phase 3 task 5 — dispute builder landed.
+`DisputeBuilderView` assesses each required evidence item from the
+retailer rules against Cinderhaven's actual records, scores per-
+deduction readiness, and previews a mock dispute package.
+
+**Why:** Fifth Phase 3 feature. Makes the "you don't have what you
+need" problem concrete and retailer-specific — gap analysis driven
+by the rules already encoded in `retailers.json`, not generic.
+
+**State:** App.tsx now loads retailers.json alongside summary +
+deductions. Per-requirement status of have_digital / have_paper /
+inferable / missing produces ready / needs work / not disputable
+buckets. Across the full portfolio: 334 ready / 1,533 needs work /
+1,462 not disputable. Filter tabs, prev/next/random nav, two-column
+requirements + mock package layout naming the retailer's portal.
+Builder syncs to external `tracedDeductionId` so clicking "Trace →"
+in the cost view also pivots the builder to that deduction (verified
+via Playwright). "View causation trace →" cross-link pushes the
+builder's current selection to the trace view. `screenshot-builder.mjs`
+green; zero JS errors. Build passes. PLAN.md Phase 3 task 5 checked
+off. 4 Phase 3 features remaining (timeline pressure, post-audit risk,
+retailer scorecard, origin clustering).
+
+**Next:** Phase 3 task 6 — timeline pressure view. Map each
+unresolved deduction against its retailer-specific dispute deadline,
+showing what's still in window, what's expiring inside the lean
+team's realistic working capacity, and what's already past deadline
+(auto-loss). Plugs into the same selection-filtered cohort.
+
+---
