@@ -156,8 +156,17 @@ views for each feature before moving to the next.
       realized post-audit claims, exposure-by-retailer table with
       hardcoded retailer audit profiles, and exposure-by-evidence-
       bucket breakdown. Trace cross-link on realized claims.
-- [ ] Retailer scorecard — deduction patterns, dispute acceptance
-      rates, deadline strictness, aggressiveness by retailer
+- [x] Retailer scorecard — deduction patterns, dispute acceptance
+      rates, deadline strictness, aggressiveness by retailer —
+      `RetailerScorecardView` renders 2-column cards per retailer
+      with net loss, volume, top deduction type, filed→won rates,
+      recovery, dispute window, evidence demand, past-deadline
+      counts, and a research-grounded behavioral profile blurb.
+      Selection union extended with a `retailer` kind so the
+      "Filter →" button on each card writes back to the same
+      lifted state that drives every other view; the scorecard
+      itself special-cases retailer filters (so the comparative
+      view survives) but respects every other filter kind.
 - [ ] Root cause clustering by origin point — deductions grouped by
       warehouse, packing line, carrier, or system
 

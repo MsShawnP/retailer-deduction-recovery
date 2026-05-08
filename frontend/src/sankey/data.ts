@@ -204,10 +204,12 @@ export function pathIds(d: Deduction): string[] {
 
 export type Selection =
   | { kind: "node"; nodeId: string }
-  | { kind: "link"; source: string; target: string };
+  | { kind: "link"; source: string; target: string }
+  | { kind: "retailer"; retailerId: string };
 
 export function isOnSelectedPath(d: Deduction, sel: Selection | null): boolean {
   if (!sel) return true;
+  if (sel.kind === "retailer") return d.retailer.id === sel.retailerId;
   const ids = pathIds(d);
   if (sel.kind === "node") return ids.includes(sel.nodeId);
   const layer = parseInt(sel.source.split(":")[0], 10);
@@ -234,8 +236,13 @@ export function highlightedNodeSet(selectedDeductions: Deduction[]): Set<string>
 }
 
 // Human-readable label for a selection — used in the filter chip.
-export function selectionLabel(sel: Selection | null): string {
+// Retailer-kind selections need the retailers map to look up display
+// names; callers can pass a fallback name so this stays self-contained.
+export function selectionLabel(sel: Selection | null, retailerName?: string): string {
   if (!sel) return "";
+  if (sel.kind === "retailer") {
+    return `Retailer = ${retailerName ?? sel.retailerId}`;
+  }
   if (sel.kind === "node") {
     const [layerStr, ...rest] = sel.nodeId.split(":");
     const layer = parseInt(layerStr, 10);

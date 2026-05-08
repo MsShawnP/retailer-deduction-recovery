@@ -9,6 +9,7 @@ import CostToDisputeView from "./cost/CostToDisputeView";
 import DisputeBuilderView from "./builder/DisputeBuilderView";
 import TimelinePressureView from "./pressure/TimelinePressureView";
 import PostAuditRiskView from "./audit/PostAuditRiskView";
+import RetailerScorecardView from "./scorecard/RetailerScorecardView";
 import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
@@ -117,7 +118,14 @@ export default function App() {
       {selection && (
         <div className="selection-chip">
           <span className="selection-label">Filter:</span>
-          <span className="selection-value">{selectionLabel(selection)}</span>
+          <span className="selection-value">
+            {selectionLabel(
+              selection,
+              selection.kind === "retailer"
+                ? retailers?.[selection.retailerId]?.name
+                : undefined
+            )}
+          </span>
           <span className="selection-count">{formatCount(kpiCount)} deductions • {formatDollars(kpiDollar)}</span>
           <button onClick={() => setSelection(null)} className="selection-clear">×</button>
         </div>
@@ -185,6 +193,21 @@ export default function App() {
       <PostAuditRiskView
         cohort={filteredDeductions ?? deductions}
         onTrace={setTracedDeductionId}
+      />
+
+      <RetailerScorecardView
+        cohort={
+          selection?.kind === "retailer"
+            ? deductions
+            : filteredDeductions ?? deductions
+        }
+        retailers={retailers}
+        activeRetailerId={
+          selection?.kind === "retailer" ? selection.retailerId : null
+        }
+        onSelectRetailer={(id) =>
+          setSelection(id ? { kind: "retailer", retailerId: id } : null)
+        }
       />
 
       <section className="break">

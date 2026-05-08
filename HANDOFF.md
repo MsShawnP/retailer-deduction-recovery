@@ -436,3 +436,35 @@ Pull together the retailer-side numbers that have been ambient
 across other views into one comparable scorecard.
 
 ---
+
+## 2026-05-08 13:14
+
+**What changed:** Phase 3 task 8 — retailer scorecard landed.
+`RetailerScorecardView` renders per-retailer cards with net loss,
+six metric tiles, and a behavioral profile; the per-card "Filter →"
+button writes a new retailer-kind selection that drives the rest of
+the app.
+
+**Why:** Eighth Phase 3 feature. Pulls the retailer-side numbers
+that were ambient across other views into one comparable scorecard
+so Walmart-vs-UNFI-vs-KeHE differences read at a glance.
+
+**State:** 10 cards in the full portfolio. Default-sort top three:
+Walmart $557K / UNFI $227K / KeHE $159K. Sort selector toggles
+net-loss / volume / recovery-rate. Selection union extended in
+sankey/data.ts with `kind: "retailer"`; isOnSelectedPath and
+selectionLabel updated; App.tsx looks up the retailer name for the
+filter chip and special-cases the scorecard cohort so retailer
+filters don't collapse the comparative view (other filter kinds
+still rescope the cards — verified). screenshot-scorecard.mjs
+green; zero JS errors. Build passes. PLAN.md Phase 3 task 8 checked
+off. 1 Phase 3 feature remaining (origin clustering).
+
+**Next:** Phase 3 task 9 — root-cause clustering by origin point.
+Group deductions by warehouse / packing line / carrier / system
+signal so the user can see which physical or operational origins
+are generating the most deductions. Plugs into the existing cohort;
+should expose the cluster as another selection kind so the rest of
+the app can scope to one origin point.
+
+---
