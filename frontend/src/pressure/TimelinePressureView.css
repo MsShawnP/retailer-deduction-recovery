@@ -1,0 +1,317 @@
+.pressure {
+  margin-top: 36px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+.pressure h2 {
+  border: none;
+  padding-bottom: 0;
+  margin-bottom: 4px;
+}
+
+.pressure-context {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 16px;
+  margin: 0;
+  max-width: 720px;
+}
+
+.pressure-empty {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 16px;
+  padding: 32px;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+}
+
+.pressure-header {
+  margin-bottom: 18px;
+}
+
+.pressure-buckets {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pressure-bucket {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-left-width: 4px;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--serif);
+  color: var(--ink);
+}
+
+.pressure-bucket:hover {
+  border-color: var(--ink-faint);
+}
+
+.pressure-bucket.active {
+  background: #fafafa;
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+
+.pressure-bucket-critical {
+  border-left-color: var(--accent-red);
+}
+.pressure-bucket-expiring {
+  border-left-color: var(--accent-gold);
+}
+.pressure-bucket-active {
+  border-left-color: var(--accent-green);
+}
+.pressure-bucket-expired {
+  border-left-color: var(--ink-soft);
+}
+.pressure-bucket-no_deadline {
+  border-left-color: var(--ink-faint);
+}
+
+.pressure-bucket-name {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.pressure-bucket-count {
+  font-size: 30px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin: 4px 0 4px;
+  line-height: 1.05;
+}
+
+.pressure-bucket-sub {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 6px;
+}
+
+.pressure-bucket-sub strong {
+  font-weight: 700;
+}
+
+.pressure-bucket-range {
+  font-size: 13px;
+  color: var(--ink-faint);
+  font-style: italic;
+  border-top: 1px solid var(--rule);
+  padding-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pressure-crosstab {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-family: var(--serif);
+}
+
+.pressure-section-head {
+  margin-bottom: 14px;
+}
+
+.pressure-crosstab h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--serif);
+}
+
+.pressure-crosstab-desc {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 15px;
+  margin: 0;
+  max-width: 720px;
+  line-height: 1.5;
+}
+
+.pressure-crosstab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-family: var(--serif);
+  margin-top: 8px;
+}
+
+.pressure-crosstab-table th,
+.pressure-crosstab-table td {
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid #eef0f2;
+}
+
+.pressure-crosstab-table th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+  background: #f1f2f4;
+  border-bottom: 1px solid var(--rule);
+}
+
+.pressure-crosstab-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.pressure-crosstab-table tr:last-child td {
+  border-bottom: none;
+}
+
+.bucket-name {
+  font-weight: 700;
+}
+
+.bucket-name .muted {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.bucket-row.bucket-critical {
+  background: #fff5f5;
+}
+
+.bucket-row.bucket-expiring {
+  background: #fffaf0;
+}
+
+.compounding {
+  color: var(--accent-red);
+  font-weight: 700;
+}
+
+.pressure-table-wrapper {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+}
+
+.pressure-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 18px;
+  background: #f1f2f4;
+  border-bottom: 1px solid var(--rule);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pressure-table-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--serif);
+}
+
+.pressure-table-count {
+  font-size: 14px;
+  color: var(--ink-soft);
+  font-style: italic;
+  font-variant-numeric: tabular-nums;
+}
+
+.pressure-table-scroll {
+  overflow-x: auto;
+}
+
+.pressure-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-family: var(--serif);
+  background: var(--panel);
+}
+
+.pressure-table th,
+.pressure-table td {
+  text-align: left;
+  padding: 9px 14px;
+  border-bottom: 1px solid #eef0f2;
+}
+
+.pressure-table th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+  background: var(--panel);
+}
+
+.pressure-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.pressure-table tr:last-child td {
+  border-bottom: none;
+}
+
+.pressure-id {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.pressure-days {
+  font-weight: 700;
+}
+
+.pressure-days-critical {
+  color: var(--accent-red);
+}
+.pressure-days-expiring {
+  color: var(--accent-gold);
+}
+.pressure-days-active {
+  color: var(--accent-green);
+}
+.pressure-days-expired {
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.pressure-days-no_deadline {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.row-critical {
+  background: #fff5f5;
+}
+
+.pressure-trace-btn {
+  font-family: var(--serif);
+  font-size: 14px;
+  background: var(--panel);
+  border: 1px solid var(--accent-red);
+  color: var(--accent-red);
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pressure-trace-btn:hover {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .pressure-buckets {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

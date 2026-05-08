@@ -371,3 +371,35 @@ team's realistic working capacity, and what's already past deadline
 (auto-loss). Plugs into the same selection-filtered cohort.
 
 ---
+
+## 2026-05-08 12:40
+
+**What changed:** Phase 3 task 6 — timeline pressure view landed.
+`TimelinePressureView` buckets unfiled, unresolved deductions by
+days-to-deadline and pairs the result with an evidence-quality
+cross-tab so the compounding story of the fifth failure shows up at
+a glance.
+
+**Why:** Sixth Phase 3 feature. Makes the timeliness compounding
+failure concrete: a lean team running paper records loses winnable
+deductions to the clock, and the dollars already gone are visible.
+
+**State:** Five bucket tiles (Critical ≤7d / Expiring 8–30d / Active
+>30d / Expired / No deadline) clickable to filter the urgent-list
+table; days-to-deadline computed against TODAY (2026-05-31). Cross-
+tab grid (bucket × digital/paper/missing) highlights compounding
+cells (urgent + paper or missing) in red. Top-25 urgent list ordered
+by days-remaining ascending, with Trace cross-link. Full-portfolio
+read: 9 critical / 43 expiring / 438 active / 475 expired ($144K
+already lost) / 860 no-deadline. `screenshot-pressure.mjs` green;
+zero JS errors. Build passes. PLAN.md Phase 3 task 6 checked off.
+3 Phase 3 features remaining (post-audit risk, retailer scorecard,
+origin clustering).
+
+**Next:** Phase 3 task 7 — post-audit risk exposure. Score each
+deduction's vulnerability to a retroactive retailer-audit clawback
+based on current evidence gaps. Surface dollar exposure by retailer,
+deduction type, and evidence quality, and contrast against the
+post-audit deductions already in the dataset.
+
+---

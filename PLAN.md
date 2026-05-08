@@ -134,9 +134,17 @@ views for each feature before moving to the next.
       drives `tracedDeductionId`. Builder syncs to that anchor when
       set externally so explorer/cost-view entries land on the same
       deduction.
-- [ ] Timeline pressure view — deductions mapped against
+- [x] Timeline pressure view — deductions mapped against
       retailer-specific dispute deadlines, showing what's still
-      in window, what's expiring, what's already dead
+      in window, what's expiring, what's already dead —
+      `TimelinePressureView` filters the cohort to unfiled +
+      unresolved, computes days-to-deadline against TODAY
+      (2026-05-31), and buckets each (Critical ≤7d / Expiring 8–30d
+      / Active >30d / Expired / No deadline) with count + dollar
+      tiles. A pressure × evidence-quality cross-tab tells the
+      compounding story (urgent + paper/missing cells highlighted
+      red). Selectable bucket cards drive a top-25 urgent-first
+      table with a Trace cross-link.
 - [ ] Post-audit risk exposure — based on current evidence gaps,
       calculate and visualize retroactive clawback vulnerability
 - [ ] Retailer scorecard — deduction patterns, dispute acceptance

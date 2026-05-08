@@ -7,6 +7,7 @@ import CausationTraceView from "./causation/CausationTraceView";
 import RecoverySimulationView from "./simulation/RecoverySimulationView";
 import CostToDisputeView from "./cost/CostToDisputeView";
 import DisputeBuilderView from "./builder/DisputeBuilderView";
+import TimelinePressureView from "./pressure/TimelinePressureView";
 import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
@@ -172,6 +173,11 @@ export default function App() {
         cohort={filteredDeductions ?? deductions}
         retailers={retailers}
         tracedDeductionId={tracedDeductionId}
+        onTrace={setTracedDeductionId}
+      />
+
+      <TimelinePressureView
+        cohort={filteredDeductions ?? deductions}
         onTrace={setTracedDeductionId}
       />
 
