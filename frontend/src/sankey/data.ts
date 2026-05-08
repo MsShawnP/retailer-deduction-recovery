@@ -34,7 +34,7 @@ export interface SankeyData {
   links: SankeyLink[];
 }
 
-const TYPE_LABELS: Record<string, string> = {
+export const TYPE_LABELS: Record<string, string> = {
   short_ship: "Short ship",
   label_fine: "Label fine",
   pallet_fine: "Pallet fine",
@@ -43,6 +43,18 @@ const TYPE_LABELS: Record<string, string> = {
   promo_billback: "Promo billback",
   vague: "Vague",
 };
+
+// Display order for the type dropdown — by descending volume in the
+// dataset so the most common types appear first.
+export const TYPE_OPTIONS: string[] = [
+  "Short ship",
+  "Label fine",
+  "Late delivery",
+  "Promo billback",
+  "Damaged",
+  "Pallet fine",
+  "Vague",
+];
 
 const OUTCOME_LABELS: Record<string, string> = {
   won_full: "Won full",

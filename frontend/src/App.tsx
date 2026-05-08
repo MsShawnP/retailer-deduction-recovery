@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ByRetailer, ByType, Deduction, Summary } from "./types";
 import { loadDeductions, loadSummary, formatDollars, formatPercent, formatCount } from "./data";
 import SankeyView from "./sankey/SankeyView";
-import { isOnSelectedPath, selectionLabel, type Selection } from "./sankey/data";
+import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
 export default function App() {
@@ -40,6 +40,22 @@ export default function App() {
 
   const byRetailer = byChannel.filter((r) => r.channel_type === "retailer");
   const byDistributor = byChannel.filter((r) => r.channel_type === "distributor");
+
+  // The dropdown reflects layer-0 (Deduction type) selections.
+  // Selections in other layers leave the dropdown at "all" but the
+  // chip continues to indicate the active filter.
+  const dropdownValue = useMemo(() => {
+    if (!selection || selection.kind !== "node") return "all";
+    const [layerStr, ...rest] = selection.nodeId.split(":");
+    if (layerStr !== "0") return "all";
+    const label = rest.join(":");
+    return TYPE_OPTIONS.includes(label) ? label : "all";
+  }, [selection]);
+
+  function onDropdownChange(value: string) {
+    if (value === "all") setSelection(null);
+    else setSelection({ kind: "node", nodeId: `0:${value}` });
+  }
 
   if (error) return <div className="error">Error loading data: {error}</div>;
   if (!summary || !deductions) return <div className="loading">Loading…</div>;
@@ -82,6 +98,22 @@ export default function App() {
         <Kpi label="Labor on disputes" value={`${formatCount(Math.round(kpiLaborHours))} hrs`} sub={`~${kpiFte.toFixed(1)} FTE`} />
         <Kpi label="Undisputed losses" value={formatDollars(kpiNoDisputeDollar)} sub={`${formatCount(kpiNoDisputeCount)} deductions never filed`} negative />
       </section>
+
+      <div className="type-selector">
+        <label htmlFor="type-filter">Filter by deduction type:</label>
+        <select
+          id="type-filter"
+          value={dropdownValue}
+          onChange={(e) => onDropdownChange(e.target.value)}
+        >
+          <option value="all">All deductions</option>
+          {TYPE_OPTIONS.map((label) => (
+            <option key={label} value={label}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <SankeyView deductions={deductions} selection={selection} onSelect={setSelection} />
 
