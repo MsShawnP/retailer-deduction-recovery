@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ByRetailer, ByType, Deduction, Summary } from "./types";
 import { loadDeductions, loadSummary, formatDollars, formatPercent, formatCount } from "./data";
 import SankeyView from "./sankey/SankeyView";
 import ExplorerView from "./explorer/ExplorerView";
+import CausationTraceView from "./causation/CausationTraceView";
 import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
@@ -11,6 +12,8 @@ export default function App() {
   const [deductions, setDeductions] = useState<Deduction[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selection, setSelection] = useState<Selection | null>(null);
+  const [tracedDeductionId, setTracedDeductionId] = useState<string | null>(null);
+  const traceRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     Promise.all([loadSummary(), loadDeductions()])
@@ -26,6 +29,26 @@ export default function App() {
     if (!deductions || !selection) return deductions;
     return deductions.filter((d) => isOnSelectedPath(d, selection));
   }, [deductions, selection]);
+
+  // If the cohort changes and the traced deduction is no longer in it,
+  // clear the trace so the view doesn't show a stale anchor.
+  useEffect(() => {
+    if (
+      tracedDeductionId &&
+      filteredDeductions &&
+      !filteredDeductions.some((d) => d.deduction_id === tracedDeductionId)
+    ) {
+      setTracedDeductionId(null);
+    }
+  }, [filteredDeductions, tracedDeductionId]);
+
+  // Scroll the trace section into view whenever a new trace is set from
+  // the explorer.
+  useEffect(() => {
+    if (tracedDeductionId && traceRef.current) {
+      traceRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [tracedDeductionId]);
 
   const byType: ByType[] = useMemo(() => {
     if (!filteredDeductions || !summary) return [];
@@ -121,7 +144,17 @@ export default function App() {
       <ExplorerView
         cohort={filteredDeductions ?? deductions}
         allDeductions={deductions}
+        onTrace={setTracedDeductionId}
+        tracedDeductionId={tracedDeductionId}
       />
+
+      <div ref={traceRef}>
+        <CausationTraceView
+          tracedDeductionId={tracedDeductionId}
+          cohort={filteredDeductions ?? deductions}
+          onChange={setTracedDeductionId}
+        />
+      </div>
 
       <section className="break">
         <h2>By deduction type{selection && <span className="filtered-tag">filtered</span>}</h2>

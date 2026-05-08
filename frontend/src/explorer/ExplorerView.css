@@ -67,6 +67,24 @@
   cursor: not-allowed;
 }
 
+.explorer-trace-btn {
+  margin-left: 12px;
+  border-color: var(--accent-red) !important;
+  color: var(--accent-red) !important;
+  font-weight: 700;
+}
+
+.explorer-trace-btn.active {
+  background: var(--accent-red) !important;
+  color: #fff !important;
+  border-color: var(--accent-red) !important;
+}
+
+.explorer-trace-btn.active:hover {
+  background: var(--accent-red) !important;
+  color: #fff !important;
+}
+
 .explorer-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

@@ -241,3 +241,35 @@ framing than the explorer's parallel cards); plug into the same
 `selection` state. Source data already in JSON.
 
 ---
+
+## 2026-05-08 11:24
+
+**What changed:** Phase 3 task 2 — causation tracing landed.
+`CausationTraceView` renders a chronological PO → pack → ship →
+delivery → deduction → dispute → outcome timeline with severity-colored
+markers; explorer gets a "Trace this order →" button that drives it.
+
+**Why:** Second Phase 3 feature. The explorer surfaces one
+deduction's six failure layers in parallel; the trace shows the same
+order's story chronologically — what happened, in what sequence, and
+where it broke down. Same connected-views wiring as the rest of the
+app.
+
+**State:** `tracedDeductionId` lifted into App.tsx alongside the
+existing Sankey `selection` filter. ExplorerView's "Trace this order →"
+button sets it; trace section auto-scrolls into view, runs its own
+prev/next/random over the current cohort, resets when the cohort drops
+the anchor. Standard chains render 7 timeline events with red/gold/green
+dots and per-step failure flags; post-audit clawbacks get a parallel
+3-event audit-period path. `frontend/screenshot-trace.mjs` verifies the
+flow end to end — zero JS errors. Build passes (`npm run build`).
+PLAN.md Phase 3 task 2 checked off in the same commit. 7 Phase 3
+features remaining.
+
+**Next:** Phase 3 task 3 — recovery simulation. Toggle operational
+and administrative fixes (compliant labels, digital pack verification,
+faster evidence retrieval, on-time dispute filing) on/off and watch
+portfolio-wide recovery rate and dollar amounts shift in real time.
+Plugs into the same `selection` cohort.
+
+---

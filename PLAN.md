@@ -94,8 +94,14 @@ views for each feature before moving to the next.
       reads from `selection` state, sorts cohort by amount, prev /
       next / random nav. 3-column card grid with red-numbered
       headers and color-coded timeliness.
-- [ ] Causation tracing — follow a single order from label → short
-      count → deduction → failed dispute, end to end
+- [x] Causation tracing — follow a single order from label → short
+      count → deduction → failed dispute, end to end — `CausationTraceView`
+      reads `tracedDeductionId` from App.tsx (set from explorer's "Trace
+      this order" button), renders a chronological timeline of PO → pack
+      & label → ship → delivery → deduction → dispute → outcome with
+      severity-colored markers (red/gold/green) and per-step failure
+      flags. Post-audit claims get a parallel audit-period path. Cohort
+      nav (prev/next/random) on the trace itself.
 - [ ] Recovery simulation — toggle operational and administrative
       fixes on/off, watch portfolio-wide recovery rate and dollar
       amounts shift in real time

@@ -7,11 +7,18 @@ import "./ExplorerView.css";
 interface Props {
   cohort: Deduction[];
   allDeductions: Deduction[];
+  onTrace?: (deductionId: string) => void;
+  tracedDeductionId?: string | null;
 }
 
 const TODAY = new Date("2026-05-31");
 
-export default function ExplorerView({ cohort, allDeductions }: Props) {
+export default function ExplorerView({
+  cohort,
+  allDeductions,
+  onTrace,
+  tracedDeductionId,
+}: Props) {
   const sorted = useMemo(
     () => [...cohort].sort((a, b) => b.amount - a.amount),
     [cohort]
@@ -56,6 +63,19 @@ export default function ExplorerView({ cohort, allDeductions }: Props) {
           <button onClick={goPrev} aria-label="Previous deduction">← Prev</button>
           <button onClick={goRandom}>Random</button>
           <button onClick={goNext} aria-label="Next deduction">Next →</button>
+          {onTrace && (
+            <button
+              onClick={() => onTrace(current.deduction_id)}
+              className={
+                tracedDeductionId === current.deduction_id
+                  ? "explorer-trace-btn active"
+                  : "explorer-trace-btn"
+              }
+              aria-label="Trace this order chronologically"
+            >
+              Trace this order →
+            </button>
+          )}
         </div>
       </header>
 
