@@ -158,12 +158,16 @@ export function buildSankeyData(deductions: Deduction[]): SankeyData {
   return { nodes, links };
 }
 
+// Abbreviated to keep all six column titles on one line at common
+// viewport widths: "Evidence quality" → "Evidence",
+// "Evidence accessibility" → "Accessibility",
+// "Dispute timeliness" → "Timeliness".
 export const LAYER_TITLES = [
   "Deduction type",
   "Root cause",
-  "Evidence quality",
-  "Evidence accessibility",
-  "Dispute timeliness",
+  "Evidence",
+  "Accessibility",
+  "Timeliness",
   "Outcome",
 ];
 
@@ -230,17 +234,20 @@ export function selectionLabel(sel: Selection | null): string {
   return `${srcRest.join(":")} → ${tgtRest.join(":")}`;
 }
 
-// Outcome-specific colors. Layer 5 nodes need hue-distinct shades for
-// the four lost_* outcomes so a color-blind viewer can tell them
-// apart. Economist palette — crisp, high-contrast, hue-distinct.
+// Outcomes split into three categorical buckets:
+//   - Wins  — green (#0A7B3E)
+//   - Pending — neutral gray
+//   - Lost / abandoned / never_filed — Economist red
+// Within-bucket detail comes from the node label, not the color.
+// Wins use one shade so won_full and won_partial both read as "won".
 export const OUTCOME_COLORS: Record<string, string> = {
-  "Won full":           "#157F3D",  // Economist green
-  "Won partial":        "#4FAE7A",  // light green
-  Pending:              "#6B7D8C",  // blue-gray
-  Abandoned:            "#FFB800",  // gold — gave up
-  "Lost — evidence":    "#E3120B",  // Economist red — biggest cause
-  "Lost — deadline":    "#E55B0F",  // orange — time-based
-  "Lost — no response": "#003F5C",  // dark navy — silence
-  "Lost — other":       "#8B95A1",  // medium gray
-  "Never filed":        "#2C3E50",  // charcoal navy
+  "Won full":           "#0A7B3E",  // green
+  "Won partial":        "#0A7B3E",  // green (same — winning is winning)
+  Pending:              "#8B95A1",  // neutral gray
+  Abandoned:            "#E3120B",  // red — gave up = loss
+  "Lost — evidence":    "#E3120B",
+  "Lost — deadline":    "#E3120B",
+  "Lost — no response": "#E3120B",
+  "Lost — other":       "#E3120B",
+  "Never filed":        "#E3120B",
 };

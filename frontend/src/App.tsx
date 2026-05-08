@@ -32,11 +32,14 @@ export default function App() {
     return aggregateByType(filteredDeductions);
   }, [filteredDeductions, selection, summary]);
 
-  const byRetailer: ByRetailer[] = useMemo(() => {
+  const byChannel: ByRetailer[] = useMemo(() => {
     if (!filteredDeductions || !summary) return [];
     if (!selection) return summary.by_retailer;
     return aggregateByRetailer(filteredDeductions);
   }, [filteredDeductions, selection, summary]);
+
+  const byRetailer = byChannel.filter((r) => r.channel_type === "retailer");
+  const byDistributor = byChannel.filter((r) => r.channel_type === "distributor");
 
   if (error) return <div className="error">Error loading data: {error}</div>;
   if (!summary || !deductions) return <div className="loading">Loading…</div>;
@@ -137,7 +140,38 @@ export default function App() {
             ))}
             {byRetailer.length === 0 && (
               <tr>
-                <td colSpan={5} className="empty">No deductions match this selection.</td>
+                <td colSpan={5} className="empty">No retailer deductions match this selection.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="break">
+        <h2>By distributor{selection && <span className="filtered-tag">filtered</span>}</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Distributor</th>
+              <th className="num">Deductions</th>
+              <th className="num">Dollars</th>
+              <th className="num">Recovered</th>
+              <th className="num">Recovery rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {byDistributor.map((r) => (
+              <tr key={r.retailer_id}>
+                <td>{r.name}</td>
+                <td className="num">{formatCount(r.deductions)}</td>
+                <td className="num">{formatDollars(r.dollar)}</td>
+                <td className="num">{formatDollars(r.recovered)}</td>
+                <td className="num">{formatPercent(r.recovery_rate)}</td>
+              </tr>
+            ))}
+            {byDistributor.length === 0 && (
+              <tr>
+                <td colSpan={5} className="empty">No distributor deductions match this selection.</td>
               </tr>
             )}
           </tbody>

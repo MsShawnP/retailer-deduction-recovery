@@ -17,19 +17,23 @@ interface Props {
   onSelect: (sel: Selection | null) => void;
 }
 
-const WIDTH = 1100;
-const HEIGHT = 880;
-const MARGIN = { top: 36, right: 220, bottom: 16, left: 16 };
+const WIDTH = 1600;
+const HEIGHT = 1200;
+const MARGIN = { top: 44, right: 260, bottom: 20, left: 32 };
 
-// Economist palette: dark navy, red as primary accent, blue/teal,
-// amber for time, per-outcome for layer 5.
+// Single-hue teal gradient across the six layers, darkest at Deduction
+// Type and lightest at Outcome. Outcome nodes are overridden per-bucket
+// by OUTCOME_COLORS — red for losses, green for wins, gray for pending.
+// One color family carries the flow; categorical hues call out the
+// terminal verdicts.
 const LAYER_COLORS = [
-  "#0D1B2A", // type — dark navy
-  "#E3120B", // root cause — Economist red (project's central story)
-  "#0077B6", // evidence quality — bright blue
-  "#00A5CF", // accessibility — teal
-  "#C97C1A", // timeliness — amber (time)
-  "#3a4a3a", // outcome (overridden per-node by OUTCOME_COLORS)
+  "#053D52", // type            — darkest teal
+  "#125F77",
+  "#26829A",
+  "#43A4B5",
+  "#6BBFC8",
+  "#9CD7D4", // outcome         — lightest (only visible on layer 5
+              //                   nodes that fall outside OUTCOME_COLORS)
 ];
 
 function dollarsCompact(n: number): string {

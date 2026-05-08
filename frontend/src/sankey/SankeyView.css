@@ -1,20 +1,26 @@
 .sankey {
-  margin-top: 32px;
-  padding-top: 8px;
+  /* Break out of the .app container's max-width — the Sankey is the
+     hero chart and benefits from full viewport. */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  padding: 8px 48px 32px;
+  margin-top: 36px;
   border-top: 1px solid var(--rule);
 }
 
 .sankey h2 {
   border: none;
   padding-bottom: 0;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .sankey-sub {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--ink-soft);
   font-style: italic;
-  margin: 0 0 16px;
+  margin: 0 0 18px;
+  font-family: var(--serif);
 }
 
 .sankey-svg {
@@ -26,8 +32,8 @@
 }
 
 .sankey-layer-title {
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  font-size: 11px;
+  font-family: var(--serif);
+  font-size: 16px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   fill: var(--ink-soft);
@@ -35,15 +41,15 @@
 }
 
 .sankey-node-label {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 11px;
+  font-family: var(--serif);
+  font-size: 15px;
   fill: var(--ink);
   pointer-events: none;
 }
 
 .sankey-node-value {
   fill: var(--ink-faint);
-  font-size: 10px;
+  font-size: 14px;
 }
 
 .sankey-links path {
