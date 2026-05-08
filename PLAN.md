@@ -74,13 +74,17 @@ views for each feature before moving to the next.
       points the build at `frontend/dist/`. Minimal landing page
       renders KPIs, by-type, and by-retailer tables from summary.json.
       Build passes; runtime data fetches verified via dev server.
-- [ ] Build Sankey flow — full deduction view on landing, all branch
+- [x] Build Sankey flow — full deduction view on landing, all branch
       points (type → root cause → evidence quality → accessibility →
-      timeliness → outcome)
-- [ ] Implement zoom-on-click — user clicks a branch, view narrows
-      to that path with detail
-- [ ] Connect Sankey branches to downstream views (clicking a path
-      loads relevant data in other views)
+      timeliness → outcome) — d3-sankey rendering 41 nodes, $1.33M
+      total flow, hue-distinct outcome layer
+- [x] Implement zoom-on-click — user clicks a node or link, that
+      path stays at full opacity and the rest dims to ~4% (context
+      preserved, not removed)
+- [x] Connect Sankey branches to downstream views — selection state
+      lifted to App.tsx; KPIs, by_type, and by_retailer tables
+      recompute from the filtered subset. Phase 3 feature views
+      will plug into the same selection state.
 
 ### Phase 3: Feature views (vertical slices)
 
