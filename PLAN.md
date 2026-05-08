@@ -88,9 +88,12 @@ views for each feature before moving to the next.
 
 ### Phase 3: Feature views (vertical slices)
 
-- [ ] Deduction explorer — six-layer drill-down for individual
+- [x] Deduction explorer — six-layer drill-down for individual
       deductions (the deduction, visibility/pattern, root cause,
-      evidence quality, accessibility, timeliness)
+      evidence quality, accessibility, timeliness) — `ExplorerView`
+      reads from `selection` state, sorts cohort by amount, prev /
+      next / random nav. 3-column card grid with red-numbered
+      headers and color-coded timeliness.
 - [ ] Causation tracing — follow a single order from label → short
       count → deduction → failed dispute, end to end
 - [ ] Recovery simulation — toggle operational and administrative
