@@ -131,3 +131,31 @@ Netlify deploy config. Frontend will live in a `frontend/` (or
 `app/`) subdirectory and consume data/json/ at build time.
 
 ---
+
+## 2026-05-07 21:44
+
+**What changed:** Phase 2 complete — Sankey 6-layer flow with
+click-to-zoom, color-blind-safe outcome layer, and selection-state
+architecture wired through KPIs and tables for connected views.
+
+**Why:** Sankey is the demo's centerpiece. With the selection-state
+architecture lifted into App.tsx, every Phase 3 feature view can
+plug into the same filter signal without re-architecting.
+
+**State:** Vite + React + TS scaffold under `frontend/`, dev server
+runs from `npm run dev`, build passes, Netlify config at root. The
+landing page renders 4 KPIs, the Sankey, and by_type / by_retailer
+tables. Click any Sankey node or band → KPIs and both tables
+recompute from the filtered cohort, the clicked path stays at full
+opacity while everything else fades to ~4%. Outcome layer uses
+hue-distinct colors so the four lost_* variants are
+deuteranopia/protanopia-safe. Playwright screenshot scripts (default
++ clicked) live in `frontend/` for visual verification.
+
+**Next:** Phase 3 task 1 — deduction explorer. Click a single
+Sankey node or table row → drill-down panel showing one deduction
+with all six layers (the deduction itself, visibility/pattern, root
+cause, evidence quality, accessibility, timeliness) plus its order /
+shipment / pack record / dispute chain.
+
+---
