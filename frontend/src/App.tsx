@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ByRetailer, ByType, Deduction, Summary } from "./types";
 import { loadDeductions, loadSummary, formatDollars, formatPercent, formatCount } from "./data";
 import SankeyView from "./sankey/SankeyView";
+import ExplorerView from "./explorer/ExplorerView";
 import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
@@ -116,6 +117,11 @@ export default function App() {
       </div>
 
       <SankeyView deductions={deductions} selection={selection} onSelect={setSelection} />
+
+      <ExplorerView
+        cohort={filteredDeductions ?? deductions}
+        allDeductions={deductions}
+      />
 
       <section className="break">
         <h2>By deduction type{selection && <span className="filtered-tag">filtered</span>}</h2>

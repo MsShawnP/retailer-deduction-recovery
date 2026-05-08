@@ -81,7 +81,7 @@ const LOCATION_LABELS: Record<string, string> = {
   lost: "Lost",
 };
 
-function rootCauseFor(d: Deduction): string {
+export function rootCauseFor(d: Deduction): string {
   if (d.is_post_audit) return "Post-audit clawback";
 
   if (d.deduction_type === "short_ship") {
