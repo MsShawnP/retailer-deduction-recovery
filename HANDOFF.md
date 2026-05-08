@@ -273,3 +273,35 @@ portfolio-wide recovery rate and dollar amounts shift in real time.
 Plugs into the same `selection` cohort.
 
 ---
+
+## 2026-05-08 11:42
+
+**What changed:** Phase 3 task 3 — recovery simulation landed.
+`RecoverySimulationView` presents five fix toggles with solo-impact
+previews and a live current-vs-projected comparison panel against the
+selection-filtered cohort.
+
+**Why:** Third Phase 3 feature. Lets a CEO turn fixes on and off and
+watch the portfolio shift in real time, so the cost of each gap
+becomes discoverable through play instead of lectured.
+
+**State:** Five toggles (compliant labels, digital pack verification,
+systematic filing, deadline tracking, EDI/ASN compliance). Elimination
+rules per toggle remove deductions upstream; evidence-quality-keyed
+win-probability table (digital_complete 65% / digital_partial 35% /
+handwritten 12% / none 5%) re-models surviving disputes whose path
+actually changed — untouched disputes keep their actual recovered
+amount. With all toggles on against the $1.33M portfolio: 1,650
+deductions prevented, recovery rate 7.4% → 64.6%, net loss $1.23M →
+$308K, $924K saved. Toggles are local view state; cohort comes from
+App.tsx selection. `screenshot-sim.mjs` verifies behavior — zero JS
+errors. Build passes. PLAN.md Phase 3 task 3 checked off. 6 Phase 3
+features remaining.
+
+**Next:** Phase 3 task 4 — cost-to-dispute profitability filter.
+Compute per-deduction whether the labor cost of disputing exceeds the
+expected recovery; surface the threshold, the deductions on each side
+of it, and how the line moves as evidence quality and dispute method
+change. Plugs into the same `selection` cohort.
+
+---

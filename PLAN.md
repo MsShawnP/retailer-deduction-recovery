@@ -102,9 +102,16 @@ views for each feature before moving to the next.
       severity-colored markers (red/gold/green) and per-step failure
       flags. Post-audit claims get a parallel audit-period path. Cohort
       nav (prev/next/random) on the trace itself.
-- [ ] Recovery simulation — toggle operational and administrative
+- [x] Recovery simulation — toggle operational and administrative
       fixes on/off, watch portfolio-wide recovery rate and dollar
-      amounts shift in real time
+      amounts shift in real time — `RecoverySimulationView` runs
+      against the `selection`-filtered cohort, five toggles
+      (compliant labels, digital pack verification, systematic
+      filing, deadline tracking, EDI/ASN compliance) drive an
+      evidence-quality-calibrated win-probability model
+      (digital_complete 65% / digital_partial 35% / handwritten 12%
+      / none 5%). Per-toggle solo-impact previews and a current-vs-
+      projected comparison panel update live.
 - [ ] Cost-to-dispute profitability filter — calculate whether a
       deduction is worth fighting given labor cost to gather evidence
       and dispute

@@ -1,0 +1,260 @@
+.sim {
+  margin-top: 36px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+.sim h2 {
+  border: none;
+  padding-bottom: 0;
+  margin-bottom: 4px;
+}
+
+.sim-context {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 16px;
+  margin: 0;
+  max-width: 720px;
+}
+
+.sim-empty {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 16px;
+  padding: 32px;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+}
+
+.sim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.sim-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sim-actions button {
+  font-family: var(--serif);
+  font-size: 16px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.sim-actions button:hover:not(:disabled) {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.sim-actions button:focus {
+  outline: 2px solid var(--accent-red);
+  outline-offset: 1px;
+}
+
+.sim-actions button:disabled {
+  color: var(--ink-faint);
+  cursor: not-allowed;
+}
+
+.sim-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.sim-toggle {
+  display: grid;
+  grid-template-columns: 28px 1fr 180px;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-left-width: 3px;
+  border-left-color: var(--rule);
+  cursor: pointer;
+  font-family: var(--serif);
+}
+
+.sim-toggle:hover {
+  border-color: var(--ink-faint);
+}
+
+.sim-toggle.on {
+  border-left-color: var(--accent-green);
+  background: #fafdf9;
+}
+
+.sim-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-green);
+  cursor: pointer;
+}
+
+.sim-toggle-title {
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.sim-toggle-desc {
+  font-size: 15px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.sim-toggle-impact {
+  text-align: right;
+  font-family: var(--serif);
+  border-left: 1px solid var(--rule);
+  padding-left: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-toggle-impact-num {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.sim-toggle-impact-label {
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.sim-toggle-impact-savings {
+  font-size: 14px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.sim-toggle-impact-savings strong {
+  color: var(--accent-green);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.sim-compare {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  font-family: var(--serif);
+}
+
+.sim-compare-row {
+  display: grid;
+  grid-template-columns: 220px 1fr 1fr;
+  gap: 16px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+  font-size: 16px;
+}
+
+.sim-compare-row:last-child {
+  border-bottom: none;
+}
+
+.sim-compare-head {
+  background: #f1f2f4;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.sim-compare-label {
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.sim-compare-cell {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.sim-compare-cell strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.sim-compare-cell .muted {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 15px;
+}
+
+.sim-delta {
+  margin-left: 8px;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.sim-delta-pos {
+  color: var(--accent-green);
+}
+
+.sim-compare-savings {
+  background: #fafafa;
+  border-top: 2px solid var(--ink);
+}
+
+.sim-compare-savings .sim-compare-label {
+  color: var(--ink);
+  font-style: normal;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 14px;
+}
+
+.sim-savings-pos {
+  color: var(--accent-green);
+}
+
+@media (max-width: 900px) {
+  .sim-toggle {
+    grid-template-columns: 24px 1fr;
+    grid-template-rows: auto auto;
+  }
+  .sim-toggle-impact {
+    grid-column: 2;
+    border-left: none;
+    padding-left: 0;
+    text-align: left;
+    border-top: 1px solid var(--rule);
+    padding-top: 8px;
+    margin-top: 4px;
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+  }
+  .sim-toggle-impact-num {
+    font-size: 18px;
+  }
+  .sim-compare-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .sim-compare-head {
+    display: none;
+  }
+}

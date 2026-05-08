@@ -4,6 +4,7 @@ import { loadDeductions, loadSummary, formatDollars, formatPercent, formatCount 
 import SankeyView from "./sankey/SankeyView";
 import ExplorerView from "./explorer/ExplorerView";
 import CausationTraceView from "./causation/CausationTraceView";
+import RecoverySimulationView from "./simulation/RecoverySimulationView";
 import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
@@ -155,6 +156,8 @@ export default function App() {
           onChange={setTracedDeductionId}
         />
       </div>
+
+      <RecoverySimulationView cohort={filteredDeductions ?? deductions} />
 
       <section className="break">
         <h2>By deduction type{selection && <span className="filtered-tag">filtered</span>}</h2>
