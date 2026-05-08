@@ -82,3 +82,30 @@ static seeds (retailers, retailer_rules, deduction_codes,
 edi_requirements) before generating orders/shipments/deductions.
 
 ---
+
+## 2026-05-07 20:33
+
+**What changed:** End-to-end synthetic deduction dataset built —
+orders/pack/ship/deductions/remittances/disputes/post-audit, ~$1.4M
+deduction value, 8.6% recovery rate. Six of eight Phase 1 tasks now
+complete.
+
+**Why:** Phase 1 tasks 4, 5, 6 (deductions, disputes, pack/ship). Data
+is the foundation for the React app's connected views; numbers had to
+land in realistic ranges (3-5% of revenue, lots of handwritten
+evidence, low recovery) before the demo would tell the right story.
+
+**State:** `python scripts/build_deductions_db.py --force --full`
+rebuilds the entire deduction-extended DB end-to-end. Counts: 5,838
+orders / 30,127 lines / 5,838 pack_records / 5,838 shipments / 3,333
+deductions (incl. 41 post-audit) / 553 remittances / 1,505 disputes /
+3,303 dispute_evidence / 41 post_audit_claims. Cinderhaven-data base
+tables untouched (90/902/12,507/386). Two Phase 1 tasks remain: JSON
+export and dataset validation.
+
+**Next:** Phase 1 task 7 — build the JSON export script that
+transforms the SQLite extended DB into the static JSON files the
+React app will consume. Then task 8 (validate) before Phase 2 (React
+scaffold + Sankey).
+
+---
