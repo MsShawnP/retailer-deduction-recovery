@@ -155,14 +155,16 @@ def main() -> None:
                     "compliance": f"Post-audit compliance findings — period {audit_period_start.isoformat()} to {audit_period_end.isoformat()}",
                 }[claim_type]
 
-                # Some are vague (especially freight/allowance)
-                is_vague = 1 if claim_type in ("freight", "allowance") and rng.random() < 0.3 else 0
-
+                # Post-audit claims are *not* vague — they carry an audit
+                # period and claim type, so the supplier knows what the
+                # claim references even if they dispute it. is_vague stays
+                # 0 to keep the schema convention "is_vague implies
+                # deduction_type='vague'" intact.
                 deduction_rows.append((
                     deduction_id, retailer_id, None, None, deduction_type,
                     code_id, code_remitted, desc,
                     amount, ded_date.isoformat(), deadline,
-                    is_vague, 1,  # is_post_audit
+                    0, 1,  # is_vague=0, is_post_audit=1
                     None,  # remittance_id — repopulated by 14
                 ))
 

@@ -47,6 +47,7 @@ DYNAMIC_PIPELINE = [
     "14_generate_remittances.py",
     "15_generate_disputes.py",
     "20_export_json.py",
+    "21_validate_dataset.py",
 ]
 
 

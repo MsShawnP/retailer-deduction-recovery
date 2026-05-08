@@ -5,68 +5,68 @@
     "months": 20
   },
   "totals": {
-    "deductions_count": 3333,
-    "deductions_dollar": 1399534.49,
-    "annualized_dollar": 839720.69,
-    "disputes_filed": 1505,
+    "deductions_count": 3329,
+    "deductions_dollar": 1331616.68,
+    "annualized_dollar": 798970.01,
+    "disputes_filed": 1504,
     "disputes_recovered": 99087.33,
-    "recovery_rate": 0.0708,
-    "labor_hours": 6224.5,
+    "recovery_rate": 0.0744,
+    "labor_hours": 6218.4,
     "fte_equivalent": 2.99,
     "orders_count": 5838,
     "orders_dollar": 31409072.52,
-    "deductions_no_dispute_count": 1828,
-    "deductions_no_dispute_dollar": 722753.26
+    "deductions_no_dispute_count": 1825,
+    "deductions_no_dispute_dollar": 687927.64
   },
   "by_type": [
     {
       "deduction_type": "vague",
-      "count": 258,
-      "dollar": 361419.52,
-      "pct_count": 0.0774,
-      "pct_dollars": 0.2582
+      "count": 254,
+      "dollar": 324895.6,
+      "pct_count": 0.0763,
+      "pct_dollars": 0.244
     },
     {
       "deduction_type": "promo_billback",
-      "count": 404,
-      "dollar": 299073.4,
-      "pct_count": 0.1212,
-      "pct_dollars": 0.2137
+      "count": 401,
+      "dollar": 287626.14,
+      "pct_count": 0.1205,
+      "pct_dollars": 0.216
     },
     {
       "deduction_type": "short_ship",
       "count": 1250,
       "dollar": 280721.76,
-      "pct_count": 0.375,
-      "pct_dollars": 0.2006
+      "pct_count": 0.3755,
+      "pct_dollars": 0.2108
     },
     {
       "deduction_type": "label_fine",
-      "count": 476,
-      "dollar": 199771.15,
-      "pct_count": 0.1428,
-      "pct_dollars": 0.1427
+      "count": 479,
+      "dollar": 179824.52,
+      "pct_count": 0.1439,
+      "pct_dollars": 0.135
     },
     {
       "deduction_type": "late_delivery",
       "count": 646,
       "dollar": 124854.61,
-      "pct_count": 0.1938,
-      "pct_dollars": 0.0892
+      "pct_count": 0.1941,
+      "pct_dollars": 0.0938
     },
     {
       "deduction_type": "damaged",
       "count": 156,
       "dollar": 108732.5,
-      "pct_count": 0.0468,
-      "pct_dollars": 0.0777
+      "pct_count": 0.0469,
+      "pct_dollars": 0.0817
     },
     {
       "deduction_type": "pallet_fine",
       "count": 143,
       "dollar": 24961.55,
-      "pct_count": 0.0429,
-      "pct_dollars": 0.0178
+      "pct_count": 0.043,
+      "pct_dollars": 0.0187
     }
   ],
   "by_retailer": [
@@ -74,37 +74,28 @@
       "retailer_id": "walmart",
       "name": "Walmart",
       "channel_type": "retailer",
-      "deductions": 1613,
-      "dollar": 668303.82,
+      "deductions": 1609,
+      "dollar": 623499.65,
       "recovered": 66627.55,
-      "recovery_rate": 0.0997
+      "recovery_rate": 0.1069
     },
     {
       "retailer_id": "unfi",
       "name": "UNFI",
       "channel_type": "distributor",
-      "deductions": 512,
-      "dollar": 233848.33,
+      "deductions": 513,
+      "dollar": 241673.2,
       "recovered": 14495.18,
-      "recovery_rate": 0.062
+      "recovery_rate": 0.06
     },
     {
       "retailer_id": "kehe",
       "name": "KeHE",
       "channel_type": "distributor",
-      "deductions": 458,
-      "dollar": 172559.01,
+      "deductions": 457,
+      "dollar": 166664.35,
       "recovered": 7701.93,
-      "recovery_rate": 0.0446
-    },
-    {
-      "retailer_id": "costco",
-      "name": "Costco",
-      "channel_type": "retailer",
-      "deductions": 67,
-      "dollar": 122149.38,
-      "recovered": 4497.59,
-      "recovery_rate": 0.0368
+      "recovery_rate": 0.0462
     },
     {
       "retailer_id": "whole_foods",
@@ -114,6 +105,15 @@
       "dollar": 105525.11,
       "recovered": 3744.14,
       "recovery_rate": 0.0355
+    },
+    {
+      "retailer_id": "costco",
+      "name": "Costco",
+      "channel_type": "retailer",
+      "deductions": 67,
+      "dollar": 97105.53,
+      "recovered": 4497.59,
+      "recovery_rate": 0.0463
     },
     {
       "retailer_id": "green_basket_market",
@@ -164,7 +164,7 @@
   "by_outcome": [
     {
       "outcome": "lost_evidence",
-      "count": 465,
+      "count": 461,
       "dollar": 0.0
     },
     {
@@ -179,7 +179,7 @@
     },
     {
       "outcome": "pending",
-      "count": 170,
+      "count": 172,
       "dollar": 0.0
     },
     {
@@ -189,7 +189,7 @@
     },
     {
       "outcome": "lost_no_response",
-      "count": 140,
+      "count": 141,
       "dollar": 0.0
     },
     {
@@ -210,7 +210,7 @@
     },
     {
       "evidence_quality": "none",
-      "count": 298
+      "count": 297
     },
     {
       "evidence_quality": "digital_complete",

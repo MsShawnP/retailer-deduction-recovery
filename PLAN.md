@@ -60,8 +60,11 @@ views for each feature before moving to the next.
       structures the React app needs — `scripts/20_export_json.py`
       writes summary.json (5KB), deductions.json (4.8MB compact,
       3,333 denormalized records), retailers.json (47KB)
-- [ ] Validate synthetic data — deduction volumes and dollar amounts
-      feel realistic for a ~$25M manufacturer
+- [x] Validate synthetic data — deduction volumes and dollar amounts
+      feel realistic for a ~$25M manufacturer — `scripts/21_validate_dataset.py`
+      runs 36 checks (row counts, FK integrity, design conventions,
+      $/recovery targets, channel split, type mix, JSON parity);
+      36 PASS / 0 WARN / 0 FAIL on current dataset
 
 ### Phase 2: React app scaffold + Sankey
 
