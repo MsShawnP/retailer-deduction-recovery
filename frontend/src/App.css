@@ -1,15 +1,21 @@
 /* Sober, data-forward — Economist style. */
 
 :root {
-  --ink: #1a1a1a;
-  --ink-soft: #4a4a4a;
-  --ink-faint: #888;
-  --rule: #d8d8d8;
-  --bg: #fafaf7;
-  --panel: #ffffff;
-  --accent: #94221f;
-  --pos: #2a6f4d;
-  --neg: #94221f;
+  /* Economist palette — crisp and authoritative, not muted. */
+  --ink: #0D1B2A;          /* dark navy, near-black for text */
+  --ink-soft: #4A5568;     /* secondary text */
+  --ink-faint: #8B95A1;    /* tertiary, captions */
+  --rule: #C8CDD3;         /* cool gray separator */
+  --bg: #E8E8E8;           /* Economist chart-area gray */
+  --panel: #FFFFFF;        /* card / table bg */
+  --accent: #E3120B;       /* Economist red — primary accent */
+  --accent-red: #E3120B;
+  --accent-blue: #0077B6;  /* bright blue — secondary accent */
+  --accent-teal: #00A5CF;  /* teal — tertiary */
+  --accent-gold: #FFB800;  /* gold for caution / abandoned */
+  --accent-green: #157F3D; /* green for wins */
+  --neg: #E3120B;
+  --pos: #157F3D;
 }
 
 * { box-sizing: border-box; }
@@ -67,6 +73,11 @@ h2 {
   background: var(--panel);
   border: 1px solid var(--rule);
   padding: 16px 18px;
+  position: relative;
+}
+
+.kpi.kpi-neg .kpi-value {
+  color: var(--neg);
 }
 
 .kpi-label {
@@ -110,7 +121,7 @@ th {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--ink-soft);
-  background: #f4f3ee;
+  background: #F1F2F4;
 }
 
 tr:last-child td { border-bottom: 0; }
@@ -123,7 +134,7 @@ tr:last-child td { border-bottom: 0; }
 .placeholder {
   margin-top: 40px;
   padding: 16px 18px;
-  background: #f4f3ee;
+  background: #F1F2F4;
   color: var(--ink-soft);
   font-size: 13px;
   font-style: italic;
@@ -146,9 +157,9 @@ tr:last-child td { border-bottom: 0; }
   gap: 12px;
   padding: 10px 14px;
   margin-bottom: 16px;
-  background: #fff8e6;
-  border: 1px solid #d4b04a;
-  border-left: 3px solid #b08a3a;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent-red);
   font-size: 13px;
 }
 
@@ -194,7 +205,7 @@ tr:last-child td { border-bottom: 0; }
 .filtered-tag {
   margin-left: 10px;
   padding: 2px 8px;
-  background: #b08a3a;
+  background: var(--accent-red);
   color: #fff;
   font-size: 10px;
   text-transform: uppercase;

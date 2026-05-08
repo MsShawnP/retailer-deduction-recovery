@@ -231,16 +231,16 @@ export function selectionLabel(sel: Selection | null): string {
 }
 
 // Outcome-specific colors. Layer 5 nodes need hue-distinct shades for
-// the four lost_* outcomes so a color-blind viewer can tell them apart.
-// Lost variants vary in HUE, not just lightness.
+// the four lost_* outcomes so a color-blind viewer can tell them
+// apart. Economist palette — crisp, high-contrast, hue-distinct.
 export const OUTCOME_COLORS: Record<string, string> = {
-  "Won full":           "#2a6f4d",  // deep green
-  "Won partial":        "#6aa07c",  // light green
-  Pending:              "#6e8aa7",  // slate blue
-  Abandoned:            "#b08a3a",  // mustard
-  "Lost — evidence":    "#94221f",  // deep red — biggest cause
-  "Lost — deadline":    "#d97a1a",  // amber — time-based
-  "Lost — no response": "#5a4a8c",  // slate purple
-  "Lost — other":       "#6a6a6a",  // gray
-  "Never filed":        "#2a2a2a",  // charcoal
+  "Won full":           "#157F3D",  // Economist green
+  "Won partial":        "#4FAE7A",  // light green
+  Pending:              "#6B7D8C",  // blue-gray
+  Abandoned:            "#FFB800",  // gold — gave up
+  "Lost — evidence":    "#E3120B",  // Economist red — biggest cause
+  "Lost — deadline":    "#E55B0F",  // orange — time-based
+  "Lost — no response": "#003F5C",  // dark navy — silence
+  "Lost — other":       "#8B95A1",  // medium gray
+  "Never filed":        "#2C3E50",  // charcoal navy
 };

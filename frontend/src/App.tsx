@@ -77,7 +77,7 @@ export default function App() {
         <Kpi label="Annualized deductions" value={formatDollars(kpiAnnualized)} sub="against ~$25M wholesale" />
         <Kpi label="Recovery rate" value={formatPercent(kpiRecoveryRate)} sub={`${formatDollars(kpiRecovered)} recovered`} />
         <Kpi label="Labor on disputes" value={`${formatCount(Math.round(kpiLaborHours))} hrs`} sub={`~${kpiFte.toFixed(1)} FTE`} />
-        <Kpi label="Undisputed losses" value={formatDollars(kpiNoDisputeDollar)} sub={`${formatCount(kpiNoDisputeCount)} deductions never filed`} />
+        <Kpi label="Undisputed losses" value={formatDollars(kpiNoDisputeDollar)} sub={`${formatCount(kpiNoDisputeCount)} deductions never filed`} negative />
       </section>
 
       <SankeyView deductions={deductions} selection={selection} onSelect={setSelection} />
@@ -147,9 +147,9 @@ export default function App() {
   );
 }
 
-function Kpi({ label, value, sub }: { label: string; value: string; sub: string }) {
+function Kpi({ label, value, sub, negative }: { label: string; value: string; sub: string; negative?: boolean }) {
   return (
-    <div className="kpi">
+    <div className={negative ? "kpi kpi-neg" : "kpi"}>
       <div className="kpi-label">{label}</div>
       <div className="kpi-value">{value}</div>
       <div className="kpi-sub">{sub}</div>

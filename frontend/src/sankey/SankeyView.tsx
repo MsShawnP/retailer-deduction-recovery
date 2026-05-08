@@ -21,12 +21,14 @@ const WIDTH = 1100;
 const HEIGHT = 880;
 const MARGIN = { top: 36, right: 220, bottom: 16, left: 16 };
 
+// Economist palette: dark navy, red as primary accent, blue/teal,
+// amber for time, per-outcome for layer 5.
 const LAYER_COLORS = [
-  "#2a3a5a", // type
-  "#94221f", // root cause
-  "#5a6b3e", // evidence quality
-  "#7a5a3a", // accessibility
-  "#5a3a5a", // timeliness
+  "#0D1B2A", // type — dark navy
+  "#E3120B", // root cause — Economist red (project's central story)
+  "#0077B6", // evidence quality — bright blue
+  "#00A5CF", // accessibility — teal
+  "#C97C1A", // timeliness — amber (time)
   "#3a4a3a", // outcome (overridden per-node by OUTCOME_COLORS)
 ];
 
