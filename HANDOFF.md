@@ -109,3 +109,25 @@ React app will consume. Then task 8 (validate) before Phase 2 (React
 scaffold + Sankey).
 
 ---
+
+## 2026-05-07 20:56
+
+**What changed:** Phase 1 complete — JSON export and validator
+landed. Three JSON files in data/json/ (summary, deductions,
+retailers); 36-check validator passes clean.
+
+**Why:** Closes out the data foundation. Phase 2 needs static JSON
+to render against, and the validator gives confidence the
+distributions are honest before the demo locks in.
+
+**State:** All eight Phase 1 tasks checked off in PLAN.md. Running
+`python scripts/build_deductions_db.py --full` end-to-end now also
+exports JSON and runs the validator (36 PASS / 0 WARN / 0 FAIL).
+Caught and fixed one bug — post_audit_claims was setting is_vague=1
+on non-vague rows. Phase 2 untouched.
+
+**Next:** Phase 2 task 1 — set up React project, build system, and
+Netlify deploy config. Frontend will live in a `frontend/` (or
+`app/`) subdirectory and consume data/json/ at build time.
+
+---
