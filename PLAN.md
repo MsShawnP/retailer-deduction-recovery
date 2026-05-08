@@ -112,9 +112,17 @@ views for each feature before moving to the next.
       (digital_complete 65% / digital_partial 35% / handwritten 12%
       / none 5%). Per-toggle solo-impact previews and a current-vs-
       projected comparison panel update live.
-- [ ] Cost-to-dispute profitability filter — calculate whether a
+- [x] Cost-to-dispute profitability filter — calculate whether a
       deduction is worth fighting given labor cost to gather evidence
-      and dispute
+      and dispute — `CostToDisputeView` runs against the
+      selection-filtered cohort with an adjustable hourly-rate slider
+      ($20–$100) and a "project with digital evidence" toggle. Three
+      buckets (fight / marginal / write off) computed per deduction
+      from amount × win-prob (digital_complete 65% / digital_partial
+      35% / handwritten 12% / none 0% / past-deadline 0%) minus
+      labor (hours by evidence quality × rate). Selectable bucket
+      cards drive a sortable top-25 table with a cross-link to the
+      causation trace.
 - [ ] Dispute builder — evidence readiness view showing what exists
       vs. what's needed for each deduction, mock dispute package
 - [ ] Timeline pressure view — deductions mapped against

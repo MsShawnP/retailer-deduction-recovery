@@ -305,3 +305,36 @@ of it, and how the line moves as evidence quality and dispute method
 change. Plugs into the same `selection` cohort.
 
 ---
+
+## 2026-05-08 12:01
+
+**What changed:** Phase 3 task 4 — cost-to-dispute profitability
+filter landed. `CostToDisputeView` triages each unresolved deduction
+into fight / marginal / write off using per-deduction expected
+recovery against estimated labor cost.
+
+**Why:** Fourth Phase 3 feature. The triage view answers the practical
+"is this one worth my Tuesday afternoon?" question that turns a $1.4M
+backlog into a stack a lean team can actually work.
+
+**State:** Adjustable hourly-rate slider ($20–$100, default $42) and a
+"project with digital evidence" toggle drive a live re-bucketing.
+Win-probability table matches the simulation (digital_complete 65% /
+digital_partial 35% / handwritten 12% / none 0% / past-deadline 0%);
+labor hours by evidence quality (1.5 / 3 / 5 hr). Selectable bucket
+cards drive a top-25 table sorted by EV (or by amount for write-offs)
+with a "Trace →" cross-link to the causation view. Default $42/hr
+across the portfolio: 110 fight ($160K, $33K expected for $13K labor),
+27 marginal, 2,839 write-off ($1.04M unrecoverable); digital projection
+flips this to 1,884 fight ($1.01M) / 616 write-off ($157K).
+`screenshot-cost.mjs` verifies — zero JS errors. Build passes. PLAN.md
+Phase 3 task 4 checked off. 5 Phase 3 features remaining.
+
+**Next:** Phase 3 task 5 — dispute builder. Evidence-readiness view
+showing what exists vs. what's needed for a single deduction, with a
+mock dispute package preview (BOL / POD / packing list / promo
+agreement / etc., flagged "have it" / "missing" / "lost"). Plugs into
+the existing tracedDeductionId so the user can hop from triage to
+dispute prep on one click.
+
+---

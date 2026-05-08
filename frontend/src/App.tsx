@@ -5,6 +5,7 @@ import SankeyView from "./sankey/SankeyView";
 import ExplorerView from "./explorer/ExplorerView";
 import CausationTraceView from "./causation/CausationTraceView";
 import RecoverySimulationView from "./simulation/RecoverySimulationView";
+import CostToDisputeView from "./cost/CostToDisputeView";
 import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
@@ -158,6 +159,11 @@ export default function App() {
       </div>
 
       <RecoverySimulationView cohort={filteredDeductions ?? deductions} />
+
+      <CostToDisputeView
+        cohort={filteredDeductions ?? deductions}
+        onTrace={setTracedDeductionId}
+      />
 
       <section className="break">
         <h2>By deduction type{selection && <span className="filtered-tag">filtered</span>}</h2>
