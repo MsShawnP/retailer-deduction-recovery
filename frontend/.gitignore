@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Visual-check artifacts from frontend/screenshot.mjs
+*.png
