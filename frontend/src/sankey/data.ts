@@ -205,11 +205,58 @@ export function pathIds(d: Deduction): string[] {
 export type Selection =
   | { kind: "node"; nodeId: string }
   | { kind: "link"; source: string; target: string }
-  | { kind: "retailer"; retailerId: string };
+  | { kind: "retailer"; retailerId: string }
+  | { kind: "cluster"; dimension: string; value: string };
+
+// Origin-cluster dimensions used by the OriginClusteringView. Defined
+// here so isOnSelectedPath can evaluate cluster filters without taking
+// a dependency on the view module.
+export interface ClusterDimension {
+  id: string;
+  label: string;
+  getter: (d: Deduction) => string;
+}
+
+export const ORIGIN_DIMENSIONS: ClusterDimension[] = [
+  {
+    id: "carrier",
+    label: "Carrier",
+    getter: (d) => d.shipment?.carrier ?? "(no shipment)",
+  },
+  {
+    id: "label_type",
+    label: "Label decision",
+    getter: (d) => d.pack_record?.label_type_used ?? "(no pack record)",
+  },
+  {
+    id: "pack_verification",
+    label: "Pack verification",
+    getter: (d) => d.pack_record?.pack_verification ?? "(no pack record)",
+  },
+  {
+    id: "evidence_format",
+    label: "Evidence format",
+    getter: (d) => d.pack_record?.evidence_format ?? "(no pack record)",
+  },
+  {
+    id: "packer",
+    label: "Packer",
+    getter: (d) => d.pack_record?.packer_initials || "(unassigned)",
+  },
+];
+
+const DIM_BY_ID = new Map(ORIGIN_DIMENSIONS.map((d) => [d.id, d]));
+
+export function clusterValueFor(d: Deduction, dimension: string): string {
+  const dim = DIM_BY_ID.get(dimension);
+  return dim ? dim.getter(d) : "";
+}
 
 export function isOnSelectedPath(d: Deduction, sel: Selection | null): boolean {
   if (!sel) return true;
   if (sel.kind === "retailer") return d.retailer.id === sel.retailerId;
+  if (sel.kind === "cluster")
+    return clusterValueFor(d, sel.dimension) === sel.value;
   const ids = pathIds(d);
   if (sel.kind === "node") return ids.includes(sel.nodeId);
   const layer = parseInt(sel.source.split(":")[0], 10);
@@ -242,6 +289,10 @@ export function selectionLabel(sel: Selection | null, retailerName?: string): st
   if (!sel) return "";
   if (sel.kind === "retailer") {
     return `Retailer = ${retailerName ?? sel.retailerId}`;
+  }
+  if (sel.kind === "cluster") {
+    const dim = DIM_BY_ID.get(sel.dimension);
+    return `${dim?.label ?? sel.dimension} = ${sel.value.replace(/_/g, " ")}`;
   }
   if (sel.kind === "node") {
     const [layerStr, ...rest] = sel.nodeId.split(":");

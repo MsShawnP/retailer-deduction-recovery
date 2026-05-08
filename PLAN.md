@@ -167,8 +167,18 @@ views for each feature before moving to the next.
       lifted state that drives every other view; the scorecard
       itself special-cases retailer filters (so the comparative
       view survives) but respects every other filter kind.
-- [ ] Root cause clustering by origin point — deductions grouped by
-      warehouse, packing line, carrier, or system
+- [x] Root cause clustering by origin point — deductions grouped by
+      warehouse, packing line, carrier, or system —
+      `OriginClusteringView` clusters the cohort across five
+      operational dimensions (carrier, label decision, pack
+      verification, evidence format, packer) and ranks them by
+      top-cluster share so the user sees which dimensions are
+      systemic vs. targeted. Selection union extended once more
+      with a `cluster` kind keyed on (dimension, value); each
+      cluster row has a Filter that writes back to lifted state and
+      a Trace top → that pivots the causation view to the cluster's
+      largest deduction. `ORIGIN_DIMENSIONS` is the single source
+      of truth shared between the view and `isOnSelectedPath`.
 
 ### Phase 4: Polish + deploy
 

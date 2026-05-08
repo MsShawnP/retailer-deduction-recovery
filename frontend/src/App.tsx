@@ -10,6 +10,7 @@ import DisputeBuilderView from "./builder/DisputeBuilderView";
 import TimelinePressureView from "./pressure/TimelinePressureView";
 import PostAuditRiskView from "./audit/PostAuditRiskView";
 import RetailerScorecardView from "./scorecard/RetailerScorecardView";
+import OriginClusteringView from "./origin/OriginClusteringView";
 import { isOnSelectedPath, selectionLabel, TYPE_OPTIONS, type Selection } from "./sankey/data";
 import "./App.css";
 
@@ -208,6 +209,27 @@ export default function App() {
         onSelectRetailer={(id) =>
           setSelection(id ? { kind: "retailer", retailerId: id } : null)
         }
+      />
+
+      <OriginClusteringView
+        cohort={
+          selection?.kind === "cluster"
+            ? deductions
+            : filteredDeductions ?? deductions
+        }
+        activeCluster={
+          selection?.kind === "cluster"
+            ? { dimension: selection.dimension, value: selection.value }
+            : null
+        }
+        onSelectCluster={(dimension, value) =>
+          setSelection(
+            dimension && value
+              ? { kind: "cluster", dimension, value }
+              : null
+          )
+        }
+        onTrace={setTracedDeductionId}
       />
 
       <section className="break">

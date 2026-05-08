@@ -1,0 +1,227 @@
+.origin {
+  margin-top: 36px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+.origin h2 {
+  border: none;
+  padding-bottom: 0;
+  margin-bottom: 4px;
+}
+
+.origin-context {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 16px;
+  margin: 0;
+  max-width: 720px;
+}
+
+.origin-empty {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 16px;
+  padding: 32px;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+}
+
+.origin-header {
+  margin-bottom: 18px;
+}
+
+.origin-summary,
+.origin-detail {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-family: var(--serif);
+}
+
+.origin-section-head {
+  margin-bottom: 14px;
+}
+
+.origin-section-head h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--serif);
+}
+
+.origin-section-desc {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 15px;
+  margin: 0;
+  max-width: 720px;
+  line-height: 1.5;
+}
+
+.origin-summary-table,
+.origin-cluster-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-family: var(--serif);
+}
+
+.origin-summary-table th,
+.origin-summary-table td,
+.origin-cluster-table th,
+.origin-cluster-table td {
+  text-align: left;
+  padding: 9px 14px;
+  border-bottom: 1px solid #eef0f2;
+  vertical-align: middle;
+}
+
+.origin-summary-table th,
+.origin-cluster-table th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+  background: #f1f2f4;
+  border-bottom: 1px solid var(--rule);
+}
+
+.origin-summary-table .num,
+.origin-cluster-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.origin-summary-table tr:last-child td,
+.origin-cluster-table tr:last-child td {
+  border-bottom: none;
+}
+
+.origin-summary-table tr.active {
+  background: #fafafa;
+}
+
+.origin-cluster-table tr.active {
+  background: #fff5f5;
+  outline: 2px solid var(--accent-red);
+  outline-offset: -2px;
+}
+
+.origin-top-name {
+  text-transform: capitalize;
+}
+
+.origin-share-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.origin-share-bar {
+  display: inline-block;
+  width: 100px;
+  height: 8px;
+  background: #f1f2f4;
+  border: 1px solid var(--rule);
+  position: relative;
+}
+
+.origin-share-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent-red);
+}
+
+.origin-share-pct {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  min-width: 48px;
+  text-align: right;
+}
+
+.origin-drill-btn,
+.origin-filter-btn,
+.origin-trace-btn {
+  font-family: var(--serif);
+  font-size: 14px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.origin-drill-btn:hover {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.origin-filter-btn {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  font-weight: 700;
+}
+
+.origin-filter-btn:hover {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+.origin-trace-btn {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.origin-trace-btn:hover {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+.origin-tabs {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--rule);
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.origin-tab {
+  font-family: var(--serif);
+  font-size: 14px;
+  background: var(--panel);
+  border: none;
+  border-right: 1px solid var(--rule);
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.origin-tab:last-child {
+  border-right: none;
+}
+
+.origin-tab:hover:not(.active) {
+  background: #f5f6f7;
+}
+
+.origin-tab.active {
+  background: var(--ink);
+  color: #fff;
+  font-weight: 700;
+}
+
+.origin-cluster-name {
+  text-transform: capitalize;
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--ink-soft);
+  font-style: italic;
+}

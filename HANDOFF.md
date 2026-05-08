@@ -468,3 +468,35 @@ should expose the cluster as another selection kind so the rest of
 the app can scope to one origin point.
 
 ---
+
+## 2026-05-08 13:23
+
+**What changed:** Phase 3 task 9 — origin clustering landed.
+`OriginClusteringView` clusters the cohort across five operational
+dimensions and ranks them by concentration so the user can see what
+fixes are targeted vs. systemic. **Phase 3 is now complete — all 9
+feature views are live.**
+
+**Why:** Last Phase 3 feature. Root-cause clustering names the
+operational origins; concentration scores tell the CEO whether the
+problem is "mostly Line B" or systemic.
+
+**State:** Default concentrations: Label decision 73.6% Generic,
+Pack verification 59.7% paper-note, Evidence format 59.7% paper-note,
+Carrier 21% top-of-7, Packer 21% top-of-8. Selection union extended
+in sankey/data.ts with `kind: "cluster"` (dimension + value);
+ORIGIN_DIMENSIONS is the single source of truth used by the view,
+isOnSelectedPath, clusterValueFor, and selectionLabel. Per-cluster
+Filter and Trace top → cross-links work; short_ship filter rescopes
+concentration scores correctly (Generic jumps to 97.6%). Phase 4
+(cross-view nav check, responsive review, Netlify deploy, friend
+preview) is the entire remaining arc. `screenshot-origin.mjs` green;
+zero JS errors. Build passes. PLAN.md Phase 3 task 9 checked off.
+
+**Next:** Phase 4 task 1 — cross-view navigation check. Walk every
+filter / drill-down / trace cross-link end-to-end and verify the
+state transitions remain coherent across all 9 feature views. List
+any rough edges; fix what's worth fixing before the responsive
+check.
+
+---
