@@ -532,3 +532,33 @@ linked site, then capture the live URL for the friend preview hand-
 off.
 
 ---
+
+## 2026-05-08 15:56
+
+**What changed:** Phase 4 task 3 — deployed to Netlify, live at
+**https://retailer-deduction-recovery.netlify.app/**. Plus a Sankey
+label-contrast fix riding along — dollar amounts on the darker teal
+bands now meet WCAG AA contrast.
+
+**Why:** Demo URL ready for friend preview / prospect intro. The
+contrast bug surfaced during visual review of the live site —
+darkest-teal-band labels had ~2.5 contrast ratio against the gray
+ink-faint fill, which is unreadable.
+
+**State:** SankeyView picks each node label's fill by WCAG contrast-
+ratio comparison: relative luminance of the band color
+(LAYER_COLORS[node.layer]) is computed, then dark-ink vs. white is
+chosen by whichever scores higher contrast. Verified per layer via
+`verify-sankey-contrast.mjs`: layers 0–2 use ink, layers 3–4 use
+white, layer 5 sits in the right margin on white panel and stays
+ink. The naive luminance > 0.5 heuristic mis-classifies the medium
+teals — confirmed and rejected during testing. Live site bundle
+hash matched the local build at deploy time. Build passes. PLAN.md
+Phase 4 task 3 checked off with the URL embedded.
+
+**Next:** Phase 4 task 4 — hand off the live URL to friend for
+preview, capture feedback, and decide what (if anything) needs
+fixing before the prospect intro. After that the original arc is
+done.
+
+---

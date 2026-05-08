@@ -202,7 +202,8 @@ views for each feature before moving to the next.
       scroll containers like the cost view), added
       `overflow-x: hidden` on body as defense. All three viewports
       now match document width to viewport.
-- [ ] Deploy to Netlify
+- [x] Deploy to Netlify — live at
+      https://retailer-deduction-recovery.netlify.app/
 - [ ] Friend preview — hand off for feedback
 
 ## Out of scope for this arc

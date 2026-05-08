@@ -48,6 +48,41 @@ function nodeColor(node: { layer: number; label: string }): string {
   return LAYER_COLORS[node.layer];
 }
 
+// WCAG relative luminance of a #RRGGBB hex color. Used to pick text
+// color (dark vs. light) so node labels stay readable when they sit
+// on top of the colored bands flowing from the node.
+function relativeLuminance(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const lin = (c: number) =>
+    c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
+// Pick a label fill color that contrasts with the band the label sits
+// over. Node labels are positioned 6px right of the node rectangle,
+// which puts them on top of the bands flowing OUT of that node — those
+// bands are colored LAYER_COLORS[node.layer]. Layer 5 (Outcome) is the
+// rightmost layer; its labels sit in the right margin on the white
+// panel background, so always-dark text is correct there.
+//
+// For all other layers, we compare the WCAG contrast ratio of dark-ink
+// vs. white against the band color and pick the higher. The simple
+// "luminance > 0.5 → black" heuristic gets the medium teals wrong;
+// they're below 0.5 luminance but still contrast better with dark ink.
+const INK_LUMINANCE = relativeLuminance("#0D1B2A");
+
+function labelFillForLayer(layer: number): string {
+  if (layer >= LAYER_COLORS.length - 1) return "#0D1B2A";
+  const bg = relativeLuminance(LAYER_COLORS[layer]);
+  const ratio = (a: number, b: number) =>
+    (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  const contrastInk = ratio(bg, INK_LUMINANCE);
+  const contrastWhite = ratio(bg, 1);
+  return contrastInk >= contrastWhite ? "#0D1B2A" : "#FFFFFF";
+}
+
 export default function SankeyView({ deductions, selection, onSelect }: Props) {
   const layout = useMemo(() => {
     const { nodes, links } = buildSankeyData(deductions);
@@ -223,9 +258,14 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
                     y={(node.y0 + node.y1) / 2}
                     dy="0.35em"
                     className="sankey-node-label"
+                    fill={labelFillForLayer(node.layer)}
                   >
                     {node.label}
-                    <tspan className="sankey-node-value">
+                    <tspan
+                      className="sankey-node-value"
+                      fill={labelFillForLayer(node.layer)}
+                      fillOpacity={0.78}
+                    >
                       {" "}
                       {dollarsCompact(node.value || 0)}
                     </tspan>
