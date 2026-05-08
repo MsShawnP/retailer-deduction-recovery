@@ -187,3 +187,30 @@ cause / evidence quality / accessibility / timeliness. Plugs into
 the same `selection` state — no architectural change needed.
 
 ---
+
+## 2026-05-07 22:40
+
+**What changed:** Deduction explorer landed — 3-column 6-card
+drill-down below the Sankey, with prev/next/random nav and
+cause-specific prose for each root-cause variant.
+
+**Why:** First Phase 3 feature done. The explorer turns "I see a
+red band on the Sankey" into "I'm looking at deduction DED-X, here
+is exactly what happened and why" without a context switch.
+
+**State:** ExplorerView reads cohort from the same `selection`
+state the Sankey/dropdown share. Cards 1-6 render the deduction
+itself, peer-group context, root cause + prose, evidence quality
+and missing items, accessibility + retrieval cost, and color-coded
+timeliness with outcome. Cohort resets to top whenever the filter
+changes. Verified via Playwright that filter → cohort → explorer
+all stay in sync; zero console errors.
+
+**Next:** Phase 3 task 2 — causation tracing. Pick a single order
+from the explorer (or jump in independently) and walk its full
+chain: PO → pack record → label decision → ship → BOL → receiving
+→ deduction → dispute attempt → outcome. The explorer shows one
+deduction's six layers in parallel; causation tracing shows one
+order's life sequentially.
+
+---
