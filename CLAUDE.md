@@ -27,7 +27,7 @@ shows what each one is costing them and what it takes to fix it.
   with deduction-specific tables
 - Data pipeline: Python (extend synthetic data, export to static JSON)
 - Frontend: React + HTML
-- Deployment: Netlify
+- Deployment: Cloudflare Pages
 - No live backend — React app consumes pre-built JSON files
 
 ## Data architecture

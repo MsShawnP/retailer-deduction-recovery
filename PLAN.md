@@ -224,7 +224,7 @@ views for each feature before moving to the next.
 - [ ] All views update when user navigates from one to another
 - [ ] Synthetic data feels realistic for a ~$25M food manufacturer
 - [ ] Retailer-specific behaviors are recognizable (not generic)
-- [ ] Deployed to Netlify with a shareable URL
+- [ ] Deployed to Cloudflare Pages with a shareable URL
 - [ ] Friend has previewed and given feedback
 - [ ] Feedback incorporated
 

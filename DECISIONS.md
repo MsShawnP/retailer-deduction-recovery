@@ -39,10 +39,12 @@ Each entry:
 - **Scope:** global — architecture
 - **Do not:** build a backend API for V1
 
-### 2025-05-07 — Deploy to Netlify
-- **Why:** Consistent with existing portfolio deployment pattern.
-  Static site, no server needed.
-- **Scope:** deployment
+### ~~2025-05-07 — Deploy to Netlify~~ (superseded 2026-05-09)
+- ~~**Why:** Consistent with existing portfolio deployment pattern.
+  Static site, no server needed.~~
+- ~~**Scope:** deployment~~
+- Superseded by 2026-05-09 — Deploy to Cloudflare Pages instead of
+  Netlify (below)
 
 ### 2025-05-07 — Consume cinderhaven-data repo as base, extend in this repo
 - **Why:** Same pattern as other Cinderhaven portfolio projects.
@@ -85,6 +87,15 @@ Each entry:
   `setSelection`, and let App.tsx coordinate. Filter recomputation
   on the deductions array stays in App.tsx (`filteredDeductions`)
   so every consumer sees the same cohort.
+
+### 2026-05-09 — Deploy to Cloudflare Pages instead of Netlify
+- **Why:** Netlify's traffic-based billing creates DDoS cost exposure
+  on a prospect-facing demo. Cloudflare Pages has no traffic-based
+  billing, includes built-in DDoS protection, and supports the same
+  static-site Git-deploy workflow. Supersedes 2025-05-07 Netlify
+  decision.
+- **Scope:** deployment
+- **Do not:** use Netlify for this project
 
 ---
 
