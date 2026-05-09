@@ -117,6 +117,18 @@ Each entry:
   them out makes the demo unrealistically clean.
 - **Scope:** synthetic data generation
 
+### 2026-05-09 — Add spoilage and slotting as deduction types
+- **Why:** Both are real deduction types for a ~$25M food manufacturer.
+  Slotting is a planned cost (pay-to-play shelf placement), not an
+  operational failure, so routing it through root cause → evidence →
+  dispute would be misleading. Spoilage is a genuine he-said-she-said
+  about product condition at receiving and fits the failure model.
+  Slotting enters the Sankey but branches off immediately into a
+  terminal "negotiated costs — not disputable" node; spoilage flows
+  through the full five failure layers like the other operational types.
+- **Scope:** data pipeline + Sankey + all views that reference type lists
+- **Do not:** route slotting through the five failure layers
+
 ---
 
 ## Visualization

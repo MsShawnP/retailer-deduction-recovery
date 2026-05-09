@@ -42,8 +42,8 @@ TARGETS = {
     "dispute_evidence":  (3000, 10000),
     "post_audit_claims": (30, 80),
     "retailers":         (10, 12),
-    "retailer_rules":    (60, 80),
-    "deduction_codes":   (50, 80),
+    "retailer_rules":    (80, 100),  # 9 types x 10 retailers (DTC excluded) = 90
+    "deduction_codes":   (70, 100),
     "edi_requirements":  (30, 50),
 }
 
@@ -180,11 +180,40 @@ def main() -> int:
     no_order_non_vague_non_audit = cur.execute("""
         SELECT COUNT(*) FROM deductions
         WHERE order_id IS NULL AND is_vague=0 AND is_post_audit=0
+          AND deduction_type != 'slotting'
     """).fetchone()[0]
     if no_order_non_vague_non_audit == 0:
-        rep.passed("Non-vague non-post-audit deductions all have order_id")
+        rep.passed("Non-vague non-post-audit non-slotting deductions all have order_id")
     else:
-        rep.fail(f"{no_order_non_vague_non_audit} non-vague non-audit deductions missing order_id")
+        rep.fail(f"{no_order_non_vague_non_audit} non-vague non-audit non-slotting deductions missing order_id")
+
+    slotting_with_order = cur.execute("""
+        SELECT COUNT(*) FROM deductions
+        WHERE deduction_type='slotting' AND order_id IS NOT NULL
+    """).fetchone()[0]
+    if slotting_with_order == 0:
+        rep.passed("Slotting deductions never link to a specific order_id")
+    else:
+        rep.warn(f"{slotting_with_order} slotting deductions link to order_id (design says NULL)")
+
+    slotting_with_dispute = cur.execute("""
+        SELECT COUNT(*) FROM deductions d
+        JOIN disputes disp ON disp.deduction_id = d.deduction_id
+        WHERE d.deduction_type='slotting'
+    """).fetchone()[0]
+    if slotting_with_dispute == 0:
+        rep.passed("Slotting deductions never have a dispute (non-disputable)")
+    else:
+        rep.fail(f"{slotting_with_dispute} slotting deductions have a dispute (should be 0)")
+
+    slotting_with_deadline = cur.execute("""
+        SELECT COUNT(*) FROM deductions
+        WHERE deduction_type='slotting' AND dispute_deadline IS NOT NULL
+    """).fetchone()[0]
+    if slotting_with_deadline == 0:
+        rep.passed("Slotting deductions have no dispute_deadline (non-disputable)")
+    else:
+        rep.fail(f"{slotting_with_deadline} slotting deductions have dispute_deadline set")
 
     audit_with_order = cur.execute("""
         SELECT COUNT(*) FROM deductions WHERE is_post_audit=1 AND order_id IS NOT NULL

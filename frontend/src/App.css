@@ -70,6 +70,15 @@ h2 {
   font-family: var(--serif);
 }
 
+.section-description {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  margin: -6px 0 18px;
+  max-width: 780px;
+}
+
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

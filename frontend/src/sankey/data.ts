@@ -13,6 +13,13 @@
 // Link value = sum of deduction.amount. Each deduction contributes one
 // path through all six layers, so total value flowing OUT of the type
 // layer equals total deductions value.
+//
+// Slotting is the exception: it's a negotiated cost (new-item / planogram
+// / shelf-placement fees), not an operational failure. It enters at
+// layer 0 like every other type but routes directly to a single terminal
+// node at layer 5 ("Not disputable — negotiated cost") — bypassing the
+// failure pipeline entirely. The visual: a single long band crosses the
+// chart, making the categorical difference legible at a glance.
 
 import type { Deduction } from "../types";
 
@@ -42,10 +49,13 @@ export const TYPE_LABELS: Record<string, string> = {
   late_delivery: "Late delivery",
   promo_billback: "Promo billback",
   vague: "Vague",
+  spoilage: "Spoilage",
+  slotting: "Slotting",
 };
 
 // Display order for the type dropdown — by descending volume in the
-// dataset so the most common types appear first.
+// dataset so the most common types appear first. Slotting last because
+// it's categorically different (negotiated, non-disputable).
 export const TYPE_OPTIONS: string[] = [
   "Short ship",
   "Label fine",
@@ -53,8 +63,36 @@ export const TYPE_OPTIONS: string[] = [
   "Promo billback",
   "Damaged",
   "Pallet fine",
+  "Spoilage",
   "Vague",
+  "Slotting",
 ];
+
+// Operational types: the eight that flow through the failure pipeline.
+// Slotting is excluded — it's a negotiated cost, not an operational
+// failure, so views like recovery simulation, cost-to-dispute, dispute
+// builder, timeline pressure, post-audit risk, and origin clustering
+// scope to operational types only.
+export const OPERATIONAL_TYPES: ReadonlySet<string> = new Set([
+  "short_ship",
+  "label_fine",
+  "pallet_fine",
+  "damaged",
+  "late_delivery",
+  "promo_billback",
+  "vague",
+  "spoilage",
+]);
+
+export function isOperational(d: Deduction): boolean {
+  return OPERATIONAL_TYPES.has(d.deduction_type);
+}
+
+// Terminal node for slotting deductions in the Sankey. Stored at layer 5
+// (the outcome column) so it renders alongside the win/loss outcomes; the
+// label and color make the categorical difference clear.
+export const SLOTTING_TERMINAL_LABEL = "Not disputable — negotiated cost";
+export const SLOTTING_TERMINAL_NODE_ID = `5:${SLOTTING_TERMINAL_LABEL}`;
 
 const OUTCOME_LABELS: Record<string, string> = {
   won_full: "Won full",
@@ -99,6 +137,17 @@ export function rootCauseFor(d: Deduction): string {
   if (d.deduction_type === "late_delivery") return "Delivery missed window";
   if (d.deduction_type === "promo_billback") return "Promo program";
   if (d.deduction_type === "vague") return "Opaque remittance";
+  if (d.deduction_type === "spoilage") {
+    // Sub-cause is encoded in the remittance_description keyword.
+    const desc = (d.remittance_description ?? "").toLowerCase();
+    if (desc.includes("temperature")) return "Temperature abuse in transit";
+    if (desc.includes("expired") || desc.includes("short-dated"))
+      return "Expired / short-dated at receiving";
+    if (desc.includes("quality")) return "Quality complaint at receiving";
+    if (desc.includes("damage in transit")) return "Damage in transit";
+    return "Other spoilage";
+  }
+  if (d.deduction_type === "slotting") return SLOTTING_TERMINAL_LABEL;
   return "Other";
 }
 
@@ -144,6 +193,15 @@ export function buildSankeyData(deductions: Deduction[]): SankeyData {
   for (const d of deductions) {
     if (d.amount <= 0) continue;
     const t  = TYPE_LABELS[d.deduction_type] || d.deduction_type;
+
+    if (d.deduction_type === "slotting") {
+      // Slotting branches off immediately to its terminal node and
+      // skips the failure-pipeline columns. d3-sankey will draw a single
+      // band crossing the chart from layer 0 (type) to layer 5 (terminal).
+      addEdge(0, t, 5, SLOTTING_TERMINAL_LABEL, d.amount);
+      continue;
+    }
+
     const rc = rootCauseFor(d);
     const eq = evidenceQualityFor(d);
     const ac = accessibilityFor(d);
@@ -187,6 +245,10 @@ export const LAYER_TITLES = [
 
 export function pathIds(d: Deduction): string[] {
   const t  = TYPE_LABELS[d.deduction_type] || d.deduction_type;
+  if (d.deduction_type === "slotting") {
+    // Slotting bypasses layers 1–4; its only edge is type → terminal.
+    return [`0:${t}`, SLOTTING_TERMINAL_NODE_ID];
+  }
   const rc = rootCauseFor(d);
   const eq = evidenceQualityFor(d);
   const ac = accessibilityFor(d);
@@ -259,8 +321,13 @@ export function isOnSelectedPath(d: Deduction, sel: Selection | null): boolean {
     return clusterValueFor(d, sel.dimension) === sel.value;
   const ids = pathIds(d);
   if (sel.kind === "node") return ids.includes(sel.nodeId);
-  const layer = parseInt(sel.source.split(":")[0], 10);
-  return ids[layer] === sel.source && ids[layer + 1] === sel.target;
+  // Link selection: source/target are explicit IDs (e.g., "0:Slotting" →
+  // "5:Not disputable — negotiated cost"). Match against the deduction's
+  // path edges directly so the slotting shortcut works.
+  for (let i = 0; i < ids.length - 1; i++) {
+    if (ids[i] === sel.source && ids[i + 1] === sel.target) return true;
+  }
+  return false;
 }
 
 export function highlightedLinkSet(selectedDeductions: Deduction[]): Set<string> {
@@ -308,6 +375,7 @@ export function selectionLabel(sel: Selection | null, retailerName?: string): st
 //   - Wins  — green (#0A7B3E)
 //   - Pending — neutral gray
 //   - Lost / abandoned / never_filed — Economist red
+//   - Not disputable (slotting) — muted gold; categorically not a loss
 // Within-bucket detail comes from the node label, not the color.
 // Wins use one shade so won_full and won_partial both read as "won".
 export const OUTCOME_COLORS: Record<string, string> = {
@@ -320,4 +388,5 @@ export const OUTCOME_COLORS: Record<string, string> = {
   "Lost — no response": "#E3120B",
   "Lost — other":       "#E3120B",
   "Never filed":        "#E3120B",
+  [SLOTTING_TERMINAL_LABEL]: "#9E7E3A",  // muted gold — negotiated, not a loss
 };

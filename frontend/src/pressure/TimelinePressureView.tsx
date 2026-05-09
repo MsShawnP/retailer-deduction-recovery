@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars } from "../data";
+import { isOperational } from "../sankey/data";
 import "./TimelinePressureView.css";
 
 interface Props {
@@ -87,11 +88,11 @@ const BUCKET_ORDER: Bucket[] = [
 export default function TimelinePressureView({ cohort, onTrace }: Props) {
   const [selectedBucket, setSelectedBucket] = useState<Bucket | "all">("all");
 
-  // Scope: unfiled deductions that aren't already won. These are the
-  // ones a lean team would still need to act on.
+  // Scope: unfiled, disputable deductions that aren't already won.
+  // Slotting has no dispute clock — it's a negotiated cost, exclude it.
   const items = useMemo(() => {
     return cohort
-      .filter((d) => isUnfiled(d) && !isResolved(d))
+      .filter((d) => isOperational(d) && isUnfiled(d) && !isResolved(d))
       .map((d) => {
         const days = daysToDeadline(d);
         return {
@@ -152,6 +153,16 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
     return (
       <section className="pressure">
         <h2>Timeline pressure</h2>
+        <p className="section-description">
+          Every open deduction is mapped on a horizontal timeline against
+          its retailer's specific dispute deadline. Green means there's
+          still time to file. Yellow means the window is closing within
+          the next week. Red means the deadline has passed — that money
+          is gone regardless of evidence quality. Deductions are grouped
+          by retailer so you can see which retailer's deadlines are most
+          urgent. Use this to triage: file the ones about to expire before
+          working on the ones with time left.
+        </p>
         <p className="pressure-empty">No deductions in the current cohort.</p>
       </section>
     );
@@ -165,6 +176,16 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
       <header className="pressure-header">
         <div>
           <h2>Timeline pressure</h2>
+          <p className="section-description">
+            Every open deduction is mapped on a horizontal timeline against
+            its retailer's specific dispute deadline. Green means there's
+            still time to file. Yellow means the window is closing within
+            the next week. Red means the deadline has passed — that money
+            is gone regardless of evidence quality. Deductions are grouped
+            by retailer so you can see which retailer's deadlines are most
+            urgent. Use this to triage: file the ones about to expire
+            before working on the ones with time left.
+          </p>
           <p className="pressure-context">
             Today is <strong>{TODAY_LABEL}</strong>.{" "}
             <strong>{formatCount(items.length)}</strong> unfiled deductions

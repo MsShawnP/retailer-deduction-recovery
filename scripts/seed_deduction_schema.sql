@@ -23,7 +23,8 @@ CREATE TABLE retailer_rules (
     retailer_id            TEXT NOT NULL,
     deduction_type         TEXT NOT NULL CHECK (deduction_type IN (
         'short_ship', 'label_fine', 'pallet_fine', 'damaged',
-        'late_delivery', 'promo_billback', 'vague')),
+        'late_delivery', 'promo_billback', 'vague',
+        'spoilage', 'slotting')),
     dispute_window_days    INTEGER,
     auto_deduct            INTEGER NOT NULL DEFAULT 0,  -- BOOLEAN as 0/1
     evidence_required      TEXT,
@@ -147,7 +148,8 @@ CREATE TABLE deductions (
     shipment_id             TEXT,
     deduction_type          TEXT NOT NULL CHECK (deduction_type IN (
         'short_ship', 'label_fine', 'pallet_fine', 'damaged',
-        'late_delivery', 'promo_billback', 'vague')),
+        'late_delivery', 'promo_billback', 'vague',
+        'spoilage', 'slotting')),
     code_id                 TEXT,
     code_as_remitted        TEXT,
     remittance_description  TEXT,

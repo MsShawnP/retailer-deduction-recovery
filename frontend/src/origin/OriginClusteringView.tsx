@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars, formatPercent } from "../data";
-import { ORIGIN_DIMENSIONS, clusterValueFor } from "../sankey/data";
+import { ORIGIN_DIMENSIONS, clusterValueFor, isOperational } from "../sankey/data";
 import "./OriginClusteringView.css";
 
 interface Props {
@@ -125,9 +125,17 @@ export default function OriginClusteringView({
     ORIGIN_DIMENSIONS[0].id
   );
 
+  // Operational origins only — slotting deductions have no shipment,
+  // pack, or carrier and would all collapse to "(no shipment)" /
+  // "(no pack record)" buckets, polluting the concentration scores.
+  const operationalCohort = useMemo(
+    () => cohort.filter(isOperational),
+    [cohort]
+  );
+
   const summaries: DimensionSummary[] = useMemo(() => {
     return ORIGIN_DIMENSIONS.map((dim) => {
-      const clusters = clustersFor(cohort, dim.id);
+      const clusters = clustersFor(operationalCohort, dim.id);
       const total = clusters.reduce((s, c) => s + c.dollars, 0);
       const top = clusters[0];
       return {
@@ -139,22 +147,35 @@ export default function OriginClusteringView({
         totalDollars: total,
       };
     }).sort((a, b) => b.topShare - a.topShare);
-  }, [cohort]);
+  }, [operationalCohort]);
 
   const activeClusters = useMemo(
-    () => clustersFor(cohort, activeDimension),
-    [cohort, activeDimension]
+    () => clustersFor(operationalCohort, activeDimension),
+    [operationalCohort, activeDimension]
   );
 
   const activeDimLabel =
     ORIGIN_DIMENSIONS.find((d) => d.id === activeDimension)?.label ??
     activeDimension;
 
-  if (cohort.length === 0) {
+  if (operationalCohort.length === 0) {
     return (
       <section className="origin">
         <h2>Origin clustering</h2>
-        <p className="origin-empty">No deductions in the current cohort.</p>
+        <p className="section-description">
+          Instead of grouping deductions by retailer or type, this groups
+          them by where in Cinderhaven's operation they came from — which
+          warehouse, which packing line, which carrier, which shift. If
+          one packing line generates 60% of the labeling fines, the fix
+          is specific and cheap. If the problem is spread evenly, the fix
+          is systemic. Click any cluster to see the individual deductions
+          behind it.
+        </p>
+        <p className="origin-empty">
+          {cohort.length === 0
+            ? "No deductions in the current cohort."
+            : "Current cohort is slotting only — negotiated costs have no operational origin (no shipment, no pack, no carrier)."}
+        </p>
       </section>
     );
   }
@@ -164,6 +185,15 @@ export default function OriginClusteringView({
       <header className="origin-header">
         <div>
           <h2>Origin clustering</h2>
+          <p className="section-description">
+            Instead of grouping deductions by retailer or type, this
+            groups them by where in Cinderhaven's operation they came
+            from — which warehouse, which packing line, which carrier,
+            which shift. If one packing line generates 60% of the
+            labeling fines, the fix is specific and cheap. If the problem
+            is spread evenly, the fix is systemic. Click any cluster to
+            see the individual deductions behind it.
+          </p>
           <p className="origin-context">
             Where the deductions come from operationally — by carrier,
             label decision, pack verification system, evidence format, and

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars, formatPercent } from "../data";
+import { isOperational } from "../sankey/data";
 import "./RecoverySimulationView.css";
 
 interface Props {
@@ -231,20 +232,31 @@ function countAffected(cohort: Deduction[], key: ToggleKey): number {
 export default function RecoverySimulationView({ cohort }: Props) {
   const [toggles, setToggles] = useState<SimToggles>(ALL_OFF);
 
-  const baseline = useMemo(() => simulate(cohort, ALL_OFF), [cohort]);
+  // Recovery simulation models operational fixes against disputable
+  // failures. Slotting is a negotiated cost, not a failure — exclude.
+  const operationalCohort = useMemo(
+    () => cohort.filter(isOperational),
+    [cohort]
+  );
+  const slottingExcluded = cohort.length - operationalCohort.length;
+
+  const baseline = useMemo(
+    () => simulate(operationalCohort, ALL_OFF),
+    [operationalCohort]
+  );
   const projection = useMemo(
-    () => simulate(cohort, toggles),
-    [cohort, toggles]
+    () => simulate(operationalCohort, toggles),
+    [operationalCohort, toggles]
   );
 
   const soloImpacts = useMemo(() => {
     return TOGGLES.map((spec) => {
-      const solo = simulate(cohort, { ...ALL_OFF, [spec.key]: true });
+      const solo = simulate(operationalCohort, { ...ALL_OFF, [spec.key]: true });
       const savings = savingsVsBaseline(baseline, solo);
-      const affected = countAffected(cohort, spec.key);
+      const affected = countAffected(operationalCohort, spec.key);
       return { spec, savings, affected };
     });
-  }, [cohort, baseline]);
+  }, [operationalCohort, baseline]);
 
   const anyOn = TOGGLES.some((spec) => toggles[spec.key]);
   const savings = savingsVsBaseline(baseline, projection);
@@ -261,11 +273,25 @@ export default function RecoverySimulationView({ cohort }: Props) {
     setToggles(all);
   };
 
-  if (cohort.length === 0) {
+  if (operationalCohort.length === 0) {
     return (
       <section className="sim">
         <h2>Recovery simulation</h2>
-        <p className="sim-empty">No deductions in the current cohort.</p>
+        <p className="section-description">
+          Each toggle represents one specific fix — like switching to
+          retailer-specific labels, adding digital pack verification, or
+          hiring someone to file disputes on time. Turn a toggle on to see
+          how the portfolio-wide numbers change: how many deductions would
+          have been prevented, how many more disputes would have been won,
+          and how much money moves from lost to recovered. Stack multiple
+          toggles to see how fixes compound. The goal is to answer "if I
+          could only do one thing, what's worth the most?"
+        </p>
+        <p className="sim-empty">
+          {cohort.length === 0
+            ? "No deductions in the current cohort."
+            : "Current cohort is slotting only — negotiated costs aren't operational failures, so the simulation has nothing to model."}
+        </p>
       </section>
     );
   }
@@ -275,12 +301,32 @@ export default function RecoverySimulationView({ cohort }: Props) {
       <header className="sim-header">
         <div>
           <h2>Recovery simulation</h2>
+          <p className="section-description">
+            Each toggle represents one specific fix — like switching to
+            retailer-specific labels, adding digital pack verification, or
+            hiring someone to file disputes on time. Turn a toggle on to see
+            how the portfolio-wide numbers change: how many deductions would
+            have been prevented, how many more disputes would have been won,
+            and how much money moves from lost to recovered. Stack multiple
+            toggles to see how fixes compound. The goal is to answer "if I
+            could only do one thing, what's worth the most?"
+          </p>
           <p className="sim-context">
             Toggle the operational and administrative fixes Cinderhaven could
             implement. Numbers update live — current outcomes on the left,
             projected on the right. Runs against the{" "}
-            <strong>{formatCount(cohort.length)}</strong>-deduction cohort
-            currently in view.
+            <strong>{formatCount(operationalCohort.length)}</strong> operational
+            deductions in the cohort.
+            {slottingExcluded > 0 && (
+              <>
+                {" "}
+                <span className="muted">
+                  {formatCount(slottingExcluded)} slotting deduction
+                  {slottingExcluded === 1 ? "" : "s"} excluded — negotiated
+                  costs aren't operational failures.
+                </span>
+              </>
+            )}
           </p>
         </div>
         <div className="sim-actions">

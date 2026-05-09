@@ -189,6 +189,15 @@ export default function RetailerScorecardView({
     return (
       <section className="scorecard">
         <h2>Retailer scorecard</h2>
+        <p className="section-description">
+          Each retailer gets a profile showing: total deduction dollars,
+          most common deduction types, dispute acceptance rate, average
+          days to decide a dispute, deadline strictness, and how their
+          behavior compares to the group. Use this to answer questions
+          like "is Walmart actually our worst retailer or does it just
+          feel that way because they're our biggest?" and "which retailer
+          is most likely to accept a dispute if we file one?"
+        </p>
         <p className="scorecard-empty">No deductions in the current cohort.</p>
       </section>
     );
@@ -199,6 +208,15 @@ export default function RetailerScorecardView({
       <header className="scorecard-header">
         <div>
           <h2>Retailer scorecard</h2>
+          <p className="section-description">
+            Each retailer gets a profile showing: total deduction dollars,
+            most common deduction types, dispute acceptance rate, average
+            days to decide a dispute, deadline strictness, and how their
+            behavior compares to the group. Use this to answer questions
+            like "is Walmart actually our worst retailer or does it just
+            feel that way because they're our biggest?" and "which
+            retailer is most likely to accept a dispute if we file one?"
+          </p>
           <p className="scorecard-context">
             Comparative view across {formatCount(scorecards.length)} retailers
             in the current cohort. Each card pairs the dollar story (volume,

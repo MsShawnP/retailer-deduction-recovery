@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars, formatPercent } from "../data";
+import { isOperational } from "../sankey/data";
 import "./PostAuditRiskView.css";
 
 interface Props {
@@ -76,11 +77,12 @@ interface EvidenceRow {
 export default function PostAuditRiskView({ cohort, onTrace }: Props) {
   const [useDigital, setUseDigital] = useState(false);
 
-  // Forward-looking exposure scope: open / non-post-audit deductions.
-  // The 41 post-audit claims already in the data are realized losses,
-  // not future risk.
+  // Forward-looking exposure scope: open / non-post-audit, disputable
+  // deductions. Already-realized post-audit claims appear in the
+  // "Already happened" panel. Slotting is a negotiated cost — auditors
+  // don't claw back agreed placement fees, so it's out of the model.
   const forward = useMemo(
-    () => cohort.filter((d) => !d.is_post_audit),
+    () => cohort.filter((d) => !d.is_post_audit && isOperational(d)),
     [cohort]
   );
   const realized = useMemo(
@@ -204,6 +206,16 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
     return (
       <section className="audit">
         <h2>Post-audit risk exposure</h2>
+        <p className="section-description">
+          Retailers like Walmart periodically audit suppliers' past
+          shipments. If labels, pack records, or documentation don't match
+          their specs, they can deduct money retroactively — even on orders
+          that were originally accepted. This view looks at every order in
+          the past 12 months, checks what evidence Cinderhaven has on file,
+          and calculates the dollar exposure if a retailer audited today.
+          Orders with no digital records and noncompliant labels are the
+          highest risk.
+        </p>
         <p className="audit-empty">No deductions in the current cohort.</p>
       </section>
     );
@@ -217,6 +229,16 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
       <header className="audit-header">
         <div>
           <h2>Post-audit risk exposure</h2>
+          <p className="section-description">
+            Retailers like Walmart periodically audit suppliers' past
+            shipments. If labels, pack records, or documentation don't
+            match their specs, they can deduct money retroactively — even
+            on orders that were originally accepted. This view looks at
+            every order in the past 12 months, checks what evidence
+            Cinderhaven has on file, and calculates the dollar exposure if
+            a retailer audited today. Orders with no digital records and
+            noncompliant labels are the highest risk.
+          </p>
           <p className="audit-context">
             Third-party auditors show up months after the original transaction
             and pull historical records. The supplier's defense is whatever
