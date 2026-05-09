@@ -25,3 +25,10 @@ dist-ssr
 
 # Visual-check artifacts from frontend/screenshot.mjs
 *.png
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
