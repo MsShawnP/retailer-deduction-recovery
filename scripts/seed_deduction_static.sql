@@ -27,9 +27,13 @@ INSERT INTO retailers (retailer_id, name, channel_type, dispute_portal_name, dis
   ('dtc',                 'DTC',                     'dtc',         NULL,                               NULL,                                   NULL,           'Direct-to-consumer; no deduction model');
 
 -- ---------- retailer_rules ----------
--- 7 deduction_types per retailer (DTC excluded). dispute_window_days NULL where not published.
+-- 9 deduction_types per retailer (DTC excluded). dispute_window_days NULL where not published.
 -- typical_recovery_rate is a per-retailer baseline for the simulation; actual
 -- per-deduction outcome depends on evidence quality and timeliness.
+-- Spoilage flows through the same failure pipeline as the other operational
+-- types. Slotting is a negotiated cost (new-item fees, planogram changes,
+-- shelf placement allowances) and is intentionally non-disputable —
+-- typical_recovery_rate=0, no evidence_required, dispute_window NULL.
 
 INSERT INTO retailer_rules (retailer_id, deduction_type, dispute_window_days, auto_deduct, evidence_required, typical_recovery_rate, notes) VALUES
   -- Walmart
@@ -111,7 +115,29 @@ INSERT INTO retailer_rules (retailer_id, deduction_type, dispute_window_days, au
   ('harbor_fresh', 'damaged',        NULL, 0, 'signed_bol,photo',           0.50, 'Inferred'),
   ('harbor_fresh', 'late_delivery',  NULL, 0, 'pod',                        0.35, 'Inferred'),
   ('harbor_fresh', 'promo_billback', NULL, 0, 'promo_agreement',            0.45, 'Inferred'),
-  ('harbor_fresh', 'vague',          NULL, 0, 'pack_log',                   0.15, 'Inferred');
+  ('harbor_fresh', 'vague',          NULL, 0, 'pack_log',                   0.15, 'Inferred'),
+  -- ---- spoilage (operational failure — full pipeline) ----
+  ('walmart',             'spoilage', 365,  1, 'signed_bol,photo,pack_log',  0.45, 'Code 28-adjacent; product condition disputes at receiving — temperature, expiration, quality'),
+  ('costco',              'spoilage', NULL, 1, 'signed_bol,photo',           0.45, 'Cross-dock receiving rejects on cold-chain/quality at depot; window inferred'),
+  ('whole_foods',         'spoilage', NULL, 0, 'signed_bol,photo',           0.40, 'Strict quality program; regional fragmentation drives variability'),
+  ('unfi',                'spoilage', 60,   1, 'signed_bol,photo',           0.40, 'Includes unsaleables on the natural side; Excel-only dispute form'),
+  ('kehe',                'spoilage', 180,  1, 'signed_bol,photo',           0.40, 'UDR window 48hr at receipt for damage/spoilage; K-Solve 180-day cap on follow-up'),
+  ('southside_grocers',   'spoilage', NULL, 0, 'signed_bol,photo',           0.55, 'Specialty buyer relationship; willing to credit on photo + record'),
+  ('green_basket_market', 'spoilage', NULL, 0, 'signed_bol,photo',           0.45, 'Receiving teams reject perceived quality issues quickly'),
+  ('prairie_provisions',  'spoilage', NULL, 0, 'signed_bol,photo',           0.40, 'Inferred regional norm'),
+  ('mountain_pantry_co',  'spoilage', NULL, 0, 'signed_bol,photo',           0.40, 'Inferred regional norm'),
+  ('harbor_fresh',        'spoilage', NULL, 0, 'signed_bol,photo',           0.45, 'Inferred; relationship-driven'),
+  -- ---- slotting (negotiated cost — non-disputable, terminal) ----
+  ('walmart',             'slotting', NULL, 1, '',                           0.0, 'Slotting / new-item / planogram fees — contractually agreed, not disputable'),
+  ('costco',              'slotting', NULL, 1, '',                           0.0, 'Pay-to-play club placement and demo costs; non-disputable'),
+  ('whole_foods',         'slotting', NULL, 1, '',                           0.0, 'New-item slotting + reset placement fees by region; non-disputable'),
+  ('unfi',                'slotting', NULL, 1, '',                           0.0, 'New-item / catalog / planogram fees on the natural side; non-disputable'),
+  ('kehe',                'slotting', NULL, 1, '',                           0.0, 'New-item slotting + Connect BI placement fees; non-disputable'),
+  ('southside_grocers',   'slotting', NULL, 1, '',                           0.0, 'Specialty placement allowance; negotiated annually'),
+  ('green_basket_market', 'slotting', NULL, 1, '',                           0.0, 'Reset / new-item placement billbacks; non-disputable'),
+  ('prairie_provisions',  'slotting', NULL, 1, '',                           0.0, 'New-item placement allowance; non-disputable'),
+  ('mountain_pantry_co',  'slotting', NULL, 1, '',                           0.0, 'New-item placement allowance; non-disputable'),
+  ('harbor_fresh',        'slotting', NULL, 1, '',                           0.0, 'New-item placement allowance; non-disputable');
 
 -- ---------- deduction_codes ----------
 -- Walmart codes are publicly documented; KeHE codes mostly documented;
@@ -206,7 +232,29 @@ INSERT INTO deduction_codes (code_id, retailer_id, code, name, deduction_type, i
   ('harbor_fresh_damaged',        'harbor_fresh', 'DMG',   'Damaged',          'damaged',        0),
   ('harbor_fresh_late_delivery',  'harbor_fresh', 'LATE',  'Late delivery',    'late_delivery',  0),
   ('harbor_fresh_promo_billback', 'harbor_fresh', 'PROMO', 'Promo billback',   'promo_billback', 0),
-  ('harbor_fresh_vague',          'harbor_fresh', 'MISC',  'Miscellaneous',    'vague',          0);
+  ('harbor_fresh_vague',          'harbor_fresh', 'MISC',  'Miscellaneous',    'vague',          0),
+  -- ---- spoilage codes ----
+  ('walmart_spoilage',             'walmart',             '29',    'Concealed damage / spoilage at receipt',         'spoilage', 1),
+  ('costco_spoilage',              'costco',              'SPL',   'Spoilage / cold-chain rejection',                'spoilage', 0),
+  ('wholefoods_spoilage',          'whole_foods',         'SPL',   'Spoilage / quality at receipt',                  'spoilage', 0),
+  ('unfi_spoilage',                'unfi',                'UNS',   'Unsaleable / spoilage',                          'spoilage', 0),
+  ('kehe_spoilage',                'kehe',                'UDRS',  'UDR — spoilage at receipt',                      'spoilage', 0),
+  ('southside_grocers_spoilage',   'southside_grocers',   'SPL',   'Spoilage / quality complaint',                   'spoilage', 0),
+  ('green_basket_market_spoilage', 'green_basket_market', 'SPL',   'Spoilage / quality complaint',                   'spoilage', 0),
+  ('prairie_provisions_spoilage',  'prairie_provisions',  'SPL',   'Spoilage / quality complaint',                   'spoilage', 0),
+  ('mountain_pantry_co_spoilage',  'mountain_pantry_co',  'SPL',   'Spoilage / quality complaint',                   'spoilage', 0),
+  ('harbor_fresh_spoilage',        'harbor_fresh',        'SPL',   'Spoilage / quality complaint',                   'spoilage', 0),
+  -- ---- slotting codes (non-disputable, negotiated) ----
+  ('walmart_slotting',             'walmart',             'NIF',   'New-item / slotting fee',                        'slotting', 0),
+  ('costco_slotting',              'costco',              'SLOT',  'Slotting / pay-to-play club placement',          'slotting', 0),
+  ('wholefoods_slotting',          'whole_foods',         'SLOT',  'New-item / placement fee',                       'slotting', 0),
+  ('unfi_slotting',                'unfi',                'SLOT',  'Slotting / catalog placement',                   'slotting', 0),
+  ('kehe_slotting',                'kehe',                'SLOT',  'Slotting / Connect BI placement',                'slotting', 0),
+  ('southside_grocers_slotting',   'southside_grocers',   'SLOT',  'Placement allowance',                            'slotting', 0),
+  ('green_basket_market_slotting', 'green_basket_market', 'SLOT',  'Reset / new-item placement billback',            'slotting', 0),
+  ('prairie_provisions_slotting',  'prairie_provisions',  'SLOT',  'New-item placement allowance',                   'slotting', 0),
+  ('mountain_pantry_co_slotting',  'mountain_pantry_co',  'SLOT',  'New-item placement allowance',                   'slotting', 0),
+  ('harbor_fresh_slotting',        'harbor_fresh',        'SLOT',  'New-item placement allowance',                   'slotting', 0);
 
 -- ---------- edi_requirements ----------
 -- Compliance specs per retailer. Used to render retailer-rule cards in the UI

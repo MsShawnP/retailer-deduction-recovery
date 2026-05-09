@@ -7,9 +7,12 @@ import {
   OUTCOME_COLORS,
   highlightedLinkSet,
   isOnSelectedPath,
+  SLOTTING_TERMINAL_NODE_ID,
   type Selection,
 } from "./data";
 import "./SankeyView.css";
+
+const SLOTTING_BAND_COLOR = "#9E7E3A";  // muted gold — matches OUTCOME_COLORS for the terminal
 
 interface Props {
   deductions: Deduction[];
@@ -149,10 +152,17 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
   return (
     <div className="sankey">
       <h2>Deduction flow — every dollar, traced through five compounding failures</h2>
-      <p className="sankey-sub">
-        {dollarsCompact(layout.total)} of deductions, traced from type through
-        root cause, evidence quality, accessibility, timeliness, and outcome.
-        Click a node or band to filter. Click empty space to clear.
+      <p className="section-description">
+        Every dollar retailers deducted from Cinderhaven's payments starts at
+        the top and flows down through six stages: what type of deduction it
+        was, what caused it, whether good evidence existed, whether that
+        evidence was findable, whether a dispute was filed on time, and what
+        happened in the end. The width of each band is proportional to the
+        dollar amount — wider bands mean more money. Click any band or node
+        to isolate that path; everything else fades so you can follow the
+        money. Click again to reset. The dropdown above lets you filter to
+        a single deduction type. The tables below update automatically to
+        match whatever you've selected.
       </p>
 
       <svg
@@ -193,12 +203,20 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
             const opacity =
               isHighlighted === null ? 0.30 :
               isHighlighted ? 0.65 : 0.04;
+            // Slotting's single long band crosses the whole chart. Color
+            // it with the terminal's gold so the categorical difference
+            // (negotiated cost, not a failure flow) reads at a glance.
+            const isSlottingBand =
+              link.target.id === SLOTTING_TERMINAL_NODE_ID;
+            const stroke = isSlottingBand
+              ? SLOTTING_BAND_COLOR
+              : LAYER_COLORS[sourceLayer];
 
             return (
               <path
                 key={i}
                 d={linkPath(link) || ""}
-                stroke={LAYER_COLORS[sourceLayer]}
+                stroke={stroke}
                 strokeWidth={Math.max(1, link.width)}
                 fill="none"
                 opacity={opacity}

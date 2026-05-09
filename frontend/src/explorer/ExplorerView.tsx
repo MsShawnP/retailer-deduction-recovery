@@ -34,6 +34,17 @@ export default function ExplorerView({
     return (
       <section className="explorer">
         <h2>Deduction explorer</h2>
+        <p className="section-description">
+          Pick any deduction from the current view and see it broken into six
+          cards, one for each stage of the failure chain. The cards read left
+          to right, top to bottom: what the deduction is, whether it's part of
+          a pattern, what caused it, how strong the evidence is, how hard it is
+          to retrieve that evidence, and whether the dispute was filed in time.
+          Use the arrows at the top to step forward or backward through
+          deductions sorted by dollar amount, or hit Random to spot-check.
+          When you change the Sankey filter or dropdown, the explorer resets
+          to the first deduction in the new group.
+        </p>
         <p className="explorer-empty">No deductions match the current filter.</p>
       </section>
     );
@@ -52,6 +63,17 @@ export default function ExplorerView({
       <header className="explorer-header">
         <div>
           <h2>Deduction explorer</h2>
+          <p className="section-description">
+            Pick any deduction from the current view and see it broken into six
+            cards, one for each stage of the failure chain. The cards read left
+            to right, top to bottom: what the deduction is, whether it's part
+            of a pattern, what caused it, how strong the evidence is, how hard
+            it is to retrieve that evidence, and whether the dispute was filed
+            in time. Use the arrows at the top to step forward or backward
+            through deductions sorted by dollar amount, or hit Random to
+            spot-check. When you change the Sankey filter or dropdown, the
+            explorer resets to the first deduction in the new group.
+          </p>
           <p className="explorer-context">
             Showing <strong>{safeIndex + 1}</strong> of{" "}
             <strong>{formatCount(total)}</strong> in the current cohort,
@@ -323,6 +345,18 @@ function rootCauseProse(d: Deduction): string {
       return "MCB / scan-down billback flowing back from a retailer promotion. These are contractually owed but routinely arrive without the matching promo agreement on file, creating disputes by default.";
     case "Opaque remittance":
       return "Vague remittance line — no PO, no specific reason. Investigating decodes some; many remain unmapped to a specific shipment or invoice.";
+    case "Temperature abuse in transit":
+      return "Cold-chain failure between Cinderhaven's dock and the retailer's. Either the carrier's reefer drifted out of spec or the unit was off during a transfer. Receiving rejects the affected pallets on arrival; defending it requires temperature logs from the trailer and signed-off receiving photos.";
+    case "Expired / short-dated at receiving":
+      return "Receiving measures days-on-shelf against the retailer's minimum-life threshold (often 60-75% of total shelf life remaining) and rejects what doesn't meet it. Common when production-to-delivery cycle is long or the retailer slows moving the product through.";
+    case "Quality complaint at receiving":
+      return "Receiving flagged taste, appearance, or formulation concerns at the dock. Often subjective and hard to defend without lot retain samples, QA records, and signed-off photos at receiving.";
+    case "Damage in transit":
+      return "Pallets arrived intact in count but with damage that affected product condition (crushing, pressure marks, packaging compromise). The shipment's BOL may be signed clean for count even when condition fails inspection.";
+    case "Other spoilage":
+      return "Product-condition deduction at receiving without a specific sub-cause encoded. Defending these requires the same evidence chain as the named spoilage causes.";
+    case "Not disputable — negotiated cost":
+      return "Slotting / new-item / planogram-reset / shelf-placement fee. Contractually agreed up front in exchange for shelf space, not assessed as a penalty. Routing it through the failure pipeline would be misleading — it isn't an operational failure or a recoverable loss, it's the negotiated cost of access. Tracked here because it shows up on the same remittances and matters for net margin, but no dispute path applies.";
     default:
       return "";
   }

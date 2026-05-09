@@ -12,9 +12,17 @@ The central deduction record. Drives a realistic distribution of:
   - promo_billback (random per retailer; tied to promo activity)
   - vague (Walmart Code 87/99 catch-all; MISC at others; opaque
     descriptions for the "vague/undecodable" feature)
+  - spoilage (product-condition disputes at receiving — temperature,
+    expiration, quality, damage-in-transit; flows through the same
+    failure pipeline as the other operational types)
+  - slotting (negotiated cost — new-item / planogram / shelf placement
+    fees; NOT an operational failure, generated as periodic per-retailer
+    events outside the per-order loop, no order_id / shipment_id, no
+    dispute_deadline, recovery_rate=0)
 
 Volume target: $750K-$1.2M annualized (3-5% of $25M wholesale revenue).
-Roughly 3,500-5,500 deductions over 18 months.
+Roughly 3,500-5,500 standard deductions over 18 months, plus ~50-70
+slotting events.
 
 Deduction date is set 14-45 days after delivery_date (retailer-aware
 remittance cadence). dispute_deadline is calculated from
@@ -43,6 +51,10 @@ SEED = 45
 PROFILES = {
     # short_perceived: extra rate of perceived-shortage deductions when label
     # is non-scannable at strict retailers (Walmart Code 22 driver)
+    # spoilage: per-order base rate of product-condition deductions
+    # slotting_events: integer count of slotting events to generate per
+    #   retailer across the data window (not per-order)
+    # slotting_amount_range: (min, max) dollars per slotting event
     "walmart": {
         "short_ship_real":         0.85,   # of bol-short or pick-mismatch
         "short_ship_perceived":    0.45,   # of non-scannable-label orders
@@ -52,6 +64,9 @@ PROFILES = {
         "late_delivery_window":    0.55,   # of orders that missed window
         "promo_billback":          0.06,
         "vague":                   0.03,
+        "spoilage":                0.025,
+        "slotting_events":         3,
+        "slotting_amount_range":   (5500, 13000),
         "remittance_lag":          (28, 42),
     },
     "costco": {
@@ -63,6 +78,9 @@ PROFILES = {
         "late_delivery_window":    0.50,
         "promo_billback":          0.04,
         "vague":                   0.03,
+        "spoilage":                0.030,
+        "slotting_events":         3,
+        "slotting_amount_range":   (8000, 18000),
         "remittance_lag":          (30, 45),
     },
     "whole_foods": {
@@ -74,6 +92,9 @@ PROFILES = {
         "late_delivery_window":    0.30,
         "promo_billback":          0.05,
         "vague":                   0.05,
+        "spoilage":                0.035,  # strict quality program
+        "slotting_events":         4,
+        "slotting_amount_range":   (3000, 6500),
         "remittance_lag":          (21, 35)
     },
     "unfi": {
@@ -85,6 +106,9 @@ PROFILES = {
         "late_delivery_window":    0.30,
         "promo_billback":          0.10,   # MCB-heavy
         "vague":                   0.06,
+        "spoilage":                0.025,  # unsaleables on natural side
+        "slotting_events":         5,
+        "slotting_amount_range":   (2000, 4500),
         "remittance_lag":          (7, 21),  # weekly cadence
     },
     "kehe": {
@@ -96,6 +120,9 @@ PROFILES = {
         "late_delivery_window":    0.30,
         "promo_billback":          0.10,
         "vague":                   0.06,
+        "spoilage":                0.020,
+        "slotting_events":         5,
+        "slotting_amount_range":   (1500, 3500),
         "remittance_lag":          (10, 21),  # biweekly
     },
     "southside_grocers": {
@@ -107,6 +134,9 @@ PROFILES = {
         "late_delivery_window":    0.20,
         "promo_billback":          0.04,
         "vague":                   0.04,
+        "spoilage":                0.015,
+        "slotting_events":         2,
+        "slotting_amount_range":   (500, 1300),
         "remittance_lag":          (21, 40),
     },
     "green_basket_market": {
@@ -118,6 +148,9 @@ PROFILES = {
         "late_delivery_window":    0.25,
         "promo_billback":          0.10,   # Free Fill / Fair Share
         "vague":                   0.05,
+        "spoilage":                0.018,
+        "slotting_events":         3,
+        "slotting_amount_range":   (400, 1100),
         "remittance_lag":          (21, 40),
     },
     "prairie_provisions": {
@@ -129,6 +162,9 @@ PROFILES = {
         "late_delivery_window":    0.25,
         "promo_billback":          0.04,
         "vague":                   0.04,
+        "spoilage":                0.012,
+        "slotting_events":         2,
+        "slotting_amount_range":   (300, 850),
         "remittance_lag":          (21, 40),
     },
     "mountain_pantry_co": {
@@ -140,6 +176,9 @@ PROFILES = {
         "late_delivery_window":    0.25,
         "promo_billback":          0.04,
         "vague":                   0.04,
+        "spoilage":                0.012,
+        "slotting_events":         2,
+        "slotting_amount_range":   (300, 850),
         "remittance_lag":          (21, 40),
     },
     "harbor_fresh": {
@@ -151,9 +190,29 @@ PROFILES = {
         "late_delivery_window":    0.20,
         "promo_billback":          0.04,
         "vague":                   0.04,
+        "spoilage":                0.012,
+        "slotting_events":         2,
+        "slotting_amount_range":   (300, 850),
         "remittance_lag":          (21, 40),
     },
 }
+
+# Spoilage descriptions encode the sub-cause as a keyword the Sankey
+# rootCauseFor function reads. Keep keywords stable: 'temperature',
+# 'expired'/'short-dated', 'quality', 'damage in transit'.
+SPOILAGE_TEMPLATES = [
+    "Spoilage — temperature abuse in transit",
+    "Spoilage — expired or short-dated at receiving",
+    "Spoilage — quality complaint at receiving",
+    "Spoilage — damage in transit affecting condition",
+]
+
+SLOTTING_TEMPLATES = [
+    "New-item slotting fee — placement allowance",
+    "Planogram reset — placement billback",
+    "Shelf placement / new-item program",
+    "Category-reset placement billback",
+]
 
 # Vague deduction descriptions that read like real remittance lines —
 # the "Code 99 / promo -$X with no PO reference" reality.
@@ -232,6 +291,13 @@ def vague_amount(rng: random.Random) -> float:
     return round(rng.uniform(800.0, 4500.0), 2)
 
 
+def spoilage_amount(rng: random.Random, total_value: float) -> float:
+    """Spoilage refund — partial credit for product condition issues at
+    receiving. Typically 8-22% of order value (a portion of the order
+    rejected, not the whole load)."""
+    return round(total_value * rng.uniform(0.08, 0.22), 2)
+
+
 def deduction_date_for(rng: random.Random, delivery_date: date, lag_range: tuple[int, int]) -> date:
     return delivery_date + timedelta(days=rng.randint(*lag_range))
 
@@ -279,6 +345,7 @@ def main() -> None:
     counters = {k: 0 for k in (
         "short_ship", "label_fine", "pallet_fine", "damaged",
         "late_delivery", "promo_billback", "vague",
+        "spoilage", "slotting",
     )}
 
     def add_deduction(retailer_id, dt, order_id, shipment_id, amount,
@@ -390,6 +457,48 @@ def main() -> None:
             link_shipment = shipment_id if link_order else None
             add_deduction(retailer_id, "vague", link_order, link_shipment,
                           amt, cid, code, description, ded_dt, is_vague=1)
+
+        # 8. SPOILAGE — product-condition disputes at receiving. Flows
+        # through the same failure pipeline as the other operational
+        # types (root cause derived from the description keyword).
+        if rng.random() < profile["spoilage"]:
+            cid, code = code_id_for(retailer_id, "spoilage", codes_by_retailer)
+            amt = spoilage_amount(rng, total_value)
+            description = rng.choice(SPOILAGE_TEMPLATES)
+            add_deduction(retailer_id, "spoilage", order_id, shipment_id,
+                          amt, cid, code, description, ded_dt)
+
+    # 9. SLOTTING — periodic, not order-tied. Negotiated cost, not an
+    # operational failure. No order_id, no shipment_id, no dispute window.
+    # Spread N events per retailer evenly across the order date window.
+    window = cur.execute(
+        "SELECT MIN(po_date), MAX(po_date) FROM orders"
+    ).fetchone()
+    if window and window[0] and window[1]:
+        ws = date.fromisoformat(window[0])
+        we = date.fromisoformat(window[1])
+        total_days = max(1, (we - ws).days)
+        for retailer_id, profile in PROFILES.items():
+            n_events = profile["slotting_events"]
+            amount_lo, amount_hi = profile["slotting_amount_range"]
+            cid, code = code_id_for(retailer_id, "slotting", codes_by_retailer)
+            for i in range(n_events):
+                # Even spread with jitter so events don't cluster on day 0
+                frac = (i + 0.5) / n_events + rng.uniform(-0.25, 0.25) / n_events
+                frac = max(0.0, min(0.999, frac))
+                ded_dt = ws + timedelta(days=int(frac * total_days))
+                amt = round(rng.uniform(amount_lo, amount_hi), 2)
+                description = rng.choice(SLOTTING_TEMPLATES)
+                seq += 1
+                deduction_id = f"DED-{seq:07d}"
+                deductions.append((
+                    deduction_id, retailer_id, None, None, "slotting",
+                    cid, code, description,
+                    amt, ded_dt.isoformat(), None,  # dispute_deadline NULL
+                    0, 0,  # is_vague=0, is_post_audit=0
+                    None,  # remittance_id populated later
+                ))
+                counters["slotting"] += 1
 
     cur.executemany("""
         INSERT INTO deductions (

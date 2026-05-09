@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars, formatPercent } from "../data";
+import { isOperational } from "../sankey/data";
 import "./CostToDisputeView.css";
 
 interface Props {
@@ -112,12 +113,14 @@ export default function CostToDisputeView({ cohort, onTrace }: Props) {
   const [useDigital, setUseDigital] = useState(false);
   const [activeBucket, setActiveBucket] = useState<Bucket>("fight");
 
-  // Triage focuses on unresolved deductions — already-won disputes are
-  // settled and don't need a fight/skip decision.
+  // Triage focuses on unresolved, disputable deductions. Already-won
+  // disputes are settled. Slotting is a negotiated cost — not subject
+  // to a fight/skip decision.
   const unresolved = useMemo(
     () =>
       cohort.filter(
         (d) =>
+          isOperational(d) &&
           d.dispute?.outcome !== "won_full" &&
           d.dispute?.outcome !== "won_partial"
       ),
@@ -188,7 +191,37 @@ export default function CostToDisputeView({ cohort, onTrace }: Props) {
     return (
       <section className="cost">
         <h2>Cost to dispute</h2>
+        <p className="section-description">
+          Every deduction is scored by whether it's worth disputing. The
+          calculation compares the deduction amount against the estimated
+          labor cost to gather evidence and file — factoring in how hard
+          the evidence is to find and the likelihood of winning based on
+          evidence quality and the retailer's track record. Deductions sort
+          into three buckets: worth fighting, borderline, and don't bother.
+          Use this to decide where limited staff time goes first.
+        </p>
         <p className="cost-empty">No deductions in the current cohort.</p>
+      </section>
+    );
+  }
+  if (unresolved.length === 0) {
+    return (
+      <section className="cost">
+        <h2>Cost to dispute</h2>
+        <p className="section-description">
+          Every deduction is scored by whether it's worth disputing. The
+          calculation compares the deduction amount against the estimated
+          labor cost to gather evidence and file — factoring in how hard
+          the evidence is to find and the likelihood of winning based on
+          evidence quality and the retailer's track record. Deductions sort
+          into three buckets: worth fighting, borderline, and don't bother.
+          Use this to decide where limited staff time goes first.
+        </p>
+        <p className="cost-empty">
+          Nothing to triage — the cohort either holds only slotting
+          (negotiated costs, not disputable) or every operational deduction
+          is already resolved.
+        </p>
       </section>
     );
   }
@@ -198,6 +231,15 @@ export default function CostToDisputeView({ cohort, onTrace }: Props) {
       <header className="cost-header">
         <div>
           <h2>Cost to dispute</h2>
+          <p className="section-description">
+            Every deduction is scored by whether it's worth disputing. The
+            calculation compares the deduction amount against the estimated
+            labor cost to gather evidence and file — factoring in how hard
+            the evidence is to find and the likelihood of winning based on
+            evidence quality and the retailer's track record. Deductions
+            sort into three buckets: worth fighting, borderline, and don't
+            bother. Use this to decide where limited staff time goes first.
+          </p>
           <p className="cost-context">
             For each unresolved deduction, expected recovery (amount × win
             probability) versus labor to assemble and file. Three buckets —

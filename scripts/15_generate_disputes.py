@@ -260,6 +260,12 @@ def main() -> None:
          evidence_format, evidence_location,
          retrieval_minutes, label_scannable) = r
 
+        # Slotting is a negotiated cost, not an operational failure —
+        # never disputed, never has evidence. Skip entirely.
+        if dt == "slotting":
+            counters["skipped"] += 1
+            continue
+
         # Filing rate, with adjustments
         rate = FILING_RATE.get(retailer_id, 0.40)
         if amount < 100:

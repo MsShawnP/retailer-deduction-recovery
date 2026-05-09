@@ -38,6 +38,16 @@ export default function CausationTraceView({
     return (
       <section className="trace">
         <h2>Causation trace</h2>
+        <p className="section-description">
+          Choose an order and see its full timeline from left to right: the
+          purchase order, how it was packed, what label was used, how it
+          shipped, what the retailer received, what deduction was taken,
+          whether a dispute was attempted, and the final outcome. Each step
+          shows what actually happened and flags where things went wrong.
+          This is different from the explorer — the explorer shows one
+          deduction's six failure layers in parallel, while this view shows
+          one order's life sequentially.
+        </p>
         <p className="trace-context">
           The explorer shows one deduction's six failure layers in parallel;
           the trace shows the same order's story chronologically — what
@@ -69,6 +79,16 @@ export default function CausationTraceView({
       <header className="trace-header">
         <div>
           <h2>Causation trace</h2>
+          <p className="section-description">
+            Choose an order and see its full timeline from left to right: the
+            purchase order, how it was packed, what label was used, how it
+            shipped, what the retailer received, what deduction was taken,
+            whether a dispute was attempted, and the final outcome. Each step
+            shows what actually happened and flags where things went wrong.
+            This is different from the explorer — the explorer shows one
+            deduction's six failure layers in parallel, while this view shows
+            one order's life sequentially.
+          </p>
           <p className="trace-context">
             Following one order chronologically — what happened, in what
             sequence, and where things broke down. Trace{" "}

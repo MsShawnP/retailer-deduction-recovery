@@ -6,6 +6,7 @@ import type {
   RetailersById,
 } from "../types";
 import { formatCount, formatDollars } from "../data";
+import { isOperational } from "../sankey/data";
 import "./DisputeBuilderView.css";
 
 interface Props {
@@ -253,14 +254,21 @@ export default function DisputeBuilderView({
   const [filter, setFilter] = useState<Filter>("all");
   const [index, setIndex] = useState(0);
 
+  // Slotting is a negotiated cost — not disputable, no requirements,
+  // never appears in the builder. Filter it out at the source.
+  const operationalCohort = useMemo(
+    () => cohort.filter(isOperational),
+    [cohort]
+  );
+
   const items: BuilderItem[] = useMemo(() => {
-    return cohort.map((d) => {
+    return operationalCohort.map((d) => {
       const retailer = retailers ? retailers[d.retailer.id] ?? null : null;
       const reqs = deductionRequirements(d, retailer);
       const readiness = readinessFor(reqs);
       return { d, retailer, reqs, readiness };
     });
-  }, [cohort, retailers]);
+  }, [operationalCohort, retailers]);
 
   const counts = useMemo(() => {
     const c = { all: items.length, ready: 0, needs_work: 0, not_disputable: 0 };
@@ -296,6 +304,15 @@ export default function DisputeBuilderView({
     return (
       <section className="builder">
         <h2>Dispute builder</h2>
+        <p className="section-description">
+          Pick a deduction and see two columns side by side: what evidence a
+          winning dispute requires (signed proof of delivery, compliant label
+          scan, pack verification log, photos) and what Cinderhaven actually
+          has on file for that order (usually a handwritten note). Missing
+          items are flagged. This is a mock-up of the dispute package — what
+          it would look like if Cinderhaven had the records, versus what
+          they can actually submit today.
+        </p>
         <div className="builder-filter">
           <FilterTab
             label={`All (${formatCount(counts.all)})`}
@@ -322,7 +339,9 @@ export default function DisputeBuilderView({
           />
         </div>
         <p className="builder-empty">
-          No deductions match the current filter.
+          {operationalCohort.length === 0 && cohort.length > 0
+            ? "Current cohort is slotting only — negotiated costs aren't disputable, so the builder has nothing to assemble."
+            : "No deductions match the current filter."}
         </p>
       </section>
     );
@@ -340,6 +359,15 @@ export default function DisputeBuilderView({
       <header className="builder-header">
         <div>
           <h2>Dispute builder</h2>
+          <p className="section-description">
+            Pick a deduction and see two columns side by side: what evidence
+            a winning dispute requires (signed proof of delivery, compliant
+            label scan, pack verification log, photos) and what Cinderhaven
+            actually has on file for that order (usually a handwritten
+            note). Missing items are flagged. This is a mock-up of the
+            dispute package — what it would look like if Cinderhaven had
+            the records, versus what they can actually submit today.
+          </p>
           <p className="builder-context">
             Evidence readiness for one deduction at a time. The retailer's
             requirements on the left, what Cinderhaven actually has on the

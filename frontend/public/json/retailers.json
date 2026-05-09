@@ -71,6 +71,23 @@
         ],
         "typical_recovery_rate": 0.1,
         "notes": "Inferred"
+      },
+      "spoilage": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Cross-dock receiving rejects on cold-chain/quality at depot; window inferred"
+      },
+      "slotting": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [],
+        "typical_recovery_rate": 0.0,
+        "notes": "Pay-to-play club placement and demo costs; non-disputable"
       }
     },
     "codes": [
@@ -121,6 +138,20 @@
         "code": "SHRT",
         "name": "Shortage at receiving",
         "deduction_type": "short_ship",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_slotting",
+        "code": "SLOT",
+        "name": "Slotting / pay-to-play club placement",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_spoilage",
+        "code": "SPL",
+        "name": "Spoilage / cold-chain rejection",
+        "deduction_type": "spoilage",
         "is_published": false
       }
     ],
@@ -245,6 +276,23 @@
         ],
         "typical_recovery_rate": 0.1,
         "notes": "Inferred"
+      },
+      "spoilage": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Receiving teams reject perceived quality issues quickly"
+      },
+      "slotting": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [],
+        "typical_recovery_rate": 0.0,
+        "notes": "Reset / new-item placement billbacks; non-disputable"
       }
     },
     "codes": [
@@ -302,6 +350,20 @@
         "code": "SHRT",
         "name": "Shortage",
         "deduction_type": "short_ship",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_slotting",
+        "code": "SLOT",
+        "name": "Reset / new-item placement billback",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_spoilage",
+        "code": "SPL",
+        "name": "Spoilage / quality complaint",
+        "deduction_type": "spoilage",
         "is_published": false
       }
     ],
@@ -408,6 +470,23 @@
         ],
         "typical_recovery_rate": 0.15,
         "notes": "Inferred"
+      },
+      "spoilage": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Inferred; relationship-driven"
+      },
+      "slotting": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [],
+        "typical_recovery_rate": 0.0,
+        "notes": "New-item placement allowance; non-disputable"
       }
     },
     "codes": [
@@ -458,6 +537,20 @@
         "code": "SHRT",
         "name": "Shortage",
         "deduction_type": "short_ship",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_slotting",
+        "code": "SLOT",
+        "name": "New-item placement allowance",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_spoilage",
+        "code": "SPL",
+        "name": "Spoilage / quality complaint",
+        "deduction_type": "spoilage",
         "is_published": false
       }
     ],
@@ -564,6 +657,23 @@
         ],
         "typical_recovery_rate": 0.1,
         "notes": "Connect BI fee 2% of sales falls here"
+      },
+      "spoilage": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "UDR window 48hr at receipt for damage/spoilage; K-Solve 180-day cap on follow-up"
+      },
+      "slotting": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [],
+        "typical_recovery_rate": 0.0,
+        "notes": "New-item slotting + Connect BI placement fees; non-disputable"
       }
     },
     "codes": [
@@ -617,11 +727,25 @@
         "is_published": true
       },
       {
+        "code_id": "kehe_slotting",
+        "code": "SLOT",
+        "name": "Slotting / Connect BI placement",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
         "code_id": "kehe_udr",
         "code": "UDR",
         "name": "Unloading Discrepancy (shortage/over/damage)",
         "deduction_type": "short_ship",
         "is_published": true
+      },
+      {
+        "code_id": "kehe_spoilage",
+        "code": "UDRS",
+        "name": "UDR — spoilage at receipt",
+        "deduction_type": "spoilage",
+        "is_published": false
       }
     ],
     "edi_requirements": [
@@ -727,6 +851,23 @@
         ],
         "typical_recovery_rate": 0.1,
         "notes": "Inferred"
+      },
+      "spoilage": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Inferred regional norm"
+      },
+      "slotting": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [],
+        "typical_recovery_rate": 0.0,
+        "notes": "New-item placement allowance; non-disputable"
       }
     },
     "codes": [
@@ -777,6 +918,20 @@
         "code": "SHRT",
         "name": "Shortage",
         "deduction_type": "short_ship",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_slotting",
+        "code": "SLOT",
+        "name": "New-item placement allowance",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_spoilage",
+        "code": "SPL",
+        "name": "Spoilage / quality complaint",
+        "deduction_type": "spoilage",
         "is_published": false
       }
     ],
@@ -883,6 +1038,23 @@
         ],
         "typical_recovery_rate": 0.1,
         "notes": "Inferred"
+      },
+      "spoilage": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Inferred regional norm"
+      },
+      "slotting": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [],
+        "typical_recovery_rate": 0.0,
+        "notes": "New-item placement allowance; non-disputable"
       }
     },
     "codes": [
@@ -933,6 +1105,20 @@
         "code": "SHRT",
         "name": "Shortage",
         "deduction_type": "short_ship",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_slotting",
+        "code": "SLOT",
+        "name": "New-item placement allowance",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_spoilage",
+        "code": "SPL",
+        "name": "Spoilage / quality complaint",
+        "deduction_type": "spoilage",
         "is_published": false
       }
     ],
@@ -1039,6 +1225,23 @@
         ],
         "typical_recovery_rate": 0.15,
         "notes": "Specialty-friendly buyer relationship"
+      },
+      "spoilage": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.55,
+        "notes": "Specialty buyer relationship; willing to credit on photo + record"
+      },
+      "slotting": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [],
+        "typical_recovery_rate": 0.0,
+        "notes": "Specialty placement allowance; negotiated annually"
       }
     },
     "codes": [
@@ -1089,6 +1292,20 @@
         "code": "SHRT",
         "name": "Shortage",
         "deduction_type": "short_ship",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_slotting",
+        "code": "SLOT",
+        "name": "Placement allowance",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_spoilage",
+        "code": "SPL",
+        "name": "Spoilage / quality complaint",
+        "deduction_type": "spoilage",
         "is_published": false
       }
     ],
@@ -1195,6 +1412,23 @@
         ],
         "typical_recovery_rate": 0.1,
         "notes": "Vague chargebacks routine; PDFs/screenshots rejected on dispute form"
+      },
+      "spoilage": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Includes unsaleables on the natural side; Excel-only dispute form"
+      },
+      "slotting": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [],
+        "typical_recovery_rate": 0.0,
+        "notes": "New-item / catalog / planogram fees on the natural side; non-disputable"
       }
     },
     "codes": [
@@ -1245,6 +1479,20 @@
         "code": "SHT",
         "name": "Shortage",
         "deduction_type": "short_ship",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_slotting",
+        "code": "SLOT",
+        "name": "Slotting / catalog placement",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_spoilage",
+        "code": "UNS",
+        "name": "Unsaleable / spoilage",
+        "deduction_type": "spoilage",
         "is_published": false
       }
     ],
@@ -1355,6 +1603,24 @@
         ],
         "typical_recovery_rate": 0.1,
         "notes": "Code 87 catch-all"
+      },
+      "spoilage": {
+        "dispute_window_days": 365,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "photo",
+          "pack_log"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Code 28-adjacent; product condition disputes at receiving — temperature, expiration, quality"
+      },
+      "slotting": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [],
+        "typical_recovery_rate": 0.0,
+        "notes": "Slotting / new-item / planogram fees — contractually agreed, not disputable"
       }
     },
     "codes": [
@@ -1408,6 +1674,13 @@
         "is_published": true
       },
       {
+        "code_id": "walmart_spoilage",
+        "code": "29",
+        "name": "Concealed damage / spoilage at receipt",
+        "deduction_type": "spoilage",
+        "is_published": true
+      },
+      {
         "code_id": "walmart_30",
         "code": "30",
         "name": "Duplicate Billing",
@@ -1441,6 +1714,13 @@
         "name": "OTIF",
         "deduction_type": "late_delivery",
         "is_published": true
+      },
+      {
+        "code_id": "walmart_slotting",
+        "code": "NIF",
+        "name": "New-item / slotting fee",
+        "deduction_type": "slotting",
+        "is_published": false
       }
     ],
     "edi_requirements": [
@@ -1553,6 +1833,23 @@
         ],
         "typical_recovery_rate": 0.1,
         "notes": "Cost-feed mismatches drive opaque deductions"
+      },
+      "spoilage": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Strict quality program; regional fragmentation drives variability"
+      },
+      "slotting": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [],
+        "typical_recovery_rate": 0.0,
+        "notes": "New-item slotting + reset placement fees by region; non-disputable"
       }
     },
     "codes": [
@@ -1603,6 +1900,20 @@
         "code": "SHRT",
         "name": "Shortage",
         "deduction_type": "short_ship",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_slotting",
+        "code": "SLOT",
+        "name": "New-item / placement fee",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_spoilage",
+        "code": "SPL",
+        "name": "Spoilage / quality at receipt",
+        "deduction_type": "spoilage",
         "is_published": false
       }
     ],
