@@ -101,7 +101,11 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
         }
         return null as any;
       })
-      .linkSort((a: any, b: any) => a.y0 - b.y0)
+      .linkSort((a: any, b: any) => {
+        if (a.source === b.source) return a.target.y0 - b.target.y0;
+        if (a.target === b.target) return a.source.y0 - b.source.y0;
+        return 0;
+      })
       .nodeWidth(14)
       .nodePadding(12)
       .extent([
