@@ -113,18 +113,18 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
 
     for (const node of result.nodes as any[]) {
       node.sourceLinks.sort((a: any, b: any) => a.target.y0 - b.target.y0);
-      node.targetLinks.sort((a: any, b: any) => a.source.y0 - b.source.y0);
-
       let y = node.y0;
       for (const link of node.sourceLinks) {
         link.y0 = y + link.width / 2;
         y += link.width;
       }
-
-      let ty = node.y0;
+    }
+    for (const node of result.nodes as any[]) {
+      node.targetLinks.sort((a: any, b: any) => a.source.y0 - b.source.y0);
+      let y = node.y0;
       for (const link of node.targetLinks) {
-        link.y1 = ty + link.width / 2;
-        ty += link.width;
+        link.y1 = y + link.width / 2;
+        y += link.width;
       }
     }
 
