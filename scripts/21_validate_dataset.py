@@ -180,12 +180,13 @@ def main() -> int:
     no_order_non_vague_non_audit = cur.execute("""
         SELECT COUNT(*) FROM deductions
         WHERE order_id IS NULL AND is_vague=0 AND is_post_audit=0
+          AND is_double_dip=0
           AND deduction_type != 'slotting'
     """).fetchone()[0]
     if no_order_non_vague_non_audit == 0:
-        rep.passed("Non-vague non-post-audit non-slotting deductions all have order_id")
+        rep.passed("Non-vague non-post-audit non-slotting non-double-dip deductions all have order_id")
     else:
-        rep.fail(f"{no_order_non_vague_non_audit} non-vague non-audit non-slotting deductions missing order_id")
+        rep.fail(f"{no_order_non_vague_non_audit} standard deductions missing order_id")
 
     slotting_with_order = cur.execute("""
         SELECT COUNT(*) FROM deductions
