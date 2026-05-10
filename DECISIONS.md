@@ -117,17 +117,51 @@ Each entry:
   them out makes the demo unrealistically clean.
 - **Scope:** synthetic data generation
 
-### 2026-05-09 — Add spoilage and slotting as deduction types
-- **Why:** Both are real deduction types for a ~$25M food manufacturer.
-  Slotting is a planned cost (pay-to-play shelf placement), not an
-  operational failure, so routing it through root cause → evidence →
-  dispute would be misleading. Spoilage is a genuine he-said-she-said
-  about product condition at receiving and fits the failure model.
-  Slotting enters the Sankey but branches off immediately into a
-  terminal "negotiated costs — not disputable" node; spoilage flows
-  through the full five failure layers like the other operational types.
-- **Scope:** data pipeline + Sankey + all views that reference type lists
-- **Do not:** route slotting through the five failure layers
+### ~~2026-05-09 — Add spoilage and slotting as deduction types~~ (superseded 2026-05-10)
+- ~~Superseded by the 16-type taxonomy below.~~
+
+### 2026-05-10 — Expand to 16-type deduction taxonomy
+- **Why:** 9 types missed real deduction categories that a ~$25M food
+  manufacturer encounters: early delivery, freight/routing violations,
+  warehouse vs. store spoilage (distinct evidence chains), pricing/
+  invoice errors, returns/unsaleables, duplicate deductions, and
+  wrong-brand charges. The expanded taxonomy also introduces a
+  "retailer_error" root cause branch (duplicate_deduction + wrong_brand)
+  — these are the retailer's mistake, not Cinderhaven's, and are the
+  most winnable category. Placement_fees replaces slotting (same concept,
+  clearer name). Volume calibrated via VOLUME_SCALE multiplier to land
+  at ~6% of revenue (SPS Commerce benchmark center).
+- **Scope:** full pipeline + all frontend views
+- **Do not:** route placement_fees through the five failure layers;
+  do not treat duplicate_deduction or wrong_brand as internal process
+  failures (they're retailer_error)
+
+### 2026-05-10 — Document-level evidence inventory model
+- **Why:** The dispute-level evidence_quality rating (digital_complete /
+  digital_partial / handwritten_only / none) was too coarse for the
+  dispute builder and post-audit risk views. The new model tracks 18
+  document types per deduction with status (exists_ready / exists_not_ready
+  / expired / never_captured), format, location, retrieval time, and
+  expiry. Models Cinderhaven's real documentation state: 60% unsigned
+  BOLs, 70% expired PODs (carrier portal 90-day retention), no label
+  scans (one generic label), 10% pallet photos (phone camera).
+- **Scope:** schema (evidence_documents + evidence_requirements tables),
+  generator (16_generate_evidence_documents.py), export (evidence_inventory
+  array per deduction), types.ts (EvidenceDocument interface)
+- **Do not:** replace the dispute-level evidence_quality field — it still
+  drives win probability in the dispute generator. The document inventory
+  is complementary detail for the builder and risk views.
+
+### 2026-05-10 — Recovery rate calibration: 80/20 full/partial split
+- **Why:** Industry data shows most successful disputes recover in full;
+  partial settlements are the exception. Original 55/45 split with
+  partial at 35-70% produced 5.7% overall recovery against a 10% target.
+  Shifting to 80/20 with partial at 55-90% is credible (you don't settle
+  for 35 cents if you have the evidence to win) and lands recovery at
+  8.9% overall / 9.5% on disputable deductions.
+- **Scope:** scripts/15_generate_disputes.py — determine_outcome function
+- **Do not:** push overall recovery above 12% — Cinderhaven's lean team
+  and handwritten-evidence reality caps realistic recovery
 
 ---
 

@@ -43,28 +43,39 @@ views for each feature before moving to the next.
       edi_requirements) via `scripts/build_deductions_db.py`. Dynamic
       generators (orders, deductions, disputes, etc.) are the next
       tasks below.
-- [x] Generate synthetic deduction data — realistic mix of types
-      (short ship, labeling fines, pallet noncompliance, promo
-      disputes, damaged product, late delivery, vague codes) — 3,333
-      deductions, $1.4M including post-audit claims, distribution
-      across all 7 types
+- [x] Generate synthetic deduction data — 16-type taxonomy (short_ship,
+      label_fine, pallet_fine, damaged, late_delivery, promo_billback,
+      vague, early_delivery, freight_routing, warehouse_spoils,
+      store_spoils, pricing_invoice, returns_unsaleables,
+      duplicate_deduction, wrong_brand, placement_fees) — 3,351
+      deductions, $1.68M total ($1.50M operational + $183K post-audit),
+      ~6% of $25M revenue (SPS Commerce benchmark center).
+      VOLUME_SCALE=0.80 multiplier on all per-order probabilities.
 - [x] Generate synthetic dispute data — timelines, evidence submitted
       (handwritten notes vs. digital records), outcomes, missed
-      deadlines — 1,505 disputes (45% file rate), $99K recovered
-      (8.6%), 75% handwritten-only evidence
+      deadlines — ~29% filing rate, ~44% win rate, 8.9% overall
+      recovery / 9.5% on disputable deductions. 80/20 full/partial
+      split, partial at 55–90%. Handwritten effective capped at
+      min(0.65, recovery_rate + 0.12).
+- [x] Generate evidence document inventory — 18 document types per
+      deduction with status (exists_ready / exists_not_ready / expired
+      / never_captured), format, location, retrieval time, expiry.
+      Models Cinderhaven's real state: 60% unsigned BOLs, 70% expired
+      PODs, no label scans, 10% pallet photos.
 - [x] Generate synthetic pack/ship records — what was actually picked,
       packed, and labeled per order — 5,838 pack_records and 5,838
       shipments, encoding generic-label / paper-only / lost-evidence
       reality
 - [x] Build JSON export script — transform SQLite into the JSON
       structures the React app needs — `scripts/20_export_json.py`
-      writes summary.json (5KB), deductions.json (4.8MB compact,
-      3,333 denormalized records), retailers.json (47KB)
+      writes summary.json, deductions.json (denormalized with
+      evidence_inventory and evidence_retrieval_cost_hours per record),
+      retailers.json (with deduction_aggressiveness)
 - [x] Validate synthetic data — deduction volumes and dollar amounts
       feel realistic for a ~$25M manufacturer — `scripts/21_validate_dataset.py`
-      runs 36 checks (row counts, FK integrity, design conventions,
-      $/recovery targets, channel split, type mix, JSON parity);
-      36 PASS / 0 WARN / 0 FAIL on current dataset
+      runs checks (row counts, FK integrity, design conventions,
+      $/recovery targets, channel split, type mix, JSON parity,
+      evidence inventory coverage)
 
 ### Phase 2: React app scaffold + Sankey
 
@@ -202,8 +213,8 @@ views for each feature before moving to the next.
       scroll containers like the cost view), added
       `overflow-x: hidden` on body as defense. All three viewports
       now match document width to viewport.
-- [x] Deploy to Netlify — live at
-      https://retailer-deduction-recovery.netlify.app/
+- [x] Deploy to Cloudflare Pages — live at
+      https://retailer-deduction-recovery.pages.dev/
 - [ ] Friend preview — hand off for feedback
 
 ## Out of scope for this arc
@@ -219,12 +230,12 @@ views for each feature before moving to the next.
 
 ## Definition of done for this arc
 
-- [ ] All ten features are functional and connected
-- [ ] Sankey flow renders full deduction picture and zooms on click
-- [ ] All views update when user navigates from one to another
-- [ ] Synthetic data feels realistic for a ~$25M food manufacturer
-- [ ] Retailer-specific behaviors are recognizable (not generic)
-- [ ] Deployed to Cloudflare Pages with a shareable URL
+- [x] All ten features are functional and connected
+- [x] Sankey flow renders full deduction picture and zooms on click
+- [x] All views update when user navigates from one to another
+- [x] Synthetic data feels realistic for a ~$25M food manufacturer
+- [x] Retailer-specific behaviors are recognizable (not generic)
+- [x] Deployed to Cloudflare Pages with a shareable URL
 - [ ] Friend has previewed and given feedback
 - [ ] Feedback incorporated
 
