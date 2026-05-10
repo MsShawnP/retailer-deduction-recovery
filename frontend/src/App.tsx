@@ -139,6 +139,7 @@ export default function App() {
   const kpiNoDisputeDollar = filteredKpis?.noDisputeDollar ?? totals.deductions_no_dispute_dollar;
   const kpiLaborHours = filteredKpis?.laborHours ?? totals.labor_hours;
   const kpiFte = kpiLaborHours / 2080;
+  const kpiDisputedCount = filteredKpis?.disputedCount ?? totals.disputes_filed;
 
   return (
     <div className="app">
@@ -164,7 +165,13 @@ export default function App() {
       <section className="kpi-row">
         <Kpi label="Annualized deductions" value={formatDollars(kpiAnnualized)} sub="against ~$25M wholesale" />
         <Kpi label="Recovery rate" value={formatPercent(kpiRecoveryRate)} sub={`${formatDollars(kpiRecovered)} recovered`} />
-        <Kpi label="Labor on disputes" value={`${formatCount(Math.round(kpiLaborHours))} hrs`} sub={`~${kpiFte.toFixed(1)} FTE`} />
+        <Kpi
+          label={kpiDisputedCount > 0 ? "Labor on disputes" : "Dispute labor"}
+          value={`${formatCount(Math.round(kpiLaborHours))} hrs`}
+          sub={kpiDisputedCount > 0
+            ? `from ${formatCount(kpiDisputedCount)} filed · ~${kpiFte.toFixed(1)} FTE`
+            : "no disputes filed in this cohort"}
+        />
         <Kpi label="Undisputed losses" value={formatDollars(kpiNoDisputeDollar)} sub={`${formatCount(kpiNoDisputeCount)} deductions never filed`} negative />
       </section>
 
@@ -516,12 +523,14 @@ function TimeRangeSelector({
 function computeKpis(ds: Deduction[]) {
   let dollar = 0;
   let recovered = 0;
+  let disputedCount = 0;
   let noDisputeCount = 0;
   let noDisputeDollar = 0;
   let laborHours = 0;
   for (const d of ds) {
     dollar += d.amount;
     if (d.dispute) {
+      disputedCount++;
       recovered += d.dispute.recovered_amount || 0;
       laborHours += d.dispute.labor_hours || 0;
     } else {
@@ -533,6 +542,7 @@ function computeKpis(ds: Deduction[]) {
     count: ds.length,
     dollar,
     recovered,
+    disputedCount,
     noDisputeCount,
     noDisputeDollar,
     laborHours,
