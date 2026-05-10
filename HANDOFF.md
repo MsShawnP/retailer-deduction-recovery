@@ -595,3 +595,57 @@ the original arc. Separately, deploy needs redeployment to Cloudflare
 Pages with the updated data.
 
 ---
+
+## 2026-05-10 — Sankey collapse + UI fixes
+
+**What changed:** Collapsed the Sankey from 6 layers to 3 (Type →
+Dispute readiness → Outcome), fixed unlabeled small nodes, and made
+the labor KPI contextually honest.
+
+**Why:** The 6-layer Sankey was too dense to read — the five
+compounding-failure layers created crossing chaos that obscured the
+signal. Collapsing to 3 layers with a single "Dispute readiness"
+column (Ready to dispute / Needs work / Can't dispute / Never
+assessed) makes the critical question immediately legible: could
+Cinderhaven have won this?
+
+**Changes this session (branch `claude/determined-keller-c1455e`):**
+
+1. **Sankey collapse** (`208d0bc`) — `buildSankeyData()` now produces
+   2 edges per deduction (type→readiness, readiness→outcome) instead
+   of 5. New `disputeReadinessFor()` scoring function. `pathIds()`
+   returns 3 IDs. All custom nodeSort logic (LAYER_SORT_ORDER,
+   LAYER_RANK_MAPS, nodeRank) removed — d3-sankey default handles 3
+   layers. SVG height 1200→700. LAYER_COLORS simplified to 3. The
+   intermediate helpers (`evidenceQualityFor`, `accessibilityFor`,
+   `timelinessFor`) are now exported for other views that still need
+   granular detail.
+
+2. **Always show node labels** (`e386231`) — removed the `> 8px`
+   height guard that suppressed labels on small nodes. Labels sit to
+   the right of the node rect, so they render fine on thin slivers.
+
+3. **Labor KPI honesty** (`9ea63ae`) — the "Labor on disputes" KPI
+   was misleading for cohorts where most deductions were never filed.
+   Now shows "from N filed" when disputes exist, and "no disputes
+   filed in this cohort" when the filtered set has none. The
+   computation was already correct (only summing actual labor_hours),
+   just poorly labeled.
+
+**State:** All changes committed and pushed on branch
+`claude/determined-keller-c1455e`. Frontend builds clean (tsc +
+vite). The Sankey now renders 3 columns with ~12 nodes instead of
+~41. Slotting still excluded from the Sankey and shown as a callout
+below. There's a visible issue with small nodes at the bottom of
+Layer 0 where labels overlap — the label *renders* now but may
+crowd adjacent labels on very small nodes. This hasn't been
+addressed yet.
+
+**Not yet merged to master.** These changes are on a worktree branch.
+
+**Next:** Merge branch to master, redeploy to Cloudflare Pages.
+Continue Phase 4 task 4 (friend preview). The Sankey may need
+further visual tuning once seen in the browser at different viewport
+sizes.
+
+---
