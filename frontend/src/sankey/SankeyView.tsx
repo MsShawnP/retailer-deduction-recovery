@@ -28,16 +28,16 @@ const LAYER_COLORS = [
   "#053D52", // outcome — overridden per-node by OUTCOME_COLORS
 ];
 
-const OUTCOME_ORDER: Record<string, number> = {
-  "Lost — evidence":    0,
-  "Lost — no response": 1,
-  "Lost — other":       2,
-  "Lost — deadline":    3,
-  "Abandoned":          4,
-  "Never filed":        5,
-  "Pending":            6,
-  "Won partial":        7,
-  "Won full":           8,
+const OUTCOME_GROUP: Record<string, string> = {
+  "Never filed":        "never_filed",
+  "Lost — evidence":    "losses",
+  "Lost — no response": "losses",
+  "Lost — other":       "losses",
+  "Lost — deadline":    "losses",
+  "Abandoned":          "abandoned",
+  "Pending":            "pending",
+  "Won full":           "wins",
+  "Won partial":        "wins",
 };
 
 function dollarsCompact(n: number): string {
@@ -68,6 +68,15 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
   const layout = useMemo(() => {
     const { nodes, links } = buildSankeyData(operationalDeductions);
 
+    const groupTotals = new Map<string, number>();
+    for (const l of links) {
+      if (l.target.startsWith("2:")) {
+        const label = l.target.slice(2);
+        const group = OUTCOME_GROUP[label] || "other";
+        groupTotals.set(group, (groupTotals.get(group) || 0) + l.value);
+      }
+    }
+
     const nodesCopy = nodes.map((n) => ({ ...n }));
     const linksCopy = links.map((l) => ({
       source: l.source,
@@ -83,8 +92,13 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
           return (b.value || 0) - (a.value || 0);
         if (a.layer === 1 && b.layer === 1)
           return (b.value || 0) - (a.value || 0);
-        if (a.layer === 2 && b.layer === 2)
-          return (OUTCOME_ORDER[a.label] ?? 99) - (OUTCOME_ORDER[b.label] ?? 99);
+        if (a.layer === 2 && b.layer === 2) {
+          const gA = OUTCOME_GROUP[a.label] || "other";
+          const gB = OUTCOME_GROUP[b.label] || "other";
+          if (gA !== gB)
+            return (groupTotals.get(gB) || 0) - (groupTotals.get(gA) || 0);
+          return (b.value || 0) - (a.value || 0);
+        }
         return null as any;
       })
       .linkSort((a: any, b: any) => a.y0 - b.y0)
