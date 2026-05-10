@@ -35,12 +35,14 @@
 .sankey-node-label {
   font-family: var(--serif);
   font-size: 15px;
-  fill: var(--ink);
+  fill: #0D1B2A;
+  stroke: #FFFFFF;
+  stroke-width: 3px;
+  paint-order: stroke;
   pointer-events: none;
 }
 
 .sankey-node-value {
-  fill: var(--ink-faint);
   font-size: 14px;
 }
 
@@ -56,4 +58,15 @@
 
 .sankey-svg {
   cursor: default;
+}
+
+.sankey-slotting-callout {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ink-soft);
+  background: #F5F0E6;
+  border: 1px solid #D4C9A8;
+  border-radius: 4px;
+  padding: 10px 16px;
+  margin-top: 12px;
 }

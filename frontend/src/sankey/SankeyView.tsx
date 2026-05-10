@@ -7,12 +7,9 @@ import {
   OUTCOME_COLORS,
   highlightedLinkSet,
   isOnSelectedPath,
-  SLOTTING_TERMINAL_NODE_ID,
   type Selection,
 } from "./data";
 import "./SankeyView.css";
-
-const SLOTTING_BAND_COLOR = "#9E7E3A";  // muted gold — matches OUTCOME_COLORS for the terminal
 
 // Fixed node orderings for layers 0 and 5. Slotting is always last in
 // layer 0 so its long band to the terminal doesn't cross through other
@@ -30,7 +27,6 @@ const LAYER_SORT_ORDER: Record<number, string[]> = {
     "Damaged",
     "Pallet fine",
     "Spoilage",
-    "Slotting",
   ],
   5: [
     "Won full",
@@ -42,7 +38,6 @@ const LAYER_SORT_ORDER: Record<number, string[]> = {
     "Lost — other",
     "Abandoned",
     "Never filed",
-    "Not disputable — negotiated cost",
   ],
 };
 
@@ -99,8 +94,18 @@ function nodeColor(node: { layer: number; label: string }): string {
 
 
 export default function SankeyView({ deductions, selection, onSelect }: Props) {
+  const operationalDeductions = useMemo(
+    () => deductions.filter((d) => d.deduction_type !== "slotting"),
+    [deductions]
+  );
+
+  const slottingStats = useMemo(() => {
+    const slotting = deductions.filter((d) => d.deduction_type === "slotting");
+    return { count: slotting.length, total: slotting.reduce((s, d) => s + d.amount, 0) };
+  }, [deductions]);
+
   const layout = useMemo(() => {
-    const { nodes, links } = buildSankeyData(deductions);
+    const { nodes, links } = buildSankeyData(operationalDeductions);
 
     const nodesCopy = nodes.map((n) => ({ ...n }));
     const linksCopy = links.map((l) => ({
@@ -127,7 +132,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       .reduce((s: number, l: any) => s + l.value, 0);
 
     return { nodes: result.nodes, links: result.links, total: totalIn };
-  }, [deductions]);
+  }, [operationalDeductions]);
 
   // For the current selection, compute which links should be highlighted.
   const highlightLinks = useMemo(() => {
@@ -216,14 +221,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
             const opacity =
               isHighlighted === null ? 0.30 :
               isHighlighted ? 0.65 : 0.04;
-            // Slotting's single long band crosses the whole chart. Color
-            // it with the terminal's gold so the categorical difference
-            // (negotiated cost, not a failure flow) reads at a glance.
-            const isSlottingBand =
-              link.target.id === SLOTTING_TERMINAL_NODE_ID;
-            const stroke = isSlottingBand
-              ? SLOTTING_BAND_COLOR
-              : LAYER_COLORS[sourceLayer];
+            const stroke = LAYER_COLORS[sourceLayer];
 
             return (
               <path
@@ -289,16 +287,9 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
                     y={(node.y0 + node.y1) / 2}
                     dy="0.35em"
                     className="sankey-node-label"
-                    fill="#0D1B2A"
-                    stroke="#FFFFFF"
-                    strokeWidth={3}
-                    paintOrder="stroke"
                   >
                     {node.label}
-                    <tspan
-                      className="sankey-node-value"
-                      fillOpacity={0.72}
-                    >
+                    <tspan className="sankey-node-value">
                       {" "}
                       {dollarsCompact(node.value || 0)}
                     </tspan>
@@ -309,6 +300,12 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
           })}
         </g>
       </svg>
+
+      {slottingStats.count > 0 && (
+        <div className="sankey-slotting-callout">
+          {slottingStats.count} placement fees · {dollarsCompact(slottingStats.total)} · negotiated cost of access — not disputable
+        </div>
+      )}
     </div>
   );
 }
