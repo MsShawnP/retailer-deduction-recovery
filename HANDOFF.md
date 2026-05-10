@@ -563,89 +563,44 @@ done.
 
 ---
 
-## 2026-05-10
+## 2026-05-10 — /wrap
 
-**What changed:** Migrated deduction pipeline to cinderhaven-data;
-this repo now consumes rather than generates.
+**Started from:** Phase 4 task 3 done (deployed to Cloudflare Pages).
+All 9 Phase 3 features and Phase 4 tasks 1–3 complete.
 
-**Why:** cinderhaven-data is the canonical dataset for all Cinderhaven
-projects. Generation scripts, schema DDL, static seeds, and research
-files now live there. This repo copies the built DB and runs only its
-own JSON export + demo-specific validator.
+**Did:**
 
-**State:** cinderhaven-data commit `6eb3cbb` had already integrated the
-pipeline scripts (07–15). This session added research files (`c55664a`,
-pushed) and updated this repo (`babffe0`): removed 9 files (7 generators
-+ 2 SQL), rewrote `build_deductions_db.py` as a copy-from-sibling script,
-updated validator for double-dip deductions. Verified end-to-end:
-`build_db.py --force` in cinderhaven-data → copy → export → validate
-(37 PASS / 0 FAIL) → frontend build clean.
+- Migrated deduction pipeline from this repo to cinderhaven-data
+  (canonical dataset). This repo now copies the built DB and runs
+  only JSON export + demo-specific validator.
+- Collapsed Sankey from 6 layers to 3 (Type → Dispute readiness →
+  Outcome). New `disputeReadinessFor()` scoring function with five
+  buckets: Disputed — won, Disputed — lost, Ready to dispute, Needs
+  work, Can't dispute, Never assessed. All custom nodeSort logic
+  removed. SVG height 1200→700.
+- Pulled slotting out of Sankey into callout box above the chart.
+  Slotting excluded from Sankey-driven cohort filters.
+- Fixed dispute readiness classification — resolved disputes now
+  classify by actual outcome (won→"Disputed — won", lost→"Disputed
+  — lost") instead of re-scoring on current evidence state.
+- Fixed KPI consistency — "Total deductions" headline now matches
+  Sankey window totals; annualized figure moved to subtitle.
+- Fixed labor KPI — shows "from N filed" or "no disputes filed in
+  this cohort" instead of misleading FTE figure on undisputed cohorts.
+- Fixed cold-chain references — all 90 SKUs are shelf-stable (sauces,
+  condiments, pantry staples). "Temperature abuse in transit" →
+  "Heat exposure in transit". Explorer prose rewritten. Costco SPL
+  code updated in cinderhaven-data.
+- CSS fixes: section intro text width, Sankey label contrast (white
+  halo knockout), italic text width, always-show node labels.
+- Full data rebuild with updated spoilage templates. Validator: 37
+  PASS / 2 WARN / 0 FAIL. Frontend builds clean.
 
-Deduction count is now 3,087 (was 3,333) because the canonical
-cinderhaven-data scripts produce slightly lower volume. Annualized
-dollar amount ($802K) still in the $750K–$1.2M target band.
+**State:** All changes on branch `claude/determined-keller-c1455e`,
+committed and pushed. Needs merge to master and Cloudflare Pages
+redeploy. 3,087 deductions / $1.54M total / $802K annualized.
 
-**Remaining scripts in this repo:**
-- `scripts/build_deductions_db.py` — copies DB from `../cinderhaven-data/`
-- `scripts/20_export_json.py` — transforms SQLite to static JSON
-- `scripts/21_validate_dataset.py` — demo-specific validation (37 checks)
-
-**Next:** Phase 4 task 4 (friend preview) is still the next step in
-the original arc. Separately, deploy needs redeployment to Cloudflare
-Pages with the updated data.
-
----
-
-## 2026-05-10 — Sankey collapse + UI fixes
-
-**What changed:** Collapsed the Sankey from 6 layers to 3 (Type →
-Dispute readiness → Outcome), fixed unlabeled small nodes, and made
-the labor KPI contextually honest.
-
-**Why:** The 6-layer Sankey was too dense to read — the five
-compounding-failure layers created crossing chaos that obscured the
-signal. Collapsing to 3 layers with a single "Dispute readiness"
-column (Ready to dispute / Needs work / Can't dispute / Never
-assessed) makes the critical question immediately legible: could
-Cinderhaven have won this?
-
-**Changes this session (branch `claude/determined-keller-c1455e`):**
-
-1. **Sankey collapse** (`208d0bc`) — `buildSankeyData()` now produces
-   2 edges per deduction (type→readiness, readiness→outcome) instead
-   of 5. New `disputeReadinessFor()` scoring function. `pathIds()`
-   returns 3 IDs. All custom nodeSort logic (LAYER_SORT_ORDER,
-   LAYER_RANK_MAPS, nodeRank) removed — d3-sankey default handles 3
-   layers. SVG height 1200→700. LAYER_COLORS simplified to 3. The
-   intermediate helpers (`evidenceQualityFor`, `accessibilityFor`,
-   `timelinessFor`) are now exported for other views that still need
-   granular detail.
-
-2. **Always show node labels** (`e386231`) — removed the `> 8px`
-   height guard that suppressed labels on small nodes. Labels sit to
-   the right of the node rect, so they render fine on thin slivers.
-
-3. **Labor KPI honesty** (`9ea63ae`) — the "Labor on disputes" KPI
-   was misleading for cohorts where most deductions were never filed.
-   Now shows "from N filed" when disputes exist, and "no disputes
-   filed in this cohort" when the filtered set has none. The
-   computation was already correct (only summing actual labor_hours),
-   just poorly labeled.
-
-**State:** All changes committed and pushed on branch
-`claude/determined-keller-c1455e`. Frontend builds clean (tsc +
-vite). The Sankey now renders 3 columns with ~12 nodes instead of
-~41. Slotting still excluded from the Sankey and shown as a callout
-below. There's a visible issue with small nodes at the bottom of
-Layer 0 where labels overlap — the label *renders* now but may
-crowd adjacent labels on very small nodes. This hasn't been
-addressed yet.
-
-**Not yet merged to master.** These changes are on a worktree branch.
-
-**Next:** Merge branch to master, redeploy to Cloudflare Pages.
-Continue Phase 4 task 4 (friend preview). The Sankey may need
-further visual tuning once seen in the browser at different viewport
-sizes.
+**Next:** Merge to master, redeploy to Cloudflare Pages, then Phase 4
+task 4 (friend preview).
 
 ---
