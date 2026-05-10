@@ -5,7 +5,6 @@ import {
   buildSankeyData,
   LAYER_TITLES,
   OUTCOME_COLORS,
-  TYPE_LABELS,
   highlightedLinkSet,
   isOnSelectedPath,
   type Selection,
