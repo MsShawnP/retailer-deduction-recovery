@@ -562,3 +562,54 @@ fixing before the prospect intro. After that the original arc is
 done.
 
 ---
+
+## 2026-05-10 — Taxonomy expansion + evidence model + recalibration
+
+**What changed:** Expanded deduction taxonomy from 9 to 16 types,
+added document-level evidence inventory model, and recalibrated
+volume and recovery rates to industry benchmarks.
+
+**Why:** The 9-type taxonomy missed real deduction categories (early
+delivery, freight routing, spoils split into warehouse/store, pricing
+errors, returns, duplicate deductions, wrong-brand errors). Evidence
+model was dispute-level (quality rating) rather than document-level
+(what specific documents exist, where, in what format). Volume at
+$2.02M was 8.1% of revenue, above SPS Commerce 5-7% benchmark.
+Recovery at 5.7% was below 10% target.
+
+**State:** Full pipeline rebuilt end-to-end. Key metrics:
+- 3,351 deductions totaling $1.68M (6.7% of $25M revenue)
+- 16 types across 10 retailers (160 retailer_rules, 163 codes)
+- 13,868 evidence_documents (avg 4.1 per deduction)
+- 966 disputes (28.8% filing), 43.8% win rate
+- $149K recovered (8.9% overall, 9.5% on disputable deductions)
+- Validator: 46 PASS, 0 WARN, 0 FAIL
+- TypeScript compiles clean, JSON export updated
+
+Files changed (19):
+- Schema: `seed_deduction_schema.sql` (16-type CHECKs, evidence_documents
+  + evidence_requirements tables)
+- Seeds: `seed_deduction_static.sql` (160 rules, 163 codes, 45 evidence
+  requirements, aggressiveness scores)
+- Generators: `13_generate_deductions.py` (VOLUME_SCALE 0.80, 9 new type
+  generators), `15_generate_disputes.py` (80/20 full/partial, 0.55-0.90
+  partial floor, +0.04 filing rates), `16_generate_evidence_documents.py`
+  (NEW)
+- Pipeline: `build_deductions_db.py` (added evidence_documents to pipeline)
+- Export: `20_export_json.py` (evidence_inventory per deduction,
+  deduction_aggressiveness per retailer)
+- Validator: `21_validate_dataset.py` (updated targets, evidence coverage)
+- Frontend: `data.ts` (TYPE_LABELS 16 types, OPERATIONAL_TYPES 15,
+  rootCauseFor with retailer_error branch), `SankeyView.tsx`, `types.ts`
+  (EvidenceDocument interface, evidence_inventory, deduction_aggressiveness),
+  plus 5 view components updated slotting→placement_fees
+
+Commit: `dfc591a` on `claude/mystifying-elgamal-2bb8bb`
+
+**Next:** Verify the live app renders correctly with new 16-type data
+by running the dev server. Recovery simulation toggle logic may need
+review — the simulation's elimination rules and win-probability table
+were calibrated for the old 9-type mix. Cloudflare Pages deploy needs
+updating with the new build.
+
+---
