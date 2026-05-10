@@ -28,6 +28,18 @@ const LAYER_COLORS = [
   "#053D52", // outcome — overridden per-node by OUTCOME_COLORS
 ];
 
+const OUTCOME_ORDER: Record<string, number> = {
+  "Lost — evidence":    0,
+  "Lost — no response": 1,
+  "Lost — other":       2,
+  "Lost — deadline":    3,
+  "Abandoned":          4,
+  "Never filed":        5,
+  "Pending":            6,
+  "Won partial":        7,
+  "Won full":           8,
+};
+
 function dollarsCompact(n: number): string {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
@@ -66,6 +78,11 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
     const generator = sankey<any, any>()
       .nodeId((d: any) => d.id)
       .nodeAlign(sankeyJustify)
+      .nodeSort((a: any, b: any) => {
+        if (a.layer === 2 && b.layer === 2)
+          return (OUTCOME_ORDER[a.label] ?? 99) - (OUTCOME_ORDER[b.label] ?? 99);
+        return null as any;
+      })
       .nodeWidth(14)
       .nodePadding(12)
       .extent([
