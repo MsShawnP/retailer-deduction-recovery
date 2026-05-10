@@ -62,11 +62,13 @@
 
 .sankey-slotting-callout {
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
   color: var(--ink-soft);
   background: #F5F0E6;
   border: 1px solid #D4C9A8;
   border-radius: 4px;
-  padding: 10px 16px;
+  padding: 12px 16px;
   margin-bottom: 12px;
 }
