@@ -345,8 +345,8 @@ function rootCauseProse(d: Deduction): string {
       return "MCB / scan-down billback flowing back from a retailer promotion. These are contractually owed but routinely arrive without the matching promo agreement on file, creating disputes by default.";
     case "Opaque remittance":
       return "Vague remittance line — no PO, no specific reason. Investigating decodes some; many remain unmapped to a specific shipment or invoice.";
-    case "Temperature abuse in transit":
-      return "Cold-chain failure between Cinderhaven's dock and the retailer's. Either the carrier's reefer drifted out of spec or the unit was off during a transfer. Receiving rejects the affected pallets on arrival; defending it requires temperature logs from the trailer and signed-off receiving photos.";
+    case "Heat exposure in transit":
+      return "Product exposed to excessive heat during transit — trailer parked in sun, unventilated transfer dock, or prolonged staging without climate control. Shelf-stable product can still degrade visibly (label discoloration, seal softening, texture changes). Receiving rejects the affected pallets; defending it requires carrier delivery records and signed-off receiving photos.";
     case "Expired / short-dated at receiving":
       return "Receiving measures days-on-shelf against the retailer's minimum-life threshold (often 60-75% of total shelf life remaining) and rejects what doesn't meet it. Common when production-to-delivery cycle is long or the retailer slows moving the product through.";
     case "Quality complaint at receiving":

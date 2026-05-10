@@ -124,7 +124,7 @@ export function rootCauseFor(d: Deduction): string {
   if (d.deduction_type === "spoilage") {
     // Sub-cause is encoded in the remittance_description keyword.
     const desc = (d.remittance_description ?? "").toLowerCase();
-    if (desc.includes("temperature")) return "Temperature abuse in transit";
+    if (desc.includes("temperature")) return "Heat exposure in transit";
     if (desc.includes("expired") || desc.includes("short-dated"))
       return "Expired / short-dated at receiving";
     if (desc.includes("quality")) return "Quality complaint at receiving";
