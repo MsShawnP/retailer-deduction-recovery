@@ -163,7 +163,7 @@ export default function App() {
       />
 
       <section className="kpi-row">
-        <Kpi label="Annualized deductions" value={formatDollars(kpiAnnualized)} sub="against ~$25M wholesale" />
+        <Kpi label="Total deductions" value={formatDollars(kpiDollar)} sub={`annualized ${formatDollars(kpiAnnualized)} · ~$25M wholesale`} />
         <Kpi label="Recovery rate" value={formatPercent(kpiRecoveryRate)} sub={`${formatDollars(kpiRecovered)} recovered`} />
         <Kpi
           label={kpiDisputedCount > 0 ? "Labor on disputes" : "Dispute labor"}
