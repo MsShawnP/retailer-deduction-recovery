@@ -5,6 +5,7 @@ import {
   buildSankeyData,
   LAYER_TITLES,
   OUTCOME_COLORS,
+  TYPE_LABELS,
   highlightedLinkSet,
   isOnSelectedPath,
   type Selection,
@@ -68,6 +69,24 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
   const layout = useMemo(() => {
     const { nodes, links } = buildSankeyData(operationalDeductions);
 
+    // Per-type proportion of dollars that were disputed (have a dispute
+    // record). Types with high disputed share sort to the top of layer 0
+    // so their bands travel the shortest distance to the "Disputed" node
+    // in layer 1.
+    const typeTotal = new Map<string, number>();
+    const typeDisputed = new Map<string, number>();
+    for (const d of operationalDeductions) {
+      if (d.amount <= 0) continue;
+      const t = TYPE_LABELS[d.deduction_type] || d.deduction_type;
+      typeTotal.set(t, (typeTotal.get(t) || 0) + d.amount);
+      if (d.dispute) typeDisputed.set(t, (typeDisputed.get(t) || 0) + d.amount);
+    }
+    const disputedShare = (label: string) => {
+      const total = typeTotal.get(label) || 1;
+      const disputed = typeDisputed.get(label) || 0;
+      return disputed / total;
+    };
+
     const nodesCopy = nodes.map((n) => ({ ...n }));
     const linksCopy = links.map((l) => ({
       source: l.source,
@@ -79,6 +98,8 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       .nodeId((d: any) => d.id)
       .nodeAlign(sankeyJustify)
       .nodeSort((a: any, b: any) => {
+        if (a.layer === 0 && b.layer === 0)
+          return disputedShare(b.label) - disputedShare(a.label);
         if (a.layer === 2 && b.layer === 2)
           return (OUTCOME_ORDER[a.label] ?? 99) - (OUTCOME_ORDER[b.label] ?? 99);
         return null as any;
