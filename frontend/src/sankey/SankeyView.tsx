@@ -29,6 +29,14 @@ const LAYER_COLORS = [
   "#053D52", // outcome — overridden per-node by OUTCOME_COLORS
 ];
 
+const READINESS_ORDER: Record<string, number> = {
+  "Disputed":           0,
+  "Ready to dispute":   1,
+  "Needs work":         2,
+  "Can't dispute":      3,
+  "Never assessed":     4,
+};
+
 const OUTCOME_ORDER: Record<string, number> = {
   "Lost — evidence":    0,
   "Lost — no response": 1,
@@ -100,6 +108,8 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       .nodeSort((a: any, b: any) => {
         if (a.layer === 0 && b.layer === 0)
           return disputedShare(b.label) - disputedShare(a.label);
+        if (a.layer === 1 && b.layer === 1)
+          return (READINESS_ORDER[a.label] ?? 99) - (READINESS_ORDER[b.label] ?? 99);
         if (a.layer === 2 && b.layer === 2)
           return (OUTCOME_ORDER[a.label] ?? 99) - (OUTCOME_ORDER[b.label] ?? 99);
         return null as any;
