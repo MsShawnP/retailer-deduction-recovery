@@ -111,6 +111,36 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
 
     const result = generator({ nodes: nodesCopy as any, links: linksCopy as any });
 
+    // Reorder layer 2 nodes by source barycenter so ribbons from the
+    // top of layer 1 land at the top of layer 2, minimizing crossings.
+    const layer2 = (result.nodes as any[]).filter((n: any) => n.layer === 2);
+    for (const node of layer2) {
+      let sumY = 0, sumW = 0;
+      for (const link of node.targetLinks) {
+        const mid = (link.source.y0 + link.source.y1) / 2;
+        sumY += mid * link.value;
+        sumW += link.value;
+      }
+      node._bary = sumW > 0 ? sumY / sumW : 0;
+    }
+    layer2.sort((a: any, b: any) => {
+      if (Math.abs(a._bary - b._bary) > 0.5) return a._bary - b._bary;
+      const gA = OUTCOME_GROUP[a.label] || "other";
+      const gB = OUTCOME_GROUP[b.label] || "other";
+      if (gA !== gB)
+        return (groupTotals.get(gB) || 0) - (groupTotals.get(gA) || 0);
+      return (b.value || 0) - (a.value || 0);
+    });
+    const padding = 12;
+    let ly = layer2.length > 0 ? layer2[0].y0 : 0;
+    for (const node of layer2) {
+      const h = node.y1 - node.y0;
+      node.y0 = ly;
+      node.y1 = ly + h;
+      ly += h + padding;
+    }
+
+    // Recompute link attachment positions after node reordering.
     for (const node of result.nodes as any[]) {
       node.sourceLinks.sort((a: any, b: any) => a.target.y0 - b.target.y0);
       let y = node.y0;
