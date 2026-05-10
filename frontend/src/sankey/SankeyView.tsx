@@ -28,6 +28,18 @@ const LAYER_COLORS = [
   "#053D52", // outcome — overridden per-node by OUTCOME_COLORS
 ];
 
+const OUTCOME_GROUP: Record<string, string> = {
+  "Never filed":        "never_filed",
+  "Lost — evidence":    "losses",
+  "Lost — no response": "losses",
+  "Lost — other":       "losses",
+  "Lost — deadline":    "losses",
+  "Abandoned":          "abandoned",
+  "Pending":            "pending",
+  "Won full":           "wins",
+  "Won partial":        "wins",
+};
+
 function dollarsCompact(n: number): string {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
@@ -56,6 +68,15 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
   const layout = useMemo(() => {
     const { nodes, links } = buildSankeyData(operationalDeductions);
 
+    const groupTotals = new Map<string, number>();
+    for (const l of links) {
+      if (l.target.startsWith("2:")) {
+        const label = l.target.slice(2);
+        const group = OUTCOME_GROUP[label] || "other";
+        groupTotals.set(group, (groupTotals.get(group) || 0) + l.value);
+      }
+    }
+
     const nodesCopy = nodes.map((n) => ({ ...n }));
     const linksCopy = links.map((l) => ({
       source: l.source,
@@ -66,6 +87,21 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
     const generator = sankey<any, any>()
       .nodeId((d: any) => d.id)
       .nodeAlign(sankeyJustify)
+      .nodeSort((a: any, b: any) => {
+        if (a.layer === 0 && b.layer === 0)
+          return (b.value || 0) - (a.value || 0);
+        if (a.layer === 1 && b.layer === 1)
+          return (b.value || 0) - (a.value || 0);
+        if (a.layer === 2 && b.layer === 2) {
+          const gA = OUTCOME_GROUP[a.label] || "other";
+          const gB = OUTCOME_GROUP[b.label] || "other";
+          if (gA !== gB)
+            return (groupTotals.get(gB) || 0) - (groupTotals.get(gA) || 0);
+          return (b.value || 0) - (a.value || 0);
+        }
+        return null as any;
+      })
+      .linkSort(null)
       .nodeWidth(14)
       .nodePadding(12)
       .extent([
@@ -74,6 +110,53 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       ]);
 
     const result = generator({ nodes: nodesCopy as any, links: linksCopy as any });
+
+    // Reorder layer 2 nodes by source barycenter so ribbons from the
+    // top of layer 1 land at the top of layer 2, minimizing crossings.
+    const layer2 = (result.nodes as any[]).filter((n: any) => n.layer === 2);
+    for (const node of layer2) {
+      let sumY = 0, sumW = 0;
+      for (const link of node.targetLinks) {
+        const mid = (link.source.y0 + link.source.y1) / 2;
+        sumY += mid * link.value;
+        sumW += link.value;
+      }
+      node._bary = sumW > 0 ? sumY / sumW : 0;
+    }
+    layer2.sort((a: any, b: any) => {
+      if (Math.abs(a._bary - b._bary) > 0.5) return a._bary - b._bary;
+      const gA = OUTCOME_GROUP[a.label] || "other";
+      const gB = OUTCOME_GROUP[b.label] || "other";
+      if (gA !== gB)
+        return (groupTotals.get(gB) || 0) - (groupTotals.get(gA) || 0);
+      return (b.value || 0) - (a.value || 0);
+    });
+    const padding = 12;
+    let ly = layer2.length > 0 ? layer2[0].y0 : 0;
+    for (const node of layer2) {
+      const h = node.y1 - node.y0;
+      node.y0 = ly;
+      node.y1 = ly + h;
+      ly += h + padding;
+    }
+
+    // Recompute link attachment positions after node reordering.
+    for (const node of result.nodes as any[]) {
+      node.sourceLinks.sort((a: any, b: any) => a.target.y0 - b.target.y0);
+      let y = node.y0;
+      for (const link of node.sourceLinks) {
+        link.y0 = y + link.width / 2;
+        y += link.width;
+      }
+    }
+    for (const node of result.nodes as any[]) {
+      node.targetLinks.sort((a: any, b: any) => a.source.y0 - b.source.y0);
+      let y = node.y0;
+      for (const link of node.targetLinks) {
+        link.y1 = y + link.width / 2;
+        y += link.width;
+      }
+    }
 
     const totalIn = result.links
       .filter((l: any) => l.source.layer === 0)
