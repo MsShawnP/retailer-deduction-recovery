@@ -161,25 +161,31 @@ function outcomeFor(d: Deduction): string {
 export function disputeReadinessFor(d: Deduction): string {
   if (d.is_vague) return "Never assessed";
 
-  // Past deadline — can't dispute regardless of evidence
-  if (d.dispute?.was_within_deadline === false) return "Can't dispute";
+  // Already-resolved disputes: classify by actual result, not current
+  // evidence state. They already went through the pipeline.
+  if (d.dispute) {
+    const o = d.dispute.outcome;
+    if (o === "won_full" || o === "won_partial") return "Disputed — won";
+    if (o === "abandoned" || o?.startsWith("lost_")) return "Disputed — lost";
+    // pending falls through to evidence-based scoring below
+  }
+
+  // No dispute filed — check if filing is still possible
   if (!d.dispute && d.dispute_deadline) {
     const deadline = new Date(d.dispute_deadline);
     if (deadline < new Date()) return "Can't dispute";
   }
 
-  // Evidence assessment
+  // Evidence assessment for unfiled and pending
   const eq = d.dispute?.evidence_quality;
   const loc = d.pack_record?.evidence_location;
   const verification = d.pack_record?.pack_verification;
 
-  // No evidence at all
   if (eq === "none") return "Can't dispute";
   if (!d.pack_record && !d.dispute) return "Can't dispute";
   if (loc === "lost") return "Can't dispute";
   if (!eq && verification === "none") return "Can't dispute";
 
-  // Digital + accessible = ready
   if ((eq === "digital_complete" || eq === "digital_partial") && loc === "system")
     return "Ready to dispute";
   if (!eq && verification === "digital_log" && loc === "system")
