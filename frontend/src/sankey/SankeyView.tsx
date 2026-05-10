@@ -223,20 +223,18 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
                   </title>
                 </rect>
 
-                {(node.y1 - node.y0) > 8 && (
-                  <text
-                    x={node.x1 + 6}
-                    y={(node.y0 + node.y1) / 2}
-                    dy="0.35em"
-                    className="sankey-node-label"
-                  >
-                    {node.label}
-                    <tspan className="sankey-node-value">
-                      {" "}
-                      {dollarsCompact(node.value || 0)}
-                    </tspan>
-                  </text>
-                )}
+                <text
+                  x={node.x1 + 6}
+                  y={(node.y0 + node.y1) / 2}
+                  dy="0.35em"
+                  className="sankey-node-label"
+                >
+                  {node.label}
+                  <tspan className="sankey-node-value">
+                    {" "}
+                    {dollarsCompact(node.value || 0)}
+                  </tspan>
+                </text>
               </g>
             );
           })}
