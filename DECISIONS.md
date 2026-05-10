@@ -117,6 +117,16 @@ Each entry:
   them out makes the demo unrealistically clean.
 - **Scope:** synthetic data generation
 
+### 2026-05-10 — No Cinderhaven products require cold chain shipping
+- **Why:** All 90 SKUs are shelf-stable (Artisan Sauces, Specialty
+  Condiments, Pantry Staples). Spoilage deductions reference
+  shelf-life expiration and heat exposure, not cold-chain rejection.
+  Temperature logs are not relevant evidence for Cinderhaven
+  shipments.
+- **Scope:** synthetic data generation, explorer prose, deduction codes
+- **Do not:** reference cold chain, reefer units, or temperature
+  monitoring in Cinderhaven context
+
 ### 2026-05-09 — Add spoilage and slotting as deduction types
 - **Why:** Both are real deduction types for a ~$25M food manufacturer.
   Slotting is a planned cost (pay-to-play shelf placement), not an
@@ -149,6 +159,33 @@ Each entry:
   business. More impressive for a CEO who likes exploring data.
 - **Scope:** global — UI architecture
 - **Do not:** build features as standalone pages with no cross-linking
+
+### 2026-05-10 — Collapse Sankey from 6 layers to 3 (Type → Dispute readiness → Outcome)
+- **Why:** 6-layer Sankey with 15+ types created unreadable band
+  crossings in the middle layers (evidence → accessibility →
+  timeliness). Multiple attempts at custom node sorting made it worse.
+  Collapsing the middle three layers into a single "dispute readiness"
+  score (ready to dispute / needs work / can't dispute / never
+  assessed) eliminates the spaghetti while preserving the "shape of
+  the problem" view. The five compounding failures still live in the
+  explorer's 6 cards and the causation trace where they have room to
+  breathe. Dispute readiness is a stronger business concept for a CEO
+  than the technical decomposition — it answers "can I fight this?"
+  directly.
+- **Scope:** Sankey component, data flow
+- **Do not:** reintroduce evidence/accessibility/timeliness as
+  separate Sankey layers. Those details belong in the explorer and
+  trace.
+
+### 2026-05-10 — Pull slotting out of Sankey into a callout box
+- **Why:** Slotting (~$120K) is a negotiated cost with one
+  destination — it doesn't flow through the five failures and
+  shouldn't be in the Sankey. A callout box above the chart handles
+  it. Removing it also prevents slotting deductions from inflating
+  Sankey-driven cohort filters (e.g., "Never filed" was showing
+  $821K instead of $701K because slotting deductions were included).
+- **Scope:** Sankey component, cohort filtering
+- **Do not:** include slotting in Sankey-driven cohort selections
 
 ### 2025-05-07 — Cost of gaps is discoverable, not in-your-face
 - **Why:** The prospect should discover the cost through exploration,
