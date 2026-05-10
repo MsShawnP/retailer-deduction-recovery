@@ -185,6 +185,20 @@ def build_deductions(con: sqlite3.Connection) -> list[dict]:
     # post_audit_claims by deduction_id
     audit_by_deduction = {a["deduction_id"]: a for a in cur.execute("SELECT * FROM post_audit_claims").fetchall()}
 
+    # evidence_documents grouped by deduction_id
+    evidence_docs_by_deduction: dict[str, list[dict]] = defaultdict(list)
+    for doc in cur.execute("SELECT * FROM evidence_documents").fetchall():
+        evidence_docs_by_deduction[doc["deduction_id"]].append({
+            "document_type": doc["document_type"],
+            "status": doc["status"],
+            "format": doc["format"],
+            "location": doc["location"],
+            "has_required_metadata": bool(doc["has_required_metadata"]),
+            "retrieval_minutes": doc["retrieval_minutes"],
+            "expires_at": doc["expires_at"],
+            "is_expired": bool(doc["is_expired"]),
+        })
+
     out = []
     for d in cur.execute("SELECT * FROM deductions").fetchall():
         retailer = retailers.get(d["retailer_id"], {})
@@ -276,6 +290,8 @@ def build_deductions(con: sqlite3.Connection) -> list[dict]:
                 "claim_type": audit["claim_type"],
                 "lookback_months": audit["lookback_months"],
             } if audit else None,
+            "evidence_inventory": evidence_docs_by_deduction.get(d["deduction_id"], []),
+            "evidence_retrieval_cost_hours": d["evidence_retrieval_cost_hours"],
         }
         out.append(record)
     return out
@@ -324,6 +340,7 @@ def build_retailers(con: sqlite3.Connection) -> dict:
             "dispute_portal_name": r["dispute_portal_name"],
             "dispute_portal_url": r["dispute_portal_url"],
             "dispute_method": r["dispute_method"],
+            "deduction_aggressiveness": r["deduction_aggressiveness"],
             "notes": r["notes"],
             "rules": rules_by_retailer.get(rid, {}),
             "codes": codes_by_retailer.get(rid, []),

@@ -7,12 +7,12 @@ import {
   OUTCOME_COLORS,
   highlightedLinkSet,
   isOnSelectedPath,
-  SLOTTING_TERMINAL_NODE_ID,
+  PLACEMENT_TERMINAL_NODE_ID,
   type Selection,
 } from "./data";
 import "./SankeyView.css";
 
-const SLOTTING_BAND_COLOR = "#9E7E3A";  // muted gold — matches OUTCOME_COLORS for the terminal
+const PLACEMENT_BAND_COLOR = "#9E7E3A";
 
 interface Props {
   deductions: Deduction[];
@@ -203,13 +203,10 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
             const opacity =
               isHighlighted === null ? 0.30 :
               isHighlighted ? 0.65 : 0.04;
-            // Slotting's single long band crosses the whole chart. Color
-            // it with the terminal's gold so the categorical difference
-            // (negotiated cost, not a failure flow) reads at a glance.
-            const isSlottingBand =
-              link.target.id === SLOTTING_TERMINAL_NODE_ID;
-            const stroke = isSlottingBand
-              ? SLOTTING_BAND_COLOR
+            const isPlacementBand =
+              link.target.id === PLACEMENT_TERMINAL_NODE_ID;
+            const stroke = isPlacementBand
+              ? PLACEMENT_BAND_COLOR
               : LAYER_COLORS[sourceLayer];
 
             return (

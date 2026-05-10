@@ -353,10 +353,22 @@ function rootCauseProse(d: Deduction): string {
       return "Receiving flagged taste, appearance, or formulation concerns at the dock. Often subjective and hard to defend without lot retain samples, QA records, and signed-off photos at receiving.";
     case "Damage in transit":
       return "Pallets arrived intact in count but with damage that affected product condition (crushing, pressure marks, packaging compromise). The shipment's BOL may be signed clean for count even when condition fails inspection.";
-    case "Other spoilage":
-      return "Product-condition deduction at receiving without a specific sub-cause encoded. Defending these requires the same evidence chain as the named spoilage causes.";
+    case "Warehouse spoilage":
+      return "Product spoiled while in the retailer's warehouse — temperature excursion, pest damage, or shelf-life expiry before rotation. The retailer passes the cost back. Defending requires temperature logs, lot-level pack dates, and proof the product was within spec at delivery.";
+    case "Store-level spoilage":
+      return "Product spoiled at the store level — improper rotation, damaged displays, or customer complaints. Harder to contest because the product was accepted into inventory before the loss occurred.";
+    case "Retailer error":
+      return "Deduction attributed to the wrong brand or duplicated from a prior remittance. These are the retailer's mistake, not Cinderhaven's, and are the most winnable category when identified — but they require cross-referencing multiple remittances to prove.";
+    case "Routing noncompliance":
+      return "Carrier used a non-approved route, delivered to wrong DC, or used wrong shipping method. The retailer's routing guide specifies carriers, methods, and delivery points — violations get fined even if the product arrives on time and intact.";
+    case "Delivery before window":
+      return "Shipment arrived before the delivery window opened. Like late delivery, this disrupts the retailer's receiving schedule and dock staffing plan. Some retailers fine early arrivals as heavily as late ones.";
+    case "Pricing discrepancy":
+      return "Invoice price doesn't match the retailer's purchase order price or current deal sheet. Often caused by price increases not yet reflected in the retailer's system, or promotional pricing applied incorrectly.";
+    case "Returns/unsaleables":
+      return "Product returned from stores as unsaleable — damaged packaging, short-dated, or otherwise unmarketable. The retailer passes the write-down back. Defending requires proof the product was saleable at delivery.";
     case "Not disputable — negotiated cost":
-      return "Slotting / new-item / planogram-reset / shelf-placement fee. Contractually agreed up front in exchange for shelf space, not assessed as a penalty. Routing it through the failure pipeline would be misleading — it isn't an operational failure or a recoverable loss, it's the negotiated cost of access. Tracked here because it shows up on the same remittances and matters for net margin, but no dispute path applies.";
+      return "Placement / new-item / planogram-reset / shelf-placement fee. Contractually agreed up front in exchange for shelf space, not assessed as a penalty. Tracked here because it shows up on the same remittances and matters for net margin, but no dispute path applies.";
     default:
       return "";
   }

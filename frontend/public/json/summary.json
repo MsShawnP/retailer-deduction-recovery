@@ -1,86 +1,135 @@
 {
   "window": {
-    "start": "2024-12-25",
+    "start": "2024-12-24",
     "end": "2026-07-26",
     "months": 20
   },
   "totals": {
-    "deductions_count": 3563,
-    "deductions_dollar": 1677962.12,
-    "annualized_dollar": 1006777.27,
-    "disputes_filed": 1607,
-    "disputes_recovered": 119455.84,
-    "recovery_rate": 0.0712,
-    "labor_hours": 6685.2,
-    "fte_equivalent": 3.21,
+    "deductions_count": 3351,
+    "deductions_dollar": 1683996.42,
+    "annualized_dollar": 1010397.85,
+    "disputes_filed": 966,
+    "disputes_recovered": 149173.97,
+    "recovery_rate": 0.0886,
+    "labor_hours": 4053.6,
+    "fte_equivalent": 1.95,
     "orders_count": 5838,
     "orders_dollar": 31409072.52,
-    "deductions_no_dispute_count": 1956,
-    "deductions_no_dispute_dollar": 935943.17
+    "deductions_no_dispute_count": 2385,
+    "deductions_no_dispute_dollar": 1210442.07
   },
   "by_type": [
     {
       "deduction_type": "vague",
-      "count": 292,
-      "dollar": 395970.01,
-      "pct_count": 0.082,
-      "pct_dollars": 0.236
+      "count": 221,
+      "dollar": 323534.19,
+      "pct_count": 0.066,
+      "pct_dollars": 0.1921
     },
     {
       "deduction_type": "promo_billback",
-      "count": 397,
-      "dollar": 288778.24,
-      "pct_count": 0.1114,
-      "pct_dollars": 0.1721
+      "count": 346,
+      "dollar": 248627.59,
+      "pct_count": 0.1033,
+      "pct_dollars": 0.1476
     },
     {
       "deduction_type": "short_ship",
-      "count": 1244,
-      "dollar": 286261.09,
-      "pct_count": 0.3491,
-      "pct_dollars": 0.1706
+      "count": 993,
+      "dollar": 228178.03,
+      "pct_count": 0.2963,
+      "pct_dollars": 0.1355
     },
     {
       "deduction_type": "label_fine",
-      "count": 514,
-      "dollar": 185320.82,
-      "pct_count": 0.1443,
-      "pct_dollars": 0.1104
+      "count": 414,
+      "dollar": 161601.79,
+      "pct_count": 0.1235,
+      "pct_dollars": 0.096
     },
     {
-      "deduction_type": "spoilage",
-      "count": 164,
-      "dollar": 155475.4,
-      "pct_count": 0.046,
-      "pct_dollars": 0.0927
+      "deduction_type": "placement_fees",
+      "count": 31,
+      "dollar": 120801.02,
+      "pct_count": 0.0093,
+      "pct_dollars": 0.0717
+    },
+    {
+      "deduction_type": "warehouse_spoils",
+      "count": 101,
+      "dollar": 109876.05,
+      "pct_count": 0.0301,
+      "pct_dollars": 0.0652
     },
     {
       "deduction_type": "late_delivery",
-      "count": 627,
-      "dollar": 125179.6,
-      "pct_count": 0.176,
-      "pct_dollars": 0.0746
+      "count": 524,
+      "dollar": 106004.76,
+      "pct_count": 0.1564,
+      "pct_dollars": 0.0629
     },
     {
-      "deduction_type": "slotting",
-      "count": 31,
-      "dollar": 117337.99,
-      "pct_count": 0.0087,
-      "pct_dollars": 0.0699
+      "deduction_type": "freight_routing",
+      "count": 175,
+      "dollar": 90135.13,
+      "pct_count": 0.0522,
+      "pct_dollars": 0.0535
     },
     {
       "deduction_type": "damaged",
-      "count": 154,
-      "dollar": 98832.76,
-      "pct_count": 0.0432,
-      "pct_dollars": 0.0589
+      "count": 114,
+      "dollar": 73751.0,
+      "pct_count": 0.034,
+      "pct_dollars": 0.0438
+    },
+    {
+      "deduction_type": "returns_unsaleables",
+      "count": 84,
+      "dollar": 57535.03,
+      "pct_count": 0.0251,
+      "pct_dollars": 0.0342
+    },
+    {
+      "deduction_type": "store_spoils",
+      "count": 47,
+      "dollar": 49004.42,
+      "pct_count": 0.014,
+      "pct_dollars": 0.0291
+    },
+    {
+      "deduction_type": "wrong_brand",
+      "count": 30,
+      "dollar": 47582.53,
+      "pct_count": 0.009,
+      "pct_dollars": 0.0283
+    },
+    {
+      "deduction_type": "pricing_invoice",
+      "count": 118,
+      "dollar": 30395.16,
+      "pct_count": 0.0352,
+      "pct_dollars": 0.018
     },
     {
       "deduction_type": "pallet_fine",
-      "count": 140,
-      "dollar": 24806.21,
-      "pct_count": 0.0393,
-      "pct_dollars": 0.0148
+      "count": 117,
+      "dollar": 20898.32,
+      "pct_count": 0.0349,
+      "pct_dollars": 0.0124
+    },
+    {
+      "deduction_type": "duplicate_deduction",
+      "count": 31,
+      "dollar": 15064.42,
+      "pct_count": 0.0093,
+      "pct_dollars": 0.0089
+    },
+    {
+      "deduction_type": "early_delivery",
+      "count": 5,
+      "dollar": 1006.98,
+      "pct_count": 0.0015,
+      "pct_dollars": 0.0006
     }
   ],
   "by_retailer": [
@@ -88,151 +137,151 @@
       "retailer_id": "walmart",
       "name": "Walmart",
       "channel_type": "retailer",
-      "deductions": 1674,
-      "dollar": 725757.75,
-      "recovered": 71890.04,
-      "recovery_rate": 0.0991
+      "deductions": 1511,
+      "dollar": 703360.62,
+      "recovered": 88227.58,
+      "recovery_rate": 0.1254
     },
     {
       "retailer_id": "unfi",
       "name": "UNFI",
       "channel_type": "distributor",
-      "deductions": 553,
-      "dollar": 288053.85,
-      "recovered": 15505.51,
-      "recovery_rate": 0.0538
+      "deductions": 535,
+      "dollar": 312105.94,
+      "recovered": 29327.03,
+      "recovery_rate": 0.094
     },
     {
       "retailer_id": "kehe",
       "name": "KeHE",
       "channel_type": "distributor",
-      "deductions": 478,
-      "dollar": 188992.7,
-      "recovered": 10373.2,
-      "recovery_rate": 0.0549
+      "deductions": 446,
+      "dollar": 228613.01,
+      "recovered": 10030.81,
+      "recovery_rate": 0.0439
     },
     {
       "retailer_id": "whole_foods",
       "name": "Whole Foods",
       "channel_type": "retailer",
-      "deductions": 396,
-      "dollar": 174081.24,
-      "recovered": 4117.16,
-      "recovery_rate": 0.0237
+      "deductions": 402,
+      "dollar": 164644.5,
+      "recovered": 9162.73,
+      "recovery_rate": 0.0557
     },
     {
       "retailer_id": "costco",
       "name": "Costco",
       "channel_type": "retailer",
-      "deductions": 84,
-      "dollar": 166969.87,
-      "recovered": 14092.56,
-      "recovery_rate": 0.0844
+      "deductions": 78,
+      "dollar": 151322.01,
+      "recovered": 7385.1,
+      "recovery_rate": 0.0488
     },
     {
       "retailer_id": "green_basket_market",
       "name": "Green Basket Market",
       "channel_type": "retailer",
-      "deductions": 107,
-      "dollar": 41004.94,
-      "recovered": 1266.65,
-      "recovery_rate": 0.0309
+      "deductions": 113,
+      "dollar": 43362.14,
+      "recovered": 1629.22,
+      "recovery_rate": 0.0376
     },
     {
       "retailer_id": "southside_grocers",
       "name": "Southside Grocers",
       "channel_type": "retailer",
-      "deductions": 65,
-      "dollar": 37955.94,
-      "recovered": 1228.13,
-      "recovery_rate": 0.0324
+      "deductions": 72,
+      "dollar": 28153.13,
+      "recovered": 1545.32,
+      "recovery_rate": 0.0549
     },
     {
       "retailer_id": "prairie_provisions",
       "name": "Prairie Provisions",
       "channel_type": "retailer",
-      "deductions": 84,
-      "dollar": 26718.52,
-      "recovered": 356.42,
-      "recovery_rate": 0.0133
+      "deductions": 75,
+      "dollar": 26673.97,
+      "recovered": 457.61,
+      "recovery_rate": 0.0172
     },
     {
       "retailer_id": "mountain_pantry_co",
       "name": "Mountain Pantry Co",
       "channel_type": "retailer",
-      "deductions": 68,
-      "dollar": 18267.64,
-      "recovered": 409.87,
-      "recovery_rate": 0.0224
+      "deductions": 64,
+      "dollar": 12967.31,
+      "recovered": 970.63,
+      "recovery_rate": 0.0749
     },
     {
       "retailer_id": "harbor_fresh",
       "name": "Harbor Fresh",
       "channel_type": "retailer",
-      "deductions": 54,
-      "dollar": 10159.67,
-      "recovered": 216.3,
-      "recovery_rate": 0.0213
+      "deductions": 55,
+      "dollar": 12793.79,
+      "recovered": 437.94,
+      "recovery_rate": 0.0342
     }
   ],
   "by_outcome": [
     {
+      "outcome": "won_full",
+      "count": 291,
+      "dollar": 123455.97
+    },
+    {
       "outcome": "lost_evidence",
-      "count": 508,
+      "count": 200,
       "dollar": 0.0
     },
     {
-      "outcome": "won_full",
-      "count": 248,
-      "dollar": 98099.26
-    },
-    {
       "outcome": "abandoned",
-      "count": 203,
+      "count": 111,
       "dollar": 0.0
     },
     {
       "outcome": "pending",
-      "count": 189,
-      "dollar": 0.0
-    },
-    {
-      "outcome": "lost_other",
-      "count": 172,
-      "dollar": 0.0
-    },
-    {
-      "outcome": "lost_no_response",
-      "count": 140,
+      "count": 102,
       "dollar": 0.0
     },
     {
       "outcome": "won_partial",
-      "count": 120,
-      "dollar": 21356.58
+      "count": 87,
+      "dollar": 25718.0
+    },
+    {
+      "outcome": "lost_no_response",
+      "count": 78,
+      "dollar": 0.0
+    },
+    {
+      "outcome": "lost_other",
+      "count": 66,
+      "dollar": 0.0
     },
     {
       "outcome": "lost_deadline",
-      "count": 27,
+      "count": 31,
       "dollar": 0.0
     }
   ],
   "by_evidence_quality": [
     {
       "evidence_quality": "handwritten_only",
-      "count": 1199
+      "count": 738
     },
     {
       "evidence_quality": "none",
-      "count": 320
+      "count": 186
     },
     {
       "evidence_quality": "digital_complete",
-      "count": 78
+      "count": 38
     },
     {
       "evidence_quality": "digital_partial",
-      "count": 10
+      "count": 4
     }
   ]
 }

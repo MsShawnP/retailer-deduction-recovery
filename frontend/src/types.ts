@@ -142,6 +142,17 @@ export interface PostAudit {
   lookback_months: number;
 }
 
+export interface EvidenceDocument {
+  document_type: string;
+  status: string;
+  format: string | null;
+  location: string | null;
+  has_required_metadata: boolean;
+  retrieval_minutes: number | null;
+  expires_at: string | null;
+  is_expired: boolean;
+}
+
 export interface Deduction {
   deduction_id: string;
   deduction_type: string;
@@ -160,6 +171,8 @@ export interface Deduction {
   shipment: Shipment | null;
   dispute: Dispute | null;
   post_audit: PostAudit | null;
+  evidence_inventory: EvidenceDocument[];
+  evidence_retrieval_cost_hours: number | null;
 }
 
 export interface RetailerRule {
@@ -192,6 +205,7 @@ export interface Retailer {
   dispute_portal_name: string | null;
   dispute_portal_url: string | null;
   dispute_method: string | null;
+  deduction_aggressiveness: number | null;
   notes: string;
   rules: Record<string, RetailerRule>;
   codes: RetailerCode[];

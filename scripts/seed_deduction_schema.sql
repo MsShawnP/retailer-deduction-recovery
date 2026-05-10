@@ -4,6 +4,7 @@
 -- cinderhaven_product_master.db.
 --
 -- Design rationale: see data/schema.md.
+-- 16-type taxonomy per handoff (2026-05-10).
 
 -- ---------- 1. retailers ----------
 DROP TABLE IF EXISTS retailers;
@@ -14,6 +15,7 @@ CREATE TABLE retailers (
     dispute_portal_name  TEXT,
     dispute_portal_url   TEXT,
     dispute_method       TEXT CHECK (dispute_method IN ('portal', 'email_excel', 'email_buyer', 'mixed', NULL)),
+    deduction_aggressiveness  REAL,  -- 0-1; correlates inversely with Cinderhaven's dispute rate against this retailer
     notes                TEXT
 );
 
@@ -24,7 +26,9 @@ CREATE TABLE retailer_rules (
     deduction_type         TEXT NOT NULL CHECK (deduction_type IN (
         'short_ship', 'label_fine', 'pallet_fine', 'damaged',
         'late_delivery', 'promo_billback', 'vague',
-        'spoilage', 'slotting')),
+        'early_delivery', 'freight_routing', 'warehouse_spoils',
+        'store_spoils', 'pricing_invoice', 'returns_unsaleables',
+        'duplicate_deduction', 'wrong_brand', 'placement_fees')),
     dispute_window_days    INTEGER,
     auto_deduct            INTEGER NOT NULL DEFAULT 0,  -- BOOLEAN as 0/1
     evidence_required      TEXT,
@@ -142,23 +146,26 @@ CREATE INDEX idx_remittances_retailer_date ON remittances(retailer_id, received_
 -- ---------- 9. deductions ----------
 DROP TABLE IF EXISTS deductions;
 CREATE TABLE deductions (
-    deduction_id            TEXT PRIMARY KEY,
-    retailer_id             TEXT NOT NULL,
-    order_id                TEXT,
-    shipment_id             TEXT,
-    deduction_type          TEXT NOT NULL CHECK (deduction_type IN (
+    deduction_id                 TEXT PRIMARY KEY,
+    retailer_id                  TEXT NOT NULL,
+    order_id                     TEXT,
+    shipment_id                  TEXT,
+    deduction_type               TEXT NOT NULL CHECK (deduction_type IN (
         'short_ship', 'label_fine', 'pallet_fine', 'damaged',
         'late_delivery', 'promo_billback', 'vague',
-        'spoilage', 'slotting')),
-    code_id                 TEXT,
-    code_as_remitted        TEXT,
-    remittance_description  TEXT,
-    amount                  REAL NOT NULL,
-    deduction_date          TEXT NOT NULL,
-    dispute_deadline        TEXT,
-    is_vague                INTEGER NOT NULL DEFAULT 0,
-    is_post_audit           INTEGER NOT NULL DEFAULT 0,
-    remittance_id           TEXT,
+        'early_delivery', 'freight_routing', 'warehouse_spoils',
+        'store_spoils', 'pricing_invoice', 'returns_unsaleables',
+        'duplicate_deduction', 'wrong_brand', 'placement_fees')),
+    code_id                      TEXT,
+    code_as_remitted             TEXT,
+    remittance_description       TEXT,
+    amount                       REAL NOT NULL,
+    deduction_date               TEXT NOT NULL,
+    dispute_deadline             TEXT,
+    is_vague                     INTEGER NOT NULL DEFAULT 0,
+    is_post_audit                INTEGER NOT NULL DEFAULT 0,
+    remittance_id                TEXT,
+    evidence_retrieval_cost_hours REAL,  -- total estimated hours to assemble a dispute package
     FOREIGN KEY (retailer_id) REFERENCES retailers(retailer_id),
     FOREIGN KEY (order_id) REFERENCES orders(order_id),
     FOREIGN KEY (shipment_id) REFERENCES shipments(shipment_id),
@@ -168,6 +175,7 @@ CREATE TABLE deductions (
 CREATE INDEX idx_deductions_retailer_date ON deductions(retailer_id, deduction_date);
 CREATE INDEX idx_deductions_order ON deductions(order_id);
 CREATE INDEX idx_deductions_deadline ON deductions(dispute_deadline);
+CREATE INDEX idx_deductions_type ON deductions(deduction_type);
 
 -- ---------- 10. disputes ----------
 DROP TABLE IF EXISTS disputes;
@@ -197,7 +205,11 @@ CREATE TABLE dispute_evidence (
     dispute_id       TEXT NOT NULL,
     evidence_type    TEXT NOT NULL CHECK (evidence_type IN (
         'signed_bol', 'pod', 'pack_log', 'label_scan',
-        'promo_agreement', 'asn_confirmation', 'photo')),
+        'promo_agreement', 'asn_confirmation', 'photo',
+        'weight_ticket', 'temperature_log', 'deal_sheet',
+        'carrier_inspection', 'retailer_portal_screenshot',
+        'remittance_advice', 'email_correspondence',
+        'purchase_order', 'invoice', 'carrier_tracking')),
     was_submitted    INTEGER NOT NULL,
     was_required     INTEGER NOT NULL,
     format           TEXT CHECK (format IN ('digital', 'paper_scan', 'handwritten_note', 'missing', NULL)),
@@ -234,3 +246,52 @@ CREATE TABLE post_audit_claims (
     FOREIGN KEY (deduction_id) REFERENCES deductions(deduction_id)
 );
 CREATE INDEX idx_post_audit_deduction ON post_audit_claims(deduction_id);
+
+-- ---------- 14. evidence_documents ----------
+DROP TABLE IF EXISTS evidence_documents;
+CREATE TABLE evidence_documents (
+    document_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    deduction_id      TEXT NOT NULL,
+    document_type     TEXT NOT NULL CHECK (document_type IN (
+        'signed_bol', 'unsigned_bol', 'signed_pod', 'purchase_order',
+        'invoice', 'asn_edi_856', 'packing_list', 'handwritten_packing_slip',
+        'label_scan', 'pallet_photo', 'carrier_tracking', 'weight_ticket',
+        'deal_sheet', 'temperature_log', 'carrier_inspection',
+        'retailer_portal_screenshot', 'remittance_advice',
+        'email_correspondence')),
+    status            TEXT NOT NULL CHECK (status IN (
+        'exists_ready', 'exists_not_ready', 'expired', 'never_captured')),
+    format            TEXT CHECK (format IN (
+        'system_export', 'edi_transaction', 'digital_photo', 'email',
+        'handwritten_paper', 'phone_photo', NULL)),
+    location          TEXT CHECK (location IN (
+        'erp', 'carrier_portal', 'retailer_portal', 'shared_drive',
+        'email_archive', 'filing_cabinet', 'personal_phone',
+        'personal_desk', 'destroyed', NULL)),
+    has_required_metadata  INTEGER NOT NULL DEFAULT 0,
+    retrieval_minutes      INTEGER,
+    expires_at             TEXT,
+    is_expired             INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (deduction_id) REFERENCES deductions(deduction_id)
+);
+CREATE INDEX idx_evidence_documents_deduction ON evidence_documents(deduction_id);
+CREATE INDEX idx_evidence_documents_status ON evidence_documents(status);
+
+-- ---------- 15. evidence_requirements ----------
+DROP TABLE IF EXISTS evidence_requirements;
+CREATE TABLE evidence_requirements (
+    requirement_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    retailer_id       TEXT NOT NULL,
+    deduction_type    TEXT NOT NULL,
+    document_type     TEXT NOT NULL CHECK (document_type IN (
+        'signed_bol', 'unsigned_bol', 'signed_pod', 'purchase_order',
+        'invoice', 'asn_edi_856', 'packing_list', 'handwritten_packing_slip',
+        'label_scan', 'pallet_photo', 'carrier_tracking', 'weight_ticket',
+        'deal_sheet', 'temperature_log', 'carrier_inspection',
+        'retailer_portal_screenshot', 'remittance_advice',
+        'email_correspondence')),
+    is_required       INTEGER NOT NULL DEFAULT 1,  -- 1=required, 0=supporting
+    notes             TEXT,
+    FOREIGN KEY (retailer_id) REFERENCES retailers(retailer_id)
+);
+CREATE INDEX idx_evidence_requirements_retailer_type ON evidence_requirements(retailer_id, deduction_type);

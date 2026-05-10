@@ -218,7 +218,7 @@ export default function CostToDisputeView({ cohort, onTrace }: Props) {
           Use this to decide where limited staff time goes first.
         </p>
         <p className="cost-empty">
-          Nothing to triage — the cohort either holds only slotting
+          Nothing to triage — the cohort either holds only placement fees
           (negotiated costs, not disputable) or every operational deduction
           is already resolved.
         </p>

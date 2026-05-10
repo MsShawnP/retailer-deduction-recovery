@@ -46,6 +46,7 @@ DYNAMIC_PIPELINE = [
     "13b_generate_post_audit_claims.py",
     "14_generate_remittances.py",
     "15_generate_disputes.py",
+    "16_generate_evidence_documents.py",
     "20_export_json.py",
     "21_validate_dataset.py",
 ]
@@ -82,6 +83,7 @@ def report(con: sqlite3.Connection) -> None:
         "orders", "order_lines", "shipments", "pack_records",
         "remittances", "deductions", "disputes", "dispute_evidence",
         "edi_requirements", "post_audit_claims",
+        "evidence_documents", "evidence_requirements",
     ]
     print("\nNew table row counts:")
     for t in new_tables:
