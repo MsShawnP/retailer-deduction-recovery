@@ -563,7 +563,7 @@ done.
 
 ---
 
-## 2026-05-10 — /wrap
+## 2026-05-10 — /wrap (session 1)
 
 **Started from:** Phase 4 task 3 done (deployed to Cloudflare Pages).
 All 9 Phase 3 features and Phase 4 tasks 1–3 complete.
@@ -602,5 +602,57 @@ redeploy. 3,087 deductions / $1.54M total / $802K annualized.
 
 **Next:** Merge to master, redeploy to Cloudflare Pages, then Phase 4
 task 4 (friend preview).
+
+---
+
+## 2026-05-10 — /wrap (session 2)
+
+**Started from:** Session 1 wrap done. Sankey had 3-layer structure
+but node/link sorting still needed work — ribbons crossing within
+nodes, layer 2 node ordering fighting topology.
+
+**Did:**
+
+- **Sankey node sorting overhaul:**
+  - Layers 0 and 1: dynamic sort by dollar value descending (largest
+    node at top). Replaced layer 0's disputed-share proportion sort
+    and layer 1's fixed READINESS_ORDER.
+  - Layer 2: grouped dynamic sort by group total (losses, wins,
+    abandoned, pending, never filed). Within-group sort by value
+    descending. Replaced static OUTCOME_ORDER.
+  - Post-layout barycenter reposition of layer 2 nodes — each node's
+    weighted average source y-position determines vertical placement.
+    "Never filed" moves to the bottom (its sources are the unfiled
+    nodes in the lower part of layer 1). Disputed outcomes stay at
+    top, matching "Disputed" at top of layer 1. Eliminates the
+    structural crossings caused by value-based ordering.
+
+- **Sankey link sorting:**
+  - Generator `linkSort` doesn't control attachment order (fires
+    before node positions are finalized). Replaced with post-layout
+    two-pass sort: pass 1 sorts each node's `sourceLinks` by
+    `target.y0` and recomputes `link.y0`; pass 2 sorts each node's
+    `targetLinks` by `source.y0` and recomputes `link.y1`. Ribbons
+    now attach in vertical order of their partner node, eliminating
+    within-node crossings.
+
+- **Cohort table:** New `CohortTableView` between Sankey and explorer.
+  8 columns (ID, date, retailer, type, amount, readiness, outcome,
+  retrieval hours). Sortable by any column (default: amount desc).
+  Paginated at 25 rows. Click a row to jump the explorer to that
+  deduction via new `focusedDeductionId` prop on ExplorerView.
+
+- **Slotting callout styling:** 15px → 17px, bold, centered.
+
+- Removed unused `TYPE_LABELS` import from SankeyView (caught by
+  `tsc -b` in Cloudflare build).
+
+**State:** All changes on branch `claude/determined-keller-c1455e`,
+committed and pushed (15 commits this session, head at `415de47`).
+Needs merge to master and Cloudflare Pages redeploy.
+
+**Next:** Merge to master, redeploy to Cloudflare Pages. Visual
+verification of the barycenter reposition on the live site. Then
+Phase 4 task 4 (friend preview).
 
 ---

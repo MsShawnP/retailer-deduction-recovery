@@ -1,0 +1,96 @@
+.cohort-table-section {
+  margin-top: 36px;
+}
+
+.cohort-table-wrap {
+  overflow-x: auto;
+}
+
+.cohort-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-family: var(--serif);
+  background: var(--panel);
+  border: 1px solid var(--rule);
+}
+
+.cohort-table th {
+  font-family: var(--serif);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  background: #F1F2F4;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--rule);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.cohort-table th:hover {
+  color: var(--ink);
+}
+
+.cohort-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.cohort-table tbody tr {
+  cursor: pointer;
+}
+
+.cohort-table tbody tr:hover {
+  background: #F5F6F8;
+}
+
+.cohort-table tbody tr.active-row {
+  background: #E8F4F8;
+  font-weight: 600;
+}
+
+.cohort-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.cohort-table .mono {
+  font-family: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+  font-size: 13px;
+}
+
+.cohort-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cohort-table-pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.cohort-table-pagination button {
+  font-family: var(--serif);
+  font-size: 14px;
+  padding: 4px 12px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.cohort-table-pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.cohort-table-pagination button:hover:not(:disabled) {
+  background: #F1F2F4;
+}
