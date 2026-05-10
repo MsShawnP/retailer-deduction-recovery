@@ -29,14 +29,6 @@ const LAYER_COLORS = [
   "#053D52", // outcome — overridden per-node by OUTCOME_COLORS
 ];
 
-const READINESS_ORDER: Record<string, number> = {
-  "Disputed":           0,
-  "Ready to dispute":   1,
-  "Needs work":         2,
-  "Can't dispute":      3,
-  "Never assessed":     4,
-};
-
 const OUTCOME_ORDER: Record<string, number> = {
   "Lost — evidence":    0,
   "Lost — no response": 1,
@@ -77,24 +69,6 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
   const layout = useMemo(() => {
     const { nodes, links } = buildSankeyData(operationalDeductions);
 
-    // Per-type proportion of dollars that were disputed (have a dispute
-    // record). Types with high disputed share sort to the top of layer 0
-    // so their bands travel the shortest distance to the "Disputed" node
-    // in layer 1.
-    const typeTotal = new Map<string, number>();
-    const typeDisputed = new Map<string, number>();
-    for (const d of operationalDeductions) {
-      if (d.amount <= 0) continue;
-      const t = TYPE_LABELS[d.deduction_type] || d.deduction_type;
-      typeTotal.set(t, (typeTotal.get(t) || 0) + d.amount);
-      if (d.dispute) typeDisputed.set(t, (typeDisputed.get(t) || 0) + d.amount);
-    }
-    const disputedShare = (label: string) => {
-      const total = typeTotal.get(label) || 1;
-      const disputed = typeDisputed.get(label) || 0;
-      return disputed / total;
-    };
-
     const nodesCopy = nodes.map((n) => ({ ...n }));
     const linksCopy = links.map((l) => ({
       source: l.source,
@@ -107,9 +81,9 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       .nodeAlign(sankeyJustify)
       .nodeSort((a: any, b: any) => {
         if (a.layer === 0 && b.layer === 0)
-          return disputedShare(b.label) - disputedShare(a.label);
+          return (b.value || 0) - (a.value || 0);
         if (a.layer === 1 && b.layer === 1)
-          return (READINESS_ORDER[a.label] ?? 99) - (READINESS_ORDER[b.label] ?? 99);
+          return (b.value || 0) - (a.value || 0);
         if (a.layer === 2 && b.layer === 2)
           return (OUTCOME_ORDER[a.label] ?? 99) - (OUTCOME_ORDER[b.label] ?? 99);
         return null as any;
