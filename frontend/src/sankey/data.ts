@@ -296,11 +296,10 @@ export function isOnSelectedPath(d: Deduction, sel: Selection | null): boolean {
   if (sel.kind === "retailer") return d.retailer.id === sel.retailerId;
   if (sel.kind === "cluster")
     return clusterValueFor(d, sel.dimension) === sel.value;
+  // Node/link selections come from the Sankey, which excludes slotting.
+  if (d.deduction_type === "slotting") return false;
   const ids = pathIds(d);
   if (sel.kind === "node") return ids.includes(sel.nodeId);
-  // Link selection: source/target are explicit IDs (e.g., "0:Slotting" →
-  // "5:Not disputable — negotiated cost"). Match against the deduction's
-  // path edges directly so the slotting shortcut works.
   for (let i = 0; i < ids.length - 1; i++) {
     if (ids[i] === sel.source && ids[i + 1] === sel.target) return true;
   }

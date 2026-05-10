@@ -125,6 +125,12 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
         or band to isolate that path; click again to reset.
       </p>
 
+      {slottingStats.count > 0 && (
+        <div className="sankey-slotting-callout">
+          {slottingStats.count} placement fees · {dollarsCompact(slottingStats.total)} · negotiated cost of access — not disputable
+        </div>
+      )}
+
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         className="sankey-svg"
@@ -240,12 +246,6 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
           })}
         </g>
       </svg>
-
-      {slottingStats.count > 0 && (
-        <div className="sankey-slotting-callout">
-          {slottingStats.count} placement fees · {dollarsCompact(slottingStats.total)} · negotiated cost of access — not disputable
-        </div>
-      )}
     </div>
   );
 }
