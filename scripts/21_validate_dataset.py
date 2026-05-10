@@ -8,13 +8,15 @@ calibration targets don't block the build.
 Validates:
   - Row counts in expected ranges
   - Referential integrity (every FK resolves)
-  - Annualized deduction dollars in $750K-$1.2M target band
+  - Annualized deduction dollars in $1.0M-$1.5M target band
   - Channel split: Walmart dominant, distribution roughly tracks base
   - Type mix: short_ship + label_fine dominate by count
   - Date ranges within the build window
   - Vague-deduction conventions (NULL order_id allowed, is_vague=1)
+  - Placement_fees conventions (NULL order_id, never disputed)
   - Disputes never reference a non-existent deduction
   - Recovery dollars never exceed deduction dollars
+  - Evidence inventory coverage
   - JSON export matches DB row counts
 """
 
@@ -30,25 +32,27 @@ ROOT = Path(__file__).resolve().parent.parent
 DB_PATH = ROOT / "data" / "cinderhaven_deductions.db"
 JSON_DIR = ROOT / "frontend" / "public" / "json"
 
-# Target ranges from data/schema.md
+# Target ranges — 16-type taxonomy (2026-05-10 recalibration)
 TARGETS = {
-    "orders":            (4000, 6500),
-    "order_lines":       (15000, 35000),
-    "shipments":         (4000, 6500),
-    "pack_records":      (4000, 6500),
-    "deductions":        (3000, 6000),
-    "remittances":       (200, 700),
-    "disputes":          (1500, 3600),
-    "dispute_evidence":  (3000, 10000),
-    "post_audit_claims": (30, 80),
-    "retailers":         (10, 12),
-    "retailer_rules":    (80, 100),  # 9 types x 10 retailers (DTC excluded) = 90
-    "deduction_codes":   (70, 100),
-    "edi_requirements":  (30, 50),
+    "orders":               (4000, 6500),
+    "order_lines":          (15000, 35000),
+    "shipments":            (4000, 6500),
+    "pack_records":         (4000, 6500),
+    "deductions":           (3000, 6000),
+    "remittances":          (200, 700),
+    "disputes":             (700, 1300),      # ~25% filing rate of 4K deductions
+    "dispute_evidence":     (1500, 6000),
+    "post_audit_claims":    (30, 80),
+    "retailers":            (10, 12),
+    "retailer_rules":       (140, 180),       # 16 types x 10 retailers = 160
+    "deduction_codes":      (140, 180),       # ~10 per retailer × 16 types (sparse)
+    "edi_requirements":     (30, 50),
+    "evidence_documents":   (10000, 30000),   # 3-8 docs per deduction
+    "evidence_requirements": (30, 60),
 }
 
-ANNUAL_DOLLAR_TARGET = (750_000, 1_200_000)
-RECOVERY_RATE_TARGET = (0.05, 0.20)  # 5-20%; lean team should be on the lower side
+ANNUAL_DOLLAR_TARGET = (1_000_000, 1_500_000)
+RECOVERY_RATE_TARGET = (0.03, 0.12)  # ~5-10%; 25% filing × 40% win × partial recovery
 
 
 class Reporter:
@@ -159,6 +163,16 @@ def main() -> int:
             LEFT JOIN deductions d ON d.deduction_id = p.deduction_id
             WHERE d.deduction_id IS NULL
         """),
+        ("evidence_documents.deduction_id -> deductions", """
+            SELECT COUNT(*) FROM evidence_documents ed
+            LEFT JOIN deductions d ON d.deduction_id = ed.deduction_id
+            WHERE d.deduction_id IS NULL
+        """),
+        ("evidence_requirements.retailer_id -> retailers", """
+            SELECT COUNT(*) FROM evidence_requirements er
+            LEFT JOIN retailers r ON r.retailer_id = er.retailer_id
+            WHERE r.retailer_id IS NULL
+        """),
     ]
     for label, sql in checks:
         n = cur.execute(sql).fetchone()[0]
@@ -180,40 +194,40 @@ def main() -> int:
     no_order_non_vague_non_audit = cur.execute("""
         SELECT COUNT(*) FROM deductions
         WHERE order_id IS NULL AND is_vague=0 AND is_post_audit=0
-          AND deduction_type != 'slotting'
+          AND deduction_type != 'placement_fees'
     """).fetchone()[0]
     if no_order_non_vague_non_audit == 0:
-        rep.passed("Non-vague non-post-audit non-slotting deductions all have order_id")
+        rep.passed("Non-vague non-post-audit non-placement_fees deductions all have order_id")
     else:
-        rep.fail(f"{no_order_non_vague_non_audit} non-vague non-audit non-slotting deductions missing order_id")
+        rep.fail(f"{no_order_non_vague_non_audit} non-vague non-audit non-placement_fees deductions missing order_id")
 
-    slotting_with_order = cur.execute("""
+    placement_with_order = cur.execute("""
         SELECT COUNT(*) FROM deductions
-        WHERE deduction_type='slotting' AND order_id IS NOT NULL
+        WHERE deduction_type='placement_fees' AND order_id IS NOT NULL
     """).fetchone()[0]
-    if slotting_with_order == 0:
-        rep.passed("Slotting deductions never link to a specific order_id")
+    if placement_with_order == 0:
+        rep.passed("Placement_fees deductions never link to a specific order_id")
     else:
-        rep.warn(f"{slotting_with_order} slotting deductions link to order_id (design says NULL)")
+        rep.warn(f"{placement_with_order} placement_fees deductions link to order_id (design says NULL)")
 
-    slotting_with_dispute = cur.execute("""
+    placement_with_dispute = cur.execute("""
         SELECT COUNT(*) FROM deductions d
         JOIN disputes disp ON disp.deduction_id = d.deduction_id
-        WHERE d.deduction_type='slotting'
+        WHERE d.deduction_type='placement_fees'
     """).fetchone()[0]
-    if slotting_with_dispute == 0:
-        rep.passed("Slotting deductions never have a dispute (non-disputable)")
+    if placement_with_dispute == 0:
+        rep.passed("Placement_fees deductions never have a dispute (non-disputable)")
     else:
-        rep.fail(f"{slotting_with_dispute} slotting deductions have a dispute (should be 0)")
+        rep.fail(f"{placement_with_dispute} placement_fees deductions have a dispute (should be 0)")
 
-    slotting_with_deadline = cur.execute("""
+    placement_with_deadline = cur.execute("""
         SELECT COUNT(*) FROM deductions
-        WHERE deduction_type='slotting' AND dispute_deadline IS NOT NULL
+        WHERE deduction_type='placement_fees' AND dispute_deadline IS NOT NULL
     """).fetchone()[0]
-    if slotting_with_deadline == 0:
-        rep.passed("Slotting deductions have no dispute_deadline (non-disputable)")
+    if placement_with_deadline == 0:
+        rep.passed("Placement_fees deductions have no dispute_deadline (non-disputable)")
     else:
-        rep.fail(f"{slotting_with_deadline} slotting deductions have dispute_deadline set")
+        rep.fail(f"{placement_with_deadline} placement_fees deductions have dispute_deadline set")
 
     audit_with_order = cur.execute("""
         SELECT COUNT(*) FROM deductions WHERE is_post_audit=1 AND order_id IS NOT NULL
@@ -288,6 +302,35 @@ def main() -> int:
         rep.passed(f"deductions dates {deduction_min} to {deduction_max} within reasonable window")
     else:
         rep.warn(f"deductions dates {deduction_min} to {deduction_max} fall outside expected window")
+
+    # ===== Evidence inventory coverage =====
+    print("\nEvidence inventory:")
+    deductions_with_docs = cur.execute("""
+        SELECT COUNT(DISTINCT deduction_id) FROM evidence_documents
+    """).fetchone()[0]
+    total_deductions = cur.execute("SELECT COUNT(*) FROM deductions").fetchone()[0]
+    if deductions_with_docs == total_deductions:
+        rep.passed(f"All {total_deductions:,} deductions have evidence_documents records")
+    elif deductions_with_docs >= total_deductions * 0.95:
+        rep.warn(f"{deductions_with_docs:,}/{total_deductions:,} deductions have evidence_documents")
+    else:
+        rep.fail(f"Only {deductions_with_docs:,}/{total_deductions:,} deductions have evidence_documents")
+
+    status_dist = dict(cur.execute("""
+        SELECT status, COUNT(*) FROM evidence_documents GROUP BY status
+    """).fetchall())
+    total_docs = sum(status_dist.values())
+    never_captured_pct = status_dist.get("never_captured", 0) / total_docs if total_docs else 0
+    if 0.20 <= never_captured_pct <= 0.60:
+        rep.passed(f"never_captured = {never_captured_pct:.1%} (Cinderhaven evidence gaps are visible)")
+    else:
+        rep.warn(f"never_captured = {never_captured_pct:.1%} (expected 20-60% for Cinderhaven reality)")
+
+    expired_pct = status_dist.get("expired", 0) / total_docs if total_docs else 0
+    if expired_pct >= 0.05:
+        rep.passed(f"expired = {expired_pct:.1%} (carrier portal retention limits visible)")
+    else:
+        rep.warn(f"expired = {expired_pct:.1%} (expected >=5% for carrier portal expiry)")
 
     # ===== JSON / DB row count parity =====
     print("\nJSON export parity:")

@@ -340,7 +340,7 @@ export default function DisputeBuilderView({
         </div>
         <p className="builder-empty">
           {operationalCohort.length === 0 && cohort.length > 0
-            ? "Current cohort is slotting only — negotiated costs aren't disputable, so the builder has nothing to assemble."
+            ? "Current cohort is placement fees only — negotiated costs aren't disputable, so the builder has nothing to assemble."
             : "No deductions match the current filter."}
         </p>
       </section>

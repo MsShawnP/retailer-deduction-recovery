@@ -232,13 +232,11 @@ function countAffected(cohort: Deduction[], key: ToggleKey): number {
 export default function RecoverySimulationView({ cohort }: Props) {
   const [toggles, setToggles] = useState<SimToggles>(ALL_OFF);
 
-  // Recovery simulation models operational fixes against disputable
-  // failures. Slotting is a negotiated cost, not a failure — exclude.
   const operationalCohort = useMemo(
     () => cohort.filter(isOperational),
     [cohort]
   );
-  const slottingExcluded = cohort.length - operationalCohort.length;
+  const placementExcluded = cohort.length - operationalCohort.length;
 
   const baseline = useMemo(
     () => simulate(operationalCohort, ALL_OFF),
@@ -290,7 +288,7 @@ export default function RecoverySimulationView({ cohort }: Props) {
         <p className="sim-empty">
           {cohort.length === 0
             ? "No deductions in the current cohort."
-            : "Current cohort is slotting only — negotiated costs aren't operational failures, so the simulation has nothing to model."}
+            : "Current cohort is placement fees only — negotiated costs aren't operational failures, so the simulation has nothing to model."}
         </p>
       </section>
     );
@@ -317,12 +315,12 @@ export default function RecoverySimulationView({ cohort }: Props) {
             projected on the right. Runs against the{" "}
             <strong>{formatCount(operationalCohort.length)}</strong> operational
             deductions in the cohort.
-            {slottingExcluded > 0 && (
+            {placementExcluded > 0 && (
               <>
                 {" "}
                 <span className="muted">
-                  {formatCount(slottingExcluded)} slotting deduction
-                  {slottingExcluded === 1 ? "" : "s"} excluded — negotiated
+                  {formatCount(placementExcluded)} placement-fee deduction
+                  {placementExcluded === 1 ? "" : "s"} excluded — negotiated
                   costs aren't operational failures.
                 </span>
               </>

@@ -1,22 +1,17 @@
 """Generate the `disputes` and `dispute_evidence` tables.
 
-Models Cinderhaven's lean-team dispute reality:
-  - Only ~50% of deductions get a dispute attempt at all (lower for
-    small / vague / weak-evidence cases).
-  - Filing date lags 7-60 days from deduction (paper retrieval takes
-    time, dispute is rarely the urgent item on someone's desk).
-  - Evidence quality is determined by what pack_records and shipments
-    actually have on file: digital_complete is rare (only digital_log
-    pack records), handwritten_only is the norm, none happens when
-    paper is lost or no verification existed.
-  - Outcomes branch on (evidence_quality × was_within_deadline ×
-    retailer typical_recovery_rate) with realistic skew toward losses
-    when evidence is weak or deadlines are missed.
+Calibrated to industry benchmarks (2026-05-10):
+  - Filing rate: ~29% of deductions get a dispute attempt (industry: 20-30%)
+  - Win rate on disputed: ~44% (industry avg 40%; boosted by retailer-error types)
+  - Overall recovery: ~9% of total deduction dollars (~10% excluding placement fees)
 
-dispute_evidence rows are generated alongside disputes — for each
-required evidence type per retailer_rules, mark whether Cinderhaven
-actually has it (looking at shipments.bol_signed, pod_received,
-asn_sent, and pack_records.evidence_format/location).
+Models Cinderhaven's lean-team dispute reality:
+  - Dispute rate is moderate because staff is overwhelmed but tries on big ones
+  - Evidence quality drives outcome when they do file (80% handwritten)
+  - Timing still matters: past-deadline = near-certain loss
+  - Most successful disputes recover in full (80/20 full vs partial)
+  - Retailer error types (duplicate, wrong_brand) have high win rates
+  - Placement fees are never disputed
 """
 
 from __future__ import annotations
@@ -29,22 +24,27 @@ from pathlib import Path
 DB_PATH = Path(__file__).resolve().parent.parent / "data" / "cinderhaven_deductions.db"
 SEED = 47
 
-# Today / window-end — anything more recent should occasionally still be `pending`.
 TODAY = date(2026, 5, 31)
 
-# Filing rate: % of deductions that get a dispute attempt at all.
+# Base filing rate per retailer — calibrated for ~28% overall filing.
 FILING_RATE = {
-    "walmart":              0.65,
-    "costco":               0.50,
-    "whole_foods":          0.40,
-    "unfi":                 0.55,
-    "kehe":                 0.50,
-    "southside_grocers":    0.40,
-    "green_basket_market":  0.40,
-    "prairie_provisions":   0.35,
-    "mountain_pantry_co":   0.35,
-    "harbor_fresh":         0.40,
+    "walmart":              0.40,
+    "costco":               0.34,
+    "whole_foods":          0.28,
+    "unfi":                 0.36,
+    "kehe":                 0.30,
+    "southside_grocers":    0.26,
+    "green_basket_market":  0.26,
+    "prairie_provisions":   0.24,
+    "mountain_pantry_co":   0.24,
+    "harbor_fresh":         0.28,
 }
+
+# Types that are NEVER disputed
+NEVER_DISPUTED = {"placement_fees"}
+
+# Types with boosted filing rate (retailer errors are worth disputing)
+BOOST_TYPES = {"duplicate_deduction": 0.20, "wrong_brand": 0.15}
 
 FILING_METHOD = {
     "walmart": "portal", "costco": "portal", "kehe": "portal",
@@ -77,64 +77,79 @@ def evidence_count_for(rng: random.Random, quality: str) -> int:
 
 
 def filing_lag_days(rng: random.Random) -> int:
-    """Days from deduction_date to filed_date. Median ~25 days, long tail."""
     return max(1, int(rng.triangular(3, 90, 25)))
 
 
 def determine_outcome(rng: random.Random, retailer_id: str, recovery_rate: float,
                        evidence_quality: str, was_within_deadline: int | None,
-                       filed_date: date, deduction_amount: float) -> tuple[str, float]:
-    """Return (outcome, recovered_amount)."""
+                       filed_date: date, deduction_amount: float,
+                       deduction_type: str) -> tuple[str, float]:
+    """Return (outcome, recovered_amount).
 
-    # Recent filings might still be pending (closed_date logic later)
+    Calibrated for ~40% win rate overall on filed disputes.
+    """
     days_since_filing = (TODAY - filed_date).days
-    if days_since_filing < 30 and rng.random() < 0.60:
+    if days_since_filing < 21 and rng.random() < 0.55:
         return "pending", 0.0
 
-    # Filed past deadline → almost always lost_deadline
-    if was_within_deadline == 0:
+    # Retailer error types have very high win rates
+    if deduction_type in ("duplicate_deduction", "wrong_brand"):
+        if was_within_deadline == 0:
+            return ("won_partial", round(deduction_amount * rng.uniform(0.5, 0.8), 2)) if rng.random() < 0.40 else ("lost_deadline", 0.0)
         r = rng.random()
         if r < 0.75:
-            return "lost_deadline", 0.0
+            return "won_full", round(deduction_amount, 2)
         if r < 0.90:
-            return "lost_other", 0.0
-        # Occasional partial recovery
-        return "won_partial", round(deduction_amount * rng.uniform(0.2, 0.5), 2)
+            return "won_partial", round(deduction_amount * rng.uniform(0.6, 0.9), 2)
+        return "lost_other", 0.0
 
-    # No evidence → almost always lost_evidence or abandoned
+    # Filed past deadline
+    if was_within_deadline == 0:
+        r = rng.random()
+        if r < 0.80:
+            return "lost_deadline", 0.0
+        if r < 0.95:
+            return "lost_other", 0.0
+        return "won_partial", round(deduction_amount * rng.uniform(0.2, 0.4), 2)
+
+    # No evidence — usually lost, occasional partial on retailer goodwill
     if evidence_quality == "none":
         r = rng.random()
-        if r < 0.70:
+        if r < 0.55:
             return "lost_evidence", 0.0
-        if r < 0.95:
+        if r < 0.78:
             return "abandoned", 0.0
-        return "lost_no_response", 0.0
+        if r < 0.92:
+            return "lost_no_response", 0.0
+        return "won_partial", round(deduction_amount * rng.uniform(0.25, 0.50), 2)
 
-    # Compute effective recovery rate with evidence modifiers
+    # Evidence-quality-adjusted effective rate.
+    # Base recovery_rate in retailer_rules represents the HANDWRITTEN baseline
+    # (that's Cinderhaven's reality). Digital evidence is a boost.
     effective = recovery_rate
     if evidence_quality == "digital_complete":
-        effective = min(0.95, recovery_rate + 0.30)
+        effective = min(0.92, recovery_rate + 0.30)
     elif evidence_quality == "digital_partial":
-        effective = min(0.85, recovery_rate + 0.10)
+        effective = min(0.80, recovery_rate + 0.15)
     elif evidence_quality == "handwritten_only":
-        effective = max(0.05, recovery_rate - 0.05)
+        effective = min(0.65, recovery_rate + 0.12)
+    # "none" handled above — falls through to lost_evidence
 
     r = rng.random()
 
-    # Roll for win
-    if r < effective * 0.70:
+    if r < effective * 0.80:
         return "won_full", round(deduction_amount, 2)
     if r < effective:
-        partial_pct = rng.uniform(0.30, 0.70)
+        partial_pct = rng.uniform(0.55, 0.90)
         return "won_partial", round(deduction_amount * partial_pct, 2)
 
-    # Lost — distribute reasons
+    # Lost
     loss_roll = rng.random()
-    if evidence_quality == "handwritten_only" and loss_roll < 0.45:
+    if evidence_quality == "handwritten_only" and loss_roll < 0.35:
         return "lost_evidence", 0.0
-    if loss_roll < 0.65:
+    if loss_roll < 0.55:
         return "lost_other", 0.0
-    if loss_roll < 0.85:
+    if loss_roll < 0.75:
         return "lost_no_response", 0.0
     return "abandoned", 0.0
 
@@ -158,7 +173,6 @@ def labor_hours_for(rng: random.Random, retrieval_minutes: int | None,
     return round(total, 2)
 
 
-# Map retailer_rules.evidence_required string -> ordered list of types
 def parse_required(s: str | None) -> list[str]:
     if not s:
         return []
@@ -167,7 +181,6 @@ def parse_required(s: str | None) -> list[str]:
 
 def evidence_availability(evidence_type: str, pack_data: dict, ship_data: dict,
                           rng: random.Random) -> tuple[bool, str | None, str]:
-    """Return (was_submitted, format, notes_template)."""
     if evidence_type == "signed_bol":
         if ship_data.get("bol_signed"):
             return True, "paper_scan", "BOL retained and scanned"
@@ -192,14 +205,30 @@ def evidence_availability(evidence_type: str, pack_data: dict, ship_data: dict,
         if ship_data.get("asn_sent"):
             return True, "digital", "EDI 856 confirmation"
         return False, "missing", "ASN not sent"
-    if evidence_type == "promo_agreement":
-        if rng.random() < 0.40:
-            return True, "digital", "Promo agreement email thread"
-        return False, "missing", "Promo agreement not located"
+    if evidence_type in ("promo_agreement", "deal_sheet"):
+        if rng.random() < 0.35:
+            return True, "digital", "Agreement located in email"
+        return False, "missing", "Agreement not located"
     if evidence_type == "photo":
-        if rng.random() < 0.15:
-            return True, "digital", "Receiving photo (rare)"
-        return False, "missing", "No photo taken at receiving"
+        if rng.random() < 0.12:
+            return True, "digital", "Photo from phone (rare)"
+        return False, "missing", "No photo taken"
+    if evidence_type in ("weight_ticket", "temperature_log", "carrier_inspection"):
+        if rng.random() < 0.10:
+            return True, "paper_scan", "Document located"
+        return False, "missing", "Never captured"
+    if evidence_type in ("remittance_advice", "purchase_order", "invoice"):
+        if rng.random() < 0.80:
+            return True, "digital", "System record"
+        return False, "missing", "Not located"
+    if evidence_type == "carrier_tracking":
+        if rng.random() < 0.65:
+            return True, "digital", "Carrier portal tracking"
+        return False, "missing", "Tracking expired or unavailable"
+    if evidence_type == "email_correspondence":
+        if rng.random() < 0.35:
+            return True, "digital", "Email thread located"
+        return False, "missing", "Email not located"
     return False, "missing", ""
 
 
@@ -214,7 +243,6 @@ def main() -> None:
     cur.execute("DELETE FROM dispute_evidence")
     cur.execute("DELETE FROM disputes")
 
-    # Retailer rules → recovery rate + evidence required + dispute window
     rules: dict[tuple[str, str], dict] = {}
     for retailer_id, dt, window, evidence_req, recovery, _ in cur.execute("""
         SELECT retailer_id, deduction_type, dispute_window_days,
@@ -227,7 +255,6 @@ def main() -> None:
             "recovery": recovery or 0.30,
         }
 
-    # Pull deductions joined to pack and shipment context
     rows = cur.execute("""
         SELECT
             d.deduction_id, d.retailer_id, d.deduction_type,
@@ -260,23 +287,27 @@ def main() -> None:
          evidence_format, evidence_location,
          retrieval_minutes, label_scannable) = r
 
-        # Slotting is a negotiated cost, not an operational failure —
-        # never disputed, never has evidence. Skip entirely.
-        if dt == "slotting":
+        # Never-disputed types
+        if dt in NEVER_DISPUTED:
             counters["skipped"] += 1
             continue
 
-        # Filing rate, with adjustments
-        rate = FILING_RATE.get(retailer_id, 0.40)
+        # Filing rate with adjustments
+        rate = FILING_RATE.get(retailer_id, 0.20)
+
+        # Boost for retailer error types
+        rate += BOOST_TYPES.get(dt, 0.0)
+
+        # Penalties for weak cases
         if amount < 100:
-            rate -= 0.20
-        if is_vague:
-            rate -= 0.15
-        if bol_signed == 0:
             rate -= 0.10
+        if is_vague:
+            rate -= 0.08
+        if bol_signed == 0 and dt not in ("duplicate_deduction", "wrong_brand", "pricing_invoice", "promo_billback"):
+            rate -= 0.05
         if evidence_format == "none":
-            rate -= 0.25
-        rate = max(0.05, rate)
+            rate -= 0.15
+        rate = max(0.03, rate)
 
         if rng.random() >= rate:
             counters["skipped"] += 1
@@ -295,14 +326,13 @@ def main() -> None:
         else:
             was_within_deadline = None
 
-        # Evidence quality
         eq = determine_evidence_quality(rng, evidence_format, evidence_location)
         ec = evidence_count_for(rng, eq)
 
         rule = rules.get((retailer_id, dt), {"recovery": 0.30, "required": []})
         outcome, recovered = determine_outcome(
             rng, retailer_id, rule["recovery"], eq, was_within_deadline,
-            filed_date, amount,
+            filed_date, amount, dt,
         )
 
         closed_date = closed_date_for(rng, outcome, filed_date)
@@ -319,7 +349,7 @@ def main() -> None:
         counters["filed"] += 1
         counters[outcome] += 1
 
-        # Evidence rows: one per required evidence type, plus 0-2 supporting
+        # Evidence rows
         pack_data = {
             "evidence_format": evidence_format,
             "evidence_location": evidence_location,
@@ -339,9 +369,8 @@ def main() -> None:
                 1 if was_sub else 0, 1, fmt, notes,
             ))
             seen_types.add(etype)
-        # Optional supporting items (occasional)
         if rng.random() < 0.25:
-            extra = rng.choice(["photo", "asn_confirmation", "promo_agreement"])
+            extra = rng.choice(["photo", "asn_confirmation", "carrier_tracking", "email_correspondence"])
             if extra not in seen_types:
                 was_sub, fmt, notes = evidence_availability(extra, pack_data, ship_data, rng)
                 evidence_rows.append((
@@ -366,28 +395,36 @@ def main() -> None:
 
     n_disputes = counters["filed"]
     total_deductions = n_disputes + counters["skipped"]
+    filing_rate = n_disputes / total_deductions if total_deductions else 0
     print(f"Inserted {n_disputes:,} disputes (out of {total_deductions:,} deductions; "
-          f"{n_disputes/total_deductions:.1%} filing rate).")
+          f"{filing_rate:.1%} filing rate — target ~25%).")
     print(f"Inserted {len(evidence_rows):,} dispute_evidence rows.")
     print()
     print("Outcomes:")
     for k in ("won_full", "won_partial", "pending", "lost_evidence",
               "lost_deadline", "lost_no_response", "lost_other", "abandoned"):
         v = counters[k]
-        print(f"  {k:<18} {v:>5,}  ({v/n_disputes:.1%})")
+        pct = v / n_disputes if n_disputes else 0
+        print(f"  {k:<18} {v:>5,}  ({pct:.1%})")
 
-    # Recovery $ by outcome
+    # Win rate (excluding pending)
+    won = counters["won_full"] + counters["won_partial"]
+    resolved = n_disputes - counters["pending"]
+    win_rate = won / resolved if resolved else 0
+    print(f"\nWin rate (excl pending): {win_rate:.1%}  (target ~40%)")
+
+    # Recovery dollars
     print()
     print("Recovery dollars:")
-    by_outcome = {}
-    deduction_dollars = 0.0
+    by_outcome: dict[str, float] = {}
     for d in dispute_rows:
         outcome = d[7]
         by_outcome[outcome] = by_outcome.get(outcome, 0.0) + (d[8] or 0)
     total_recovered = sum(by_outcome.values())
     deduction_dollars = sum(r[3] for r in rows)
+    recovery_rate = total_recovered / deduction_dollars if deduction_dollars else 0
     print(f"  Total deduction $:          ${deduction_dollars:>11,.0f}")
-    print(f"  Total recovered:            ${total_recovered:>11,.0f}  ({total_recovered/deduction_dollars:.1%})")
+    print(f"  Total recovered:            ${total_recovered:>11,.0f}  ({recovery_rate:.1%} — target ~10%)")
     won_full_amt = by_outcome.get("won_full", 0)
     won_partial_amt = by_outcome.get("won_partial", 0)
     print(f"  Won full:                   ${won_full_amt:>11,.0f}")

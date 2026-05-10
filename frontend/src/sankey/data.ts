@@ -14,12 +14,11 @@
 // path through all six layers, so total value flowing OUT of the type
 // layer equals total deductions value.
 //
-// Slotting is the exception: it's a negotiated cost (new-item / planogram
-// / shelf-placement fees), not an operational failure. It enters at
-// layer 0 like every other type but routes directly to a single terminal
-// node at layer 5 ("Not disputable — negotiated cost") — bypassing the
-// failure pipeline entirely. The visual: a single long band crosses the
-// chart, making the categorical difference legible at a glance.
+// Placement_fees is the exception: it's a negotiated cost (new-item /
+// planogram / shelf-placement fees), not an operational failure. It enters
+// at layer 0 like every other type but routes directly to a single
+// terminal node at layer 5 ("Not disputable — negotiated cost") —
+// bypassing the failure pipeline entirely.
 
 import type { Deduction } from "../types";
 
@@ -49,13 +48,20 @@ export const TYPE_LABELS: Record<string, string> = {
   late_delivery: "Late delivery",
   promo_billback: "Promo billback",
   vague: "Vague",
-  spoilage: "Spoilage",
-  slotting: "Slotting",
+  early_delivery: "Early delivery",
+  freight_routing: "Freight routing",
+  warehouse_spoils: "Warehouse spoils",
+  store_spoils: "Store spoils",
+  pricing_invoice: "Pricing/invoice",
+  returns_unsaleables: "Returns/unsaleables",
+  duplicate_deduction: "Duplicate deduction",
+  wrong_brand: "Wrong brand",
+  placement_fees: "Placement fees",
 };
 
 // Display order for the type dropdown — by descending volume in the
-// dataset so the most common types appear first. Slotting last because
-// it's categorically different (negotiated, non-disputable).
+// dataset so the most common types appear first. Placement fees last
+// because it's categorically different (negotiated, non-disputable).
 export const TYPE_OPTIONS: string[] = [
   "Short ship",
   "Label fine",
@@ -63,13 +69,20 @@ export const TYPE_OPTIONS: string[] = [
   "Promo billback",
   "Damaged",
   "Pallet fine",
-  "Spoilage",
+  "Freight routing",
+  "Warehouse spoils",
+  "Store spoils",
+  "Pricing/invoice",
+  "Returns/unsaleables",
+  "Early delivery",
+  "Duplicate deduction",
+  "Wrong brand",
   "Vague",
-  "Slotting",
+  "Placement fees",
 ];
 
-// Operational types: the eight that flow through the failure pipeline.
-// Slotting is excluded — it's a negotiated cost, not an operational
+// Operational types: the fifteen that flow through the failure pipeline.
+// Placement_fees is excluded — it's a negotiated cost, not an operational
 // failure, so views like recovery simulation, cost-to-dispute, dispute
 // builder, timeline pressure, post-audit risk, and origin clustering
 // scope to operational types only.
@@ -81,18 +94,24 @@ export const OPERATIONAL_TYPES: ReadonlySet<string> = new Set([
   "late_delivery",
   "promo_billback",
   "vague",
-  "spoilage",
+  "early_delivery",
+  "freight_routing",
+  "warehouse_spoils",
+  "store_spoils",
+  "pricing_invoice",
+  "returns_unsaleables",
+  "duplicate_deduction",
+  "wrong_brand",
 ]);
 
 export function isOperational(d: Deduction): boolean {
   return OPERATIONAL_TYPES.has(d.deduction_type);
 }
 
-// Terminal node for slotting deductions in the Sankey. Stored at layer 5
-// (the outcome column) so it renders alongside the win/loss outcomes; the
-// label and color make the categorical difference clear.
-export const SLOTTING_TERMINAL_LABEL = "Not disputable — negotiated cost";
-export const SLOTTING_TERMINAL_NODE_ID = `5:${SLOTTING_TERMINAL_LABEL}`;
+// Terminal node for placement_fees in the Sankey. Stored at layer 5
+// (the outcome column) so it renders alongside the win/loss outcomes.
+export const PLACEMENT_TERMINAL_LABEL = "Not disputable — negotiated cost";
+export const PLACEMENT_TERMINAL_NODE_ID = `5:${PLACEMENT_TERMINAL_LABEL}`;
 
 const OUTCOME_LABELS: Record<string, string> = {
   won_full: "Won full",
@@ -135,19 +154,17 @@ export function rootCauseFor(d: Deduction): string {
   if (d.deduction_type === "pallet_fine") return "Pallet noncompliance";
   if (d.deduction_type === "damaged") return "Damage at receiving";
   if (d.deduction_type === "late_delivery") return "Delivery missed window";
+  if (d.deduction_type === "early_delivery") return "Delivery before window";
   if (d.deduction_type === "promo_billback") return "Promo program";
   if (d.deduction_type === "vague") return "Opaque remittance";
-  if (d.deduction_type === "spoilage") {
-    // Sub-cause is encoded in the remittance_description keyword.
-    const desc = (d.remittance_description ?? "").toLowerCase();
-    if (desc.includes("temperature")) return "Temperature abuse in transit";
-    if (desc.includes("expired") || desc.includes("short-dated"))
-      return "Expired / short-dated at receiving";
-    if (desc.includes("quality")) return "Quality complaint at receiving";
-    if (desc.includes("damage in transit")) return "Damage in transit";
-    return "Other spoilage";
-  }
-  if (d.deduction_type === "slotting") return SLOTTING_TERMINAL_LABEL;
+  if (d.deduction_type === "freight_routing") return "Routing noncompliance";
+  if (d.deduction_type === "warehouse_spoils") return "Warehouse spoilage";
+  if (d.deduction_type === "store_spoils") return "Store-level spoilage";
+  if (d.deduction_type === "pricing_invoice") return "Pricing discrepancy";
+  if (d.deduction_type === "returns_unsaleables") return "Returns/unsaleables";
+  if (d.deduction_type === "duplicate_deduction") return "Retailer error";
+  if (d.deduction_type === "wrong_brand") return "Retailer error";
+  if (d.deduction_type === "placement_fees") return PLACEMENT_TERMINAL_LABEL;
   return "Other";
 }
 
@@ -194,11 +211,8 @@ export function buildSankeyData(deductions: Deduction[]): SankeyData {
     if (d.amount <= 0) continue;
     const t  = TYPE_LABELS[d.deduction_type] || d.deduction_type;
 
-    if (d.deduction_type === "slotting") {
-      // Slotting branches off immediately to its terminal node and
-      // skips the failure-pipeline columns. d3-sankey will draw a single
-      // band crossing the chart from layer 0 (type) to layer 5 (terminal).
-      addEdge(0, t, 5, SLOTTING_TERMINAL_LABEL, d.amount);
+    if (d.deduction_type === "placement_fees") {
+      addEdge(0, t, 5, PLACEMENT_TERMINAL_LABEL, d.amount);
       continue;
     }
 
@@ -245,9 +259,8 @@ export const LAYER_TITLES = [
 
 export function pathIds(d: Deduction): string[] {
   const t  = TYPE_LABELS[d.deduction_type] || d.deduction_type;
-  if (d.deduction_type === "slotting") {
-    // Slotting bypasses layers 1–4; its only edge is type → terminal.
-    return [`0:${t}`, SLOTTING_TERMINAL_NODE_ID];
+  if (d.deduction_type === "placement_fees") {
+    return [`0:${t}`, PLACEMENT_TERMINAL_NODE_ID];
   }
   const rc = rootCauseFor(d);
   const eq = evidenceQualityFor(d);
@@ -321,9 +334,8 @@ export function isOnSelectedPath(d: Deduction, sel: Selection | null): boolean {
     return clusterValueFor(d, sel.dimension) === sel.value;
   const ids = pathIds(d);
   if (sel.kind === "node") return ids.includes(sel.nodeId);
-  // Link selection: source/target are explicit IDs (e.g., "0:Slotting" →
-  // "5:Not disputable — negotiated cost"). Match against the deduction's
-  // path edges directly so the slotting shortcut works.
+  // Link selection: source/target are explicit IDs. Match against the
+  // deduction's path edges directly so the placement_fees shortcut works.
   for (let i = 0; i < ids.length - 1; i++) {
     if (ids[i] === sel.source && ids[i + 1] === sel.target) return true;
   }
@@ -371,22 +383,15 @@ export function selectionLabel(sel: Selection | null, retailerName?: string): st
   return `${srcRest.join(":")} → ${tgtRest.join(":")}`;
 }
 
-// Outcomes split into three categorical buckets:
-//   - Wins  — green (#0A7B3E)
-//   - Pending — neutral gray
-//   - Lost / abandoned / never_filed — Economist red
-//   - Not disputable (slotting) — muted gold; categorically not a loss
-// Within-bucket detail comes from the node label, not the color.
-// Wins use one shade so won_full and won_partial both read as "won".
 export const OUTCOME_COLORS: Record<string, string> = {
-  "Won full":           "#0A7B3E",  // green
-  "Won partial":        "#0A7B3E",  // green (same — winning is winning)
-  Pending:              "#8B95A1",  // neutral gray
-  Abandoned:            "#E3120B",  // red — gave up = loss
+  "Won full":           "#0A7B3E",
+  "Won partial":        "#0A7B3E",
+  Pending:              "#8B95A1",
+  Abandoned:            "#E3120B",
   "Lost — evidence":    "#E3120B",
   "Lost — deadline":    "#E3120B",
   "Lost — no response": "#E3120B",
   "Lost — other":       "#E3120B",
   "Never filed":        "#E3120B",
-  [SLOTTING_TERMINAL_LABEL]: "#9E7E3A",  // muted gold — negotiated, not a loss
+  [PLACEMENT_TERMINAL_LABEL]: "#9E7E3A",
 };

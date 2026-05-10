@@ -125,9 +125,8 @@ export default function OriginClusteringView({
     ORIGIN_DIMENSIONS[0].id
   );
 
-  // Operational origins only — slotting deductions have no shipment,
-  // pack, or carrier and would all collapse to "(no shipment)" /
-  // "(no pack record)" buckets, polluting the concentration scores.
+  // Operational origins only — placement_fees have no shipment, pack,
+  // or carrier and would collapse to "(no …)" buckets.
   const operationalCohort = useMemo(
     () => cohort.filter(isOperational),
     [cohort]
@@ -174,7 +173,7 @@ export default function OriginClusteringView({
         <p className="origin-empty">
           {cohort.length === 0
             ? "No deductions in the current cohort."
-            : "Current cohort is slotting only — negotiated costs have no operational origin (no shipment, no pack, no carrier)."}
+            : "Current cohort is placement fees only — negotiated costs have no operational origin (no shipment, no pack, no carrier)."}
         </p>
       </section>
     );

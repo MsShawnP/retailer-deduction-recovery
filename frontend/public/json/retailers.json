@@ -5,6 +5,7 @@
     "dispute_portal_name": "Costco Vendor Portal",
     "dispute_portal_url": "https://fssts.costco.com/",
     "dispute_method": "portal",
+    "deduction_aggressiveness": 0.65,
     "notes": "Lower-tech than Walmart; depot cross-dock model",
     "rules": {
       "short_ship": {
@@ -58,7 +59,8 @@
         "dispute_window_days": null,
         "auto_deduct": false,
         "evidence_required": [
-          "promo_agreement"
+          "promo_agreement",
+          "deal_sheet"
         ],
         "typical_recovery_rate": 0.4,
         "notes": "Inferred"
@@ -72,22 +74,90 @@
         "typical_recovery_rate": 0.1,
         "notes": "Inferred"
       },
-      "spoilage": {
+      "early_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pod",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Cross-dock timing strict; early = storage fee"
+      },
+      "freight_routing": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Routing guide noncompliance"
+      },
+      "warehouse_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Short shelf-life at depot; cross-dock model"
+      },
+      "store_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol"
+        ],
+        "typical_recovery_rate": 0.2,
+        "notes": "Velocity mismatch; wrong club stores"
+      },
+      "pricing_invoice": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "purchase_order",
+          "invoice"
+        ],
+        "typical_recovery_rate": 0.5,
+        "notes": "Cost file mismatch"
+      },
+      "returns_unsaleables": {
         "dispute_window_days": null,
         "auto_deduct": true,
         "evidence_required": [
           "signed_bol",
           "photo"
         ],
-        "typical_recovery_rate": 0.45,
-        "notes": "Cross-dock receiving rejects on cold-chain/quality at depot; window inferred"
+        "typical_recovery_rate": 0.3,
+        "notes": "Quality claims; packaging defects"
       },
-      "slotting": {
+      "duplicate_deduction": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "remittance_advice"
+        ],
+        "typical_recovery_rate": 0.8,
+        "notes": "Same deduction taken twice"
+      },
+      "wrong_brand": {
+        "dispute_window_days": null,
+        "auto_deduct": true,
+        "evidence_required": [
+          "remittance_advice",
+          "purchase_order"
+        ],
+        "typical_recovery_rate": 0.85,
+        "notes": "Retailer-side error"
+      },
+      "placement_fees": {
         "dispute_window_days": null,
         "auto_deduct": true,
         "evidence_required": [],
-        "typical_recovery_rate": 0.0,
-        "notes": "Pay-to-play club placement and demo costs; non-disputable"
+        "typical_recovery_rate": 0.05,
+        "notes": "Pay-to-play club placement; largely non-disputable"
       }
     },
     "codes": [
@@ -96,6 +166,27 @@
         "code": "DMG",
         "name": "Damaged at receiving",
         "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_duplicate",
+        "code": "DUP",
+        "name": "Duplicate deduction",
+        "deduction_type": "duplicate_deduction",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_early",
+        "code": "EARLY",
+        "name": "Early delivery / storage fee",
+        "deduction_type": "early_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_freight",
+        "code": "FRT",
+        "name": "Freight routing noncompliance",
+        "deduction_type": "freight_routing",
         "is_published": false
       },
       {
@@ -127,10 +218,24 @@
         "is_published": false
       },
       {
+        "code_id": "costco_pricing",
+        "code": "PRC",
+        "name": "Pricing / invoice error",
+        "deduction_type": "pricing_invoice",
+        "is_published": false
+      },
+      {
         "code_id": "costco_promo_billback",
         "code": "PROMO",
         "name": "Promotional allowance",
         "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_returns",
+        "code": "RET",
+        "name": "Returns / unsaleables",
+        "deduction_type": "returns_unsaleables",
         "is_published": false
       },
       {
@@ -141,17 +246,31 @@
         "is_published": false
       },
       {
-        "code_id": "costco_slotting",
+        "code_id": "costco_placement",
         "code": "SLOT",
-        "name": "Slotting / pay-to-play club placement",
-        "deduction_type": "slotting",
+        "name": "Slotting / placement fee",
+        "deduction_type": "placement_fees",
         "is_published": false
       },
       {
-        "code_id": "costco_spoilage",
-        "code": "SPL",
-        "name": "Spoilage / cold-chain rejection",
-        "deduction_type": "spoilage",
+        "code_id": "costco_store_spoils",
+        "code": "SPL-S",
+        "name": "Store spoilage / expired",
+        "deduction_type": "store_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_warehouse_spoils",
+        "code": "SPL-W",
+        "name": "Warehouse spoilage",
+        "deduction_type": "warehouse_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "costco_wrong_brand",
+        "code": "WRB",
+        "name": "Wrong brand / misdirected",
+        "deduction_type": "wrong_brand",
         "is_published": false
       }
     ],
@@ -159,20 +278,20 @@
       {
         "category": "appointment",
         "requirement": "Scheduled appointment window; 30-minute grace then refusal",
-        "penalty_if_violated": "Refused delivery → reduced future allocation",
+        "penalty_if_violated": "Refused delivery -> reduced future allocation",
         "is_verified": true,
         "source_url": "https://www.chep.com/files/download/costco-delivery-driver-guidelines-kemps-creek-depot-july-21.pdf"
       },
       {
         "category": "asn",
         "requirement": "EDI 856 via SPS Commerce VAN",
-        "penalty_if_violated": "$50–$200 per incident (inferred)",
+        "penalty_if_violated": "$50-$200 per incident (inferred)",
         "is_verified": false,
         "source_url": "https://www.orderease.com/community/the-2025-guide-to-costco-edi-compliance-automation-chargeback-prevention"
       },
       {
         "category": "carton",
-        "requirement": "50 lb max if hand-lifted; 1500 lbs crush <750lb load, 2500 lbs ≥750lb load",
+        "requirement": "50 lb max if hand-lifted; 1500 lbs crush <750lb load, 2500 lbs >=750lb load",
         "penalty_if_violated": "Non-compliant packaging 2% chargeback",
         "is_verified": true,
         "source_url": "https://www.clubstorepackaging.com/post/costco-packaging-specifications-requirements"
@@ -180,7 +299,7 @@
       {
         "category": "label",
         "requirement": "GS1-128/SSCC, on two adjacent sides; vendor#, PO, item, qty, weight, destination",
-        "penalty_if_violated": "$50–$150/carton (inferred)",
+        "penalty_if_violated": "$50-$150/carton (inferred)",
         "is_verified": false,
         "source_url": "https://www.orderease.com/community/the-2025-guide-to-costco-edi-compliance-automation-chargeback-prevention"
       },
@@ -199,6 +318,7 @@
     "dispute_portal_name": null,
     "dispute_portal_url": null,
     "dispute_method": null,
+    "deduction_aggressiveness": 0.0,
     "notes": "Direct-to-consumer; no deduction model",
     "rules": {},
     "codes": [],
@@ -210,6 +330,7 @@
     "dispute_portal_name": "AP email",
     "dispute_portal_url": null,
     "dispute_method": "email_buyer",
+    "deduction_aggressiveness": 0.55,
     "notes": "Sprouts-archetype: natural/reset-driven; many deductions arrive via UNFI/KeHE statements",
     "rules": {
       "short_ship": {
@@ -277,22 +398,90 @@
         "typical_recovery_rate": 0.1,
         "notes": "Inferred"
       },
-      "spoilage": {
+      "early_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Reset-timing sensitive"
+      },
+      "freight_routing": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Inferred"
+      },
+      "warehouse_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Natural products; shorter shelf life"
+      },
+      "store_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Velocity mismatch at store"
+      },
+      "pricing_invoice": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "purchase_order",
+          "invoice"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Cost file mismatch"
+      },
+      "returns_unsaleables": {
         "dispute_window_days": null,
         "auto_deduct": false,
         "evidence_required": [
           "signed_bol",
           "photo"
         ],
-        "typical_recovery_rate": 0.45,
-        "notes": "Receiving teams reject perceived quality issues quickly"
+        "typical_recovery_rate": 0.3,
+        "notes": "Quality claims"
       },
-      "slotting": {
+      "duplicate_deduction": {
         "dispute_window_days": null,
-        "auto_deduct": true,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice"
+        ],
+        "typical_recovery_rate": 0.8,
+        "notes": "Distributor pass-through doubles"
+      },
+      "wrong_brand": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice",
+          "purchase_order"
+        ],
+        "typical_recovery_rate": 0.85,
+        "notes": "Retailer-side error"
+      },
+      "placement_fees": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
         "evidence_required": [],
-        "typical_recovery_rate": 0.0,
-        "notes": "Reset / new-item placement billbacks; non-disputable"
+        "typical_recovery_rate": 0.05,
+        "notes": "Reset / new-item placement; non-disputable"
       }
     },
     "codes": [
@@ -304,17 +493,38 @@
         "is_published": false
       },
       {
+        "code_id": "green_basket_market_duplicate",
+        "code": "DUP",
+        "name": "Duplicate",
+        "deduction_type": "duplicate_deduction",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_early",
+        "code": "EARLY",
+        "name": "Early delivery",
+        "deduction_type": "early_delivery",
+        "is_published": false
+      },
+      {
         "code_id": "green_basket_market_fairshare",
         "code": "FAIR",
-        "name": "Fair Share reset billback",
+        "name": "Fair Share billback",
         "deduction_type": "promo_billback",
         "is_published": false
       },
       {
         "code_id": "green_basket_market_freefill",
         "code": "FFL",
-        "name": "Free Fill new-item billback",
+        "name": "Free Fill billback",
         "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_freight",
+        "code": "FRT",
+        "name": "Freight",
+        "deduction_type": "freight_routing",
         "is_published": false
       },
       {
@@ -346,6 +556,20 @@
         "is_published": false
       },
       {
+        "code_id": "green_basket_market_pricing",
+        "code": "PRC",
+        "name": "Pricing error",
+        "deduction_type": "pricing_invoice",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_returns",
+        "code": "RET",
+        "name": "Returns",
+        "deduction_type": "returns_unsaleables",
+        "is_published": false
+      },
+      {
         "code_id": "green_basket_market_short_ship",
         "code": "SHRT",
         "name": "Shortage",
@@ -353,17 +577,31 @@
         "is_published": false
       },
       {
-        "code_id": "green_basket_market_slotting",
+        "code_id": "green_basket_market_placement",
         "code": "SLOT",
-        "name": "Reset / new-item placement billback",
-        "deduction_type": "slotting",
+        "name": "Placement fee",
+        "deduction_type": "placement_fees",
         "is_published": false
       },
       {
-        "code_id": "green_basket_market_spoilage",
-        "code": "SPL",
-        "name": "Spoilage / quality complaint",
-        "deduction_type": "spoilage",
+        "code_id": "green_basket_market_store_spoils",
+        "code": "SPL-S",
+        "name": "Store spoilage",
+        "deduction_type": "store_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_warehouse_spoils",
+        "code": "SPL-W",
+        "name": "Warehouse spoilage",
+        "deduction_type": "warehouse_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "green_basket_market_wrong_brand",
+        "code": "WRB",
+        "name": "Wrong brand",
+        "deduction_type": "wrong_brand",
         "is_published": false
       }
     ],
@@ -404,6 +642,7 @@
     "dispute_portal_name": "AP email",
     "dispute_portal_url": null,
     "dispute_method": "email_buyer",
+    "deduction_aggressiveness": 0.42,
     "notes": "Generic regional; slightly higher recovery — relationship-driven",
     "rules": {
       "short_ship": {
@@ -471,22 +710,90 @@
         "typical_recovery_rate": 0.15,
         "notes": "Inferred"
       },
-      "spoilage": {
+      "early_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Flexible"
+      },
+      "freight_routing": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Relationship-driven"
+      },
+      "warehouse_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Inferred"
+      },
+      "store_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Inferred"
+      },
+      "pricing_invoice": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "purchase_order",
+          "invoice"
+        ],
+        "typical_recovery_rate": 0.5,
+        "notes": "Buyer relationship helps"
+      },
+      "returns_unsaleables": {
         "dispute_window_days": null,
         "auto_deduct": false,
         "evidence_required": [
           "signed_bol",
           "photo"
         ],
-        "typical_recovery_rate": 0.45,
-        "notes": "Inferred; relationship-driven"
+        "typical_recovery_rate": 0.4,
+        "notes": "Inferred"
       },
-      "slotting": {
+      "duplicate_deduction": {
         "dispute_window_days": null,
-        "auto_deduct": true,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice"
+        ],
+        "typical_recovery_rate": 0.85,
+        "notes": "Easy win"
+      },
+      "wrong_brand": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice",
+          "purchase_order"
+        ],
+        "typical_recovery_rate": 0.9,
+        "notes": "Buyer notices quickly"
+      },
+      "placement_fees": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
         "evidence_required": [],
-        "typical_recovery_rate": 0.0,
-        "notes": "New-item placement allowance; non-disputable"
+        "typical_recovery_rate": 0.05,
+        "notes": "Non-disputable"
       }
     },
     "codes": [
@@ -495,6 +802,27 @@
         "code": "DMG",
         "name": "Damaged",
         "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_duplicate",
+        "code": "DUP",
+        "name": "Duplicate",
+        "deduction_type": "duplicate_deduction",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_early",
+        "code": "EARLY",
+        "name": "Early delivery",
+        "deduction_type": "early_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_freight",
+        "code": "FRT",
+        "name": "Freight",
+        "deduction_type": "freight_routing",
         "is_published": false
       },
       {
@@ -526,10 +854,24 @@
         "is_published": false
       },
       {
+        "code_id": "harbor_fresh_pricing",
+        "code": "PRC",
+        "name": "Pricing error",
+        "deduction_type": "pricing_invoice",
+        "is_published": false
+      },
+      {
         "code_id": "harbor_fresh_promo_billback",
         "code": "PROMO",
         "name": "Promo billback",
         "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_returns",
+        "code": "RET",
+        "name": "Returns",
+        "deduction_type": "returns_unsaleables",
         "is_published": false
       },
       {
@@ -540,17 +882,31 @@
         "is_published": false
       },
       {
-        "code_id": "harbor_fresh_slotting",
+        "code_id": "harbor_fresh_placement",
         "code": "SLOT",
-        "name": "New-item placement allowance",
-        "deduction_type": "slotting",
+        "name": "Placement fee",
+        "deduction_type": "placement_fees",
         "is_published": false
       },
       {
-        "code_id": "harbor_fresh_spoilage",
-        "code": "SPL",
-        "name": "Spoilage / quality complaint",
-        "deduction_type": "spoilage",
+        "code_id": "harbor_fresh_store_spoils",
+        "code": "SPL-S",
+        "name": "Store spoilage",
+        "deduction_type": "store_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_warehouse_spoils",
+        "code": "SPL-W",
+        "name": "Warehouse spoilage",
+        "deduction_type": "warehouse_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "harbor_fresh_wrong_brand",
+        "code": "WRB",
+        "name": "Wrong brand",
+        "deduction_type": "wrong_brand",
         "is_published": false
       }
     ],
@@ -591,7 +947,8 @@
     "dispute_portal_name": "K-Solve in KeHE CONNECT Supplier",
     "dispute_portal_url": "https://connectsupplier.kehe.com/",
     "dispute_method": "portal",
-    "notes": "180-day cap (newly strict); 48-hour UDR response window. Not in base stores; orders generated against natural-foods-compatible SKU set",
+    "deduction_aggressiveness": 0.75,
+    "notes": "180-day cap (newly strict); 48-hour UDR response window",
     "rules": {
       "short_ship": {
         "dispute_window_days": 2,
@@ -644,7 +1001,8 @@
         "dispute_window_days": 180,
         "auto_deduct": false,
         "evidence_required": [
-          "promo_agreement"
+          "promo_agreement",
+          "deal_sheet"
         ],
         "typical_recovery_rate": 0.4,
         "notes": "MCB + 8% admin fee + $65/DC minimum"
@@ -658,22 +1016,90 @@
         "typical_recovery_rate": 0.1,
         "notes": "Connect BI fee 2% of sales falls here"
       },
-      "spoilage": {
+      "early_delivery": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pod",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "K-Solve; DC timing compliance"
+      },
+      "freight_routing": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Routing noncompliance"
+      },
+      "warehouse_spoils": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Shelf-life enforcement at DC"
+      },
+      "store_spoils": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol"
+        ],
+        "typical_recovery_rate": 0.2,
+        "notes": "Velocity mismatch; retailer pass-through"
+      },
+      "pricing_invoice": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "purchase_order",
+          "invoice"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Cost file mismatch; item setup"
+      },
+      "returns_unsaleables": {
         "dispute_window_days": 180,
         "auto_deduct": true,
         "evidence_required": [
           "signed_bol",
           "photo"
         ],
-        "typical_recovery_rate": 0.4,
-        "notes": "UDR window 48hr at receipt for damage/spoilage; K-Solve 180-day cap on follow-up"
+        "typical_recovery_rate": 0.3,
+        "notes": "Quality claims; expired returns"
       },
-      "slotting": {
+      "duplicate_deduction": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "remittance_advice"
+        ],
+        "typical_recovery_rate": 0.8,
+        "notes": "Same deduction taken twice"
+      },
+      "wrong_brand": {
+        "dispute_window_days": 180,
+        "auto_deduct": true,
+        "evidence_required": [
+          "remittance_advice",
+          "purchase_order"
+        ],
+        "typical_recovery_rate": 0.85,
+        "notes": "Deduction meant for another supplier"
+      },
+      "placement_fees": {
         "dispute_window_days": null,
         "auto_deduct": true,
         "evidence_required": [],
-        "typical_recovery_rate": 0.0,
-        "notes": "New-item slotting + Connect BI placement fees; non-disputable"
+        "typical_recovery_rate": 0.05,
+        "notes": "Connect BI placement fees; non-disputable"
       }
     },
     "codes": [
@@ -685,6 +1111,13 @@
         "is_published": true
       },
       {
+        "code_id": "kehe_duplicate",
+        "code": "DUP",
+        "name": "Duplicate deduction",
+        "deduction_type": "duplicate_deduction",
+        "is_published": false
+      },
+      {
         "code_id": "kehe_ep",
         "code": "EP",
         "name": "Event Promotion fee",
@@ -692,10 +1125,17 @@
         "is_published": true
       },
       {
+        "code_id": "kehe_early",
+        "code": "ERL",
+        "name": "Early delivery",
+        "deduction_type": "early_delivery",
+        "is_published": false
+      },
+      {
         "code_id": "kehe_freight",
         "code": "FRT",
         "name": "Freight allowance",
-        "deduction_type": "vague",
+        "deduction_type": "freight_routing",
         "is_published": true
       },
       {
@@ -727,10 +1167,31 @@
         "is_published": true
       },
       {
-        "code_id": "kehe_slotting",
+        "code_id": "kehe_pricing",
+        "code": "PRC",
+        "name": "Pricing / cost file error",
+        "deduction_type": "pricing_invoice",
+        "is_published": false
+      },
+      {
+        "code_id": "kehe_returns",
+        "code": "RET",
+        "name": "Returns / quality claims",
+        "deduction_type": "returns_unsaleables",
+        "is_published": false
+      },
+      {
+        "code_id": "kehe_placement",
         "code": "SLOT",
-        "name": "Slotting / Connect BI placement",
-        "deduction_type": "slotting",
+        "name": "Placement / Connect BI",
+        "deduction_type": "placement_fees",
+        "is_published": false
+      },
+      {
+        "code_id": "kehe_store_spoils",
+        "code": "SPL-S",
+        "name": "Store spoilage pass-through",
+        "deduction_type": "store_spoils",
         "is_published": false
       },
       {
@@ -741,10 +1202,17 @@
         "is_published": true
       },
       {
-        "code_id": "kehe_spoilage",
+        "code_id": "kehe_warehouse_spoils",
         "code": "UDRS",
-        "name": "UDR — spoilage at receipt",
-        "deduction_type": "spoilage",
+        "name": "UDR — spoilage at DC",
+        "deduction_type": "warehouse_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "kehe_wrong_brand",
+        "code": "WRB",
+        "name": "Wrong brand",
+        "deduction_type": "wrong_brand",
         "is_published": false
       }
     ],
@@ -785,6 +1253,7 @@
     "dispute_portal_name": "AP email",
     "dispute_portal_url": null,
     "dispute_method": "email_buyer",
+    "deduction_aggressiveness": 0.5,
     "notes": "Generic regional; inferred norms",
     "rules": {
       "short_ship": {
@@ -852,22 +1321,90 @@
         "typical_recovery_rate": 0.1,
         "notes": "Inferred"
       },
-      "spoilage": {
+      "early_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Inferred"
+      },
+      "freight_routing": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Inferred"
+      },
+      "warehouse_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Inferred"
+      },
+      "store_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Inferred"
+      },
+      "pricing_invoice": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "purchase_order",
+          "invoice"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Inferred"
+      },
+      "returns_unsaleables": {
         "dispute_window_days": null,
         "auto_deduct": false,
         "evidence_required": [
           "signed_bol",
           "photo"
         ],
-        "typical_recovery_rate": 0.4,
-        "notes": "Inferred regional norm"
+        "typical_recovery_rate": 0.35,
+        "notes": "Inferred"
       },
-      "slotting": {
+      "duplicate_deduction": {
         "dispute_window_days": null,
-        "auto_deduct": true,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice"
+        ],
+        "typical_recovery_rate": 0.8,
+        "notes": "Inferred"
+      },
+      "wrong_brand": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice",
+          "purchase_order"
+        ],
+        "typical_recovery_rate": 0.85,
+        "notes": "Inferred"
+      },
+      "placement_fees": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
         "evidence_required": [],
-        "typical_recovery_rate": 0.0,
-        "notes": "New-item placement allowance; non-disputable"
+        "typical_recovery_rate": 0.05,
+        "notes": "Non-disputable"
       }
     },
     "codes": [
@@ -876,6 +1413,27 @@
         "code": "DMG",
         "name": "Damaged",
         "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_duplicate",
+        "code": "DUP",
+        "name": "Duplicate",
+        "deduction_type": "duplicate_deduction",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_early",
+        "code": "EARLY",
+        "name": "Early delivery",
+        "deduction_type": "early_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_freight",
+        "code": "FRT",
+        "name": "Freight",
+        "deduction_type": "freight_routing",
         "is_published": false
       },
       {
@@ -907,10 +1465,24 @@
         "is_published": false
       },
       {
+        "code_id": "mountain_pantry_co_pricing",
+        "code": "PRC",
+        "name": "Pricing error",
+        "deduction_type": "pricing_invoice",
+        "is_published": false
+      },
+      {
         "code_id": "mountain_pantry_co_promo_billback",
         "code": "PROMO",
         "name": "Promo billback",
         "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_returns",
+        "code": "RET",
+        "name": "Returns",
+        "deduction_type": "returns_unsaleables",
         "is_published": false
       },
       {
@@ -921,17 +1493,31 @@
         "is_published": false
       },
       {
-        "code_id": "mountain_pantry_co_slotting",
+        "code_id": "mountain_pantry_co_placement",
         "code": "SLOT",
-        "name": "New-item placement allowance",
-        "deduction_type": "slotting",
+        "name": "Placement fee",
+        "deduction_type": "placement_fees",
         "is_published": false
       },
       {
-        "code_id": "mountain_pantry_co_spoilage",
-        "code": "SPL",
-        "name": "Spoilage / quality complaint",
-        "deduction_type": "spoilage",
+        "code_id": "mountain_pantry_co_store_spoils",
+        "code": "SPL-S",
+        "name": "Store spoilage",
+        "deduction_type": "store_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_warehouse_spoils",
+        "code": "SPL-W",
+        "name": "Warehouse spoilage",
+        "deduction_type": "warehouse_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "mountain_pantry_co_wrong_brand",
+        "code": "WRB",
+        "name": "Wrong brand",
+        "deduction_type": "wrong_brand",
         "is_published": false
       }
     ],
@@ -972,6 +1558,7 @@
     "dispute_portal_name": "AP email",
     "dispute_portal_url": null,
     "dispute_method": "email_buyer",
+    "deduction_aggressiveness": 0.48,
     "notes": "Generic regional; inferred norms",
     "rules": {
       "short_ship": {
@@ -982,7 +1569,7 @@
           "pack_log"
         ],
         "typical_recovery_rate": 0.4,
-        "notes": "Inferred norms; no published windows"
+        "notes": "Inferred norms"
       },
       "label_fine": {
         "dispute_window_days": null,
@@ -1039,22 +1626,90 @@
         "typical_recovery_rate": 0.1,
         "notes": "Inferred"
       },
-      "spoilage": {
+      "early_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Inferred"
+      },
+      "freight_routing": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Inferred"
+      },
+      "warehouse_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Inferred"
+      },
+      "store_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Inferred"
+      },
+      "pricing_invoice": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "purchase_order",
+          "invoice"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Inferred"
+      },
+      "returns_unsaleables": {
         "dispute_window_days": null,
         "auto_deduct": false,
         "evidence_required": [
           "signed_bol",
           "photo"
         ],
-        "typical_recovery_rate": 0.4,
-        "notes": "Inferred regional norm"
+        "typical_recovery_rate": 0.35,
+        "notes": "Inferred"
       },
-      "slotting": {
+      "duplicate_deduction": {
         "dispute_window_days": null,
-        "auto_deduct": true,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice"
+        ],
+        "typical_recovery_rate": 0.8,
+        "notes": "Inferred"
+      },
+      "wrong_brand": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice",
+          "purchase_order"
+        ],
+        "typical_recovery_rate": 0.85,
+        "notes": "Inferred"
+      },
+      "placement_fees": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
         "evidence_required": [],
-        "typical_recovery_rate": 0.0,
-        "notes": "New-item placement allowance; non-disputable"
+        "typical_recovery_rate": 0.05,
+        "notes": "Non-disputable"
       }
     },
     "codes": [
@@ -1063,6 +1718,27 @@
         "code": "DMG",
         "name": "Damaged",
         "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_duplicate",
+        "code": "DUP",
+        "name": "Duplicate",
+        "deduction_type": "duplicate_deduction",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_early",
+        "code": "EARLY",
+        "name": "Early delivery",
+        "deduction_type": "early_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_freight",
+        "code": "FRT",
+        "name": "Freight",
+        "deduction_type": "freight_routing",
         "is_published": false
       },
       {
@@ -1094,10 +1770,24 @@
         "is_published": false
       },
       {
+        "code_id": "prairie_provisions_pricing",
+        "code": "PRC",
+        "name": "Pricing error",
+        "deduction_type": "pricing_invoice",
+        "is_published": false
+      },
+      {
         "code_id": "prairie_provisions_promo_billback",
         "code": "PROMO",
         "name": "Promo billback",
         "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_returns",
+        "code": "RET",
+        "name": "Returns",
+        "deduction_type": "returns_unsaleables",
         "is_published": false
       },
       {
@@ -1108,17 +1798,31 @@
         "is_published": false
       },
       {
-        "code_id": "prairie_provisions_slotting",
+        "code_id": "prairie_provisions_placement",
         "code": "SLOT",
-        "name": "New-item placement allowance",
-        "deduction_type": "slotting",
+        "name": "Placement fee",
+        "deduction_type": "placement_fees",
         "is_published": false
       },
       {
-        "code_id": "prairie_provisions_spoilage",
-        "code": "SPL",
-        "name": "Spoilage / quality complaint",
-        "deduction_type": "spoilage",
+        "code_id": "prairie_provisions_store_spoils",
+        "code": "SPL-S",
+        "name": "Store spoilage",
+        "deduction_type": "store_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_warehouse_spoils",
+        "code": "SPL-W",
+        "name": "Warehouse spoilage",
+        "deduction_type": "warehouse_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "prairie_provisions_wrong_brand",
+        "code": "WRB",
+        "name": "Wrong brand",
+        "deduction_type": "wrong_brand",
         "is_published": false
       }
     ],
@@ -1159,7 +1863,8 @@
     "dispute_portal_name": "Buyer email + AP",
     "dispute_portal_url": null,
     "dispute_method": "email_buyer",
-    "notes": "Wegmans-archetype: specialty/local-supplier friendly, buyer-relationship dispute path, no published windows",
+    "deduction_aggressiveness": 0.4,
+    "notes": "Wegmans-archetype: specialty/local-supplier friendly, buyer-relationship dispute path",
     "rules": {
       "short_ship": {
         "dispute_window_days": null,
@@ -1169,7 +1874,7 @@
           "pack_log"
         ],
         "typical_recovery_rate": 0.5,
-        "notes": "No published window; specialty-friendly buyer-relationship dispute path"
+        "notes": "No published window; specialty-friendly buyer-relationship"
       },
       "label_fine": {
         "dispute_window_days": null,
@@ -1226,22 +1931,90 @@
         "typical_recovery_rate": 0.15,
         "notes": "Specialty-friendly buyer relationship"
       },
-      "spoilage": {
+      "early_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Flexible delivery windows"
+      },
+      "freight_routing": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Relationship-driven resolution"
+      },
+      "warehouse_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.4,
+        "notes": "Local/specialty friendly"
+      },
+      "store_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Willing to share velocity data"
+      },
+      "pricing_invoice": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "purchase_order",
+          "invoice"
+        ],
+        "typical_recovery_rate": 0.5,
+        "notes": "Buyer relationship helps resolution"
+      },
+      "returns_unsaleables": {
         "dispute_window_days": null,
         "auto_deduct": false,
         "evidence_required": [
           "signed_bol",
           "photo"
         ],
-        "typical_recovery_rate": 0.55,
-        "notes": "Specialty buyer relationship; willing to credit on photo + record"
+        "typical_recovery_rate": 0.4,
+        "notes": "Quality claims; relationship path"
       },
-      "slotting": {
+      "duplicate_deduction": {
         "dispute_window_days": null,
-        "auto_deduct": true,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice"
+        ],
+        "typical_recovery_rate": 0.85,
+        "notes": "Easy win — buyer relationship"
+      },
+      "wrong_brand": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice",
+          "purchase_order"
+        ],
+        "typical_recovery_rate": 0.9,
+        "notes": "Buyer notices quickly"
+      },
+      "placement_fees": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
         "evidence_required": [],
-        "typical_recovery_rate": 0.0,
-        "notes": "Specialty placement allowance; negotiated annually"
+        "typical_recovery_rate": 0.05,
+        "notes": "Specialty placement allowance; non-disputable"
       }
     },
     "codes": [
@@ -1250,6 +2023,27 @@
         "code": "DMG",
         "name": "Damaged",
         "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_duplicate",
+        "code": "DUP",
+        "name": "Duplicate",
+        "deduction_type": "duplicate_deduction",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_early",
+        "code": "EARLY",
+        "name": "Early delivery",
+        "deduction_type": "early_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_freight",
+        "code": "FRT",
+        "name": "Freight",
+        "deduction_type": "freight_routing",
         "is_published": false
       },
       {
@@ -1281,10 +2075,24 @@
         "is_published": false
       },
       {
+        "code_id": "southside_grocers_pricing",
+        "code": "PRC",
+        "name": "Pricing error",
+        "deduction_type": "pricing_invoice",
+        "is_published": false
+      },
+      {
         "code_id": "southside_grocers_promo_billback",
         "code": "PROMO",
         "name": "Promo billback",
         "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_returns",
+        "code": "RET",
+        "name": "Returns",
+        "deduction_type": "returns_unsaleables",
         "is_published": false
       },
       {
@@ -1295,17 +2103,31 @@
         "is_published": false
       },
       {
-        "code_id": "southside_grocers_slotting",
+        "code_id": "southside_grocers_placement",
         "code": "SLOT",
-        "name": "Placement allowance",
-        "deduction_type": "slotting",
+        "name": "Placement fee",
+        "deduction_type": "placement_fees",
         "is_published": false
       },
       {
-        "code_id": "southside_grocers_spoilage",
-        "code": "SPL",
-        "name": "Spoilage / quality complaint",
-        "deduction_type": "spoilage",
+        "code_id": "southside_grocers_store_spoils",
+        "code": "SPL-S",
+        "name": "Store spoilage",
+        "deduction_type": "store_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_warehouse_spoils",
+        "code": "SPL-W",
+        "name": "Warehouse spoilage",
+        "deduction_type": "warehouse_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "southside_grocers_wrong_brand",
+        "code": "WRB",
+        "name": "Wrong brand",
+        "deduction_type": "wrong_brand",
         "is_published": false
       }
     ],
@@ -1346,6 +2168,7 @@
     "dispute_portal_name": "Email + Excel template (Natural)",
     "dispute_portal_url": null,
     "dispute_method": "email_excel",
+    "deduction_aggressiveness": 0.7,
     "notes": "Natural side: Deductions@unfi.com — .xlsb only, PDFs/screenshots rejected",
     "rules": {
       "short_ship": {
@@ -1356,7 +2179,7 @@
           "pack_log"
         ],
         "typical_recovery_rate": 0.4,
-        "notes": "30–60 day practical window; Excel-only dispute form"
+        "notes": "30-60 day practical window; Excel-only dispute form"
       },
       "label_fine": {
         "dispute_window_days": 60,
@@ -1399,7 +2222,8 @@
         "dispute_window_days": 60,
         "auto_deduct": false,
         "evidence_required": [
-          "promo_agreement"
+          "promo_agreement",
+          "deal_sheet"
         ],
         "typical_recovery_rate": 0.35,
         "notes": "MCB disputes common; unsubstantiated promo backups"
@@ -1411,24 +2235,93 @@
           "pack_log"
         ],
         "typical_recovery_rate": 0.1,
-        "notes": "Vague chargebacks routine; PDFs/screenshots rejected on dispute form"
+        "notes": "Vague chargebacks routine; PDFs/screenshots rejected"
       },
-      "spoilage": {
+      "early_delivery": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pod",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Early arrival at DC; inferred norms"
+      },
+      "freight_routing": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "carrier_tracking",
+          "weight_ticket"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Collect vs prepaid; accessorial charges"
+      },
+      "warehouse_spoils": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Product expires in UNFI DC; shelf-life agreements"
+      },
+      "store_spoils": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol"
+        ],
+        "typical_recovery_rate": 0.2,
+        "notes": "Unsaleables on natural side; velocity mismatch"
+      },
+      "pricing_invoice": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "purchase_order",
+          "invoice"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Off-invoice allowance mismatch"
+      },
+      "returns_unsaleables": {
         "dispute_window_days": 60,
         "auto_deduct": true,
         "evidence_required": [
           "signed_bol",
           "photo"
         ],
-        "typical_recovery_rate": 0.4,
-        "notes": "Includes unsaleables on the natural side; Excel-only dispute form"
+        "typical_recovery_rate": 0.3,
+        "notes": "Quality claims; expired product returns"
       },
-      "slotting": {
+      "duplicate_deduction": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "remittance_advice"
+        ],
+        "typical_recovery_rate": 0.8,
+        "notes": "Same deduction taken twice"
+      },
+      "wrong_brand": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "remittance_advice",
+          "purchase_order"
+        ],
+        "typical_recovery_rate": 0.85,
+        "notes": "Deduction meant for another supplier"
+      },
+      "placement_fees": {
         "dispute_window_days": null,
         "auto_deduct": true,
         "evidence_required": [],
-        "typical_recovery_rate": 0.0,
-        "notes": "New-item / catalog / planogram fees on the natural side; non-disputable"
+        "typical_recovery_rate": 0.05,
+        "notes": "Catalog / planogram fees; non-disputable"
       }
     },
     "codes": [
@@ -1437,6 +2330,27 @@
         "code": "DMG",
         "name": "Damaged product / unsaleable",
         "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_duplicate",
+        "code": "DUP",
+        "name": "Duplicate deduction",
+        "deduction_type": "duplicate_deduction",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_early",
+        "code": "ERL",
+        "name": "Early delivery",
+        "deduction_type": "early_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_freight",
+        "code": "FRT",
+        "name": "Freight / routing",
+        "deduction_type": "freight_routing",
         "is_published": false
       },
       {
@@ -1475,6 +2389,20 @@
         "is_published": false
       },
       {
+        "code_id": "unfi_pricing",
+        "code": "PRC",
+        "name": "Pricing / invoice error",
+        "deduction_type": "pricing_invoice",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_returns",
+        "code": "RET",
+        "name": "Returns / unsaleables",
+        "deduction_type": "returns_unsaleables",
+        "is_published": false
+      },
+      {
         "code_id": "unfi_sht",
         "code": "SHT",
         "name": "Shortage",
@@ -1482,17 +2410,31 @@
         "is_published": false
       },
       {
-        "code_id": "unfi_slotting",
+        "code_id": "unfi_placement",
         "code": "SLOT",
-        "name": "Slotting / catalog placement",
-        "deduction_type": "slotting",
+        "name": "Catalog / placement fee",
+        "deduction_type": "placement_fees",
         "is_published": false
       },
       {
-        "code_id": "unfi_spoilage",
-        "code": "UNS",
-        "name": "Unsaleable / spoilage",
-        "deduction_type": "spoilage",
+        "code_id": "unfi_store_spoils",
+        "code": "UNS-S",
+        "name": "Store unsaleable / spoilage",
+        "deduction_type": "store_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_warehouse_spoils",
+        "code": "UNS-W",
+        "name": "Warehouse unsaleable / spoilage",
+        "deduction_type": "warehouse_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "unfi_wrong_brand",
+        "code": "WRB",
+        "name": "Wrong brand",
+        "deduction_type": "wrong_brand",
         "is_published": false
       }
     ],
@@ -1533,6 +2475,7 @@
     "dispute_portal_name": "Retail Link / APDP / HighRadius",
     "dispute_portal_url": "https://retaillink.wal-mart.com/",
     "dispute_method": "portal",
+    "deduction_aggressiveness": 0.72,
     "notes": "Multiple systems by deduction type — APDP for AP shortages/allowances, HighRadius for AR/OTIF",
     "rules": {
       "short_ship": {
@@ -1544,7 +2487,7 @@
           "pack_log"
         ],
         "typical_recovery_rate": 0.45,
-        "notes": "Verified — APDP 12-month window for codes 21–28"
+        "notes": "Verified — APDP 12-month window for codes 21-28"
       },
       "label_fine": {
         "dispute_window_days": null,
@@ -1590,7 +2533,8 @@
         "dispute_window_days": 730,
         "auto_deduct": false,
         "evidence_required": [
-          "promo_agreement"
+          "promo_agreement",
+          "deal_sheet"
         ],
         "typical_recovery_rate": 0.5,
         "notes": "Allowance — 24-month APDP window"
@@ -1604,23 +2548,92 @@
         "typical_recovery_rate": 0.1,
         "notes": "Code 87 catch-all"
       },
-      "spoilage": {
+      "early_delivery": {
+        "dispute_window_days": 365,
+        "auto_deduct": true,
+        "evidence_required": [
+          "pod",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Must-arrive-by-date compliance; same APDP window"
+      },
+      "freight_routing": {
         "dispute_window_days": 365,
         "auto_deduct": true,
         "evidence_required": [
           "signed_bol",
-          "photo",
-          "pack_log"
+          "carrier_tracking",
+          "weight_ticket"
         ],
-        "typical_recovery_rate": 0.45,
-        "notes": "Code 28-adjacent; product condition disputes at receiving — temperature, expiration, quality"
+        "typical_recovery_rate": 0.4,
+        "notes": "Routing guide noncompliance; collect vs prepaid confusion"
       },
-      "slotting": {
+      "warehouse_spoils": {
+        "dispute_window_days": 365,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Product expires in DC; shelf-life agreement enforcement"
+      },
+      "store_spoils": {
+        "dispute_window_days": 365,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.2,
+        "notes": "Product expires at store; velocity mismatch"
+      },
+      "pricing_invoice": {
+        "dispute_window_days": 365,
+        "auto_deduct": true,
+        "evidence_required": [
+          "purchase_order",
+          "invoice"
+        ],
+        "typical_recovery_rate": 0.55,
+        "notes": "Cost file mismatch; item setup error"
+      },
+      "returns_unsaleables": {
+        "dispute_window_days": 365,
+        "auto_deduct": true,
+        "evidence_required": [
+          "signed_bol",
+          "photo"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Defectives, quality claims, expired returns"
+      },
+      "duplicate_deduction": {
+        "dispute_window_days": 365,
+        "auto_deduct": true,
+        "evidence_required": [
+          "remittance_advice"
+        ],
+        "typical_recovery_rate": 0.85,
+        "notes": "Same deduction taken twice — easy win with proof"
+      },
+      "wrong_brand": {
+        "dispute_window_days": 365,
+        "auto_deduct": true,
+        "evidence_required": [
+          "remittance_advice",
+          "purchase_order"
+        ],
+        "typical_recovery_rate": 0.9,
+        "notes": "Retailer-side error; deduction meant for another supplier"
+      },
+      "placement_fees": {
         "dispute_window_days": null,
         "auto_deduct": true,
         "evidence_required": [],
-        "typical_recovery_rate": 0.0,
-        "notes": "Slotting / new-item / planogram fees — contractually agreed, not disputable"
+        "typical_recovery_rate": 0.05,
+        "notes": "Slotting/placement fees — largely non-disputable but occasionally forecasting error"
       }
     },
     "codes": [
@@ -1628,7 +2641,7 @@
         "code_id": "walmart_11",
         "code": "11",
         "name": "Price Difference Between PO & Invoice",
-        "deduction_type": "promo_billback",
+        "deduction_type": "pricing_invoice",
         "is_published": true
       },
       {
@@ -1674,17 +2687,17 @@
         "is_published": true
       },
       {
-        "code_id": "walmart_spoilage",
+        "code_id": "walmart_29",
         "code": "29",
-        "name": "Concealed damage / spoilage at receipt",
-        "deduction_type": "spoilage",
+        "name": "Concealed Damage / Spoilage",
+        "deduction_type": "warehouse_spoils",
         "is_published": true
       },
       {
         "code_id": "walmart_30",
         "code": "30",
         "name": "Duplicate Billing",
-        "deduction_type": "vague",
+        "deduction_type": "duplicate_deduction",
         "is_published": true
       },
       {
@@ -1698,7 +2711,7 @@
         "code_id": "walmart_59",
         "code": "59",
         "name": "Defective Merchandise Allowance",
-        "deduction_type": "damaged",
+        "deduction_type": "returns_unsaleables",
         "is_published": true
       },
       {
@@ -1716,10 +2729,38 @@
         "is_published": true
       },
       {
-        "code_id": "walmart_slotting",
+        "code_id": "walmart_early",
+        "code": "EARLY",
+        "name": "Early Delivery / Must-Arrive-By Violation",
+        "deduction_type": "early_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "walmart_freight",
+        "code": "FRT",
+        "name": "Freight / Routing Noncompliance",
+        "deduction_type": "freight_routing",
+        "is_published": false
+      },
+      {
+        "code_id": "walmart_placement",
         "code": "NIF",
-        "name": "New-item / slotting fee",
-        "deduction_type": "slotting",
+        "name": "New-Item / Slotting Fee",
+        "deduction_type": "placement_fees",
+        "is_published": false
+      },
+      {
+        "code_id": "walmart_spoils_store",
+        "code": "SPL-S",
+        "name": "Store Spoilage / Expired",
+        "deduction_type": "store_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "walmart_wrong",
+        "code": "WRB",
+        "name": "Wrong Brand / Misdirected Deduction",
+        "deduction_type": "wrong_brand",
         "is_published": false
       }
     ],
@@ -1767,6 +2808,7 @@
     "dispute_portal_name": "VIP / Smartsheet",
     "dispute_portal_url": "https://vip.wholefoods.com",
     "dispute_method": "email_excel",
+    "deduction_aggressiveness": 0.58,
     "notes": "Pay-by-PO program gates dispute access; regional fragmentation",
     "rules": {
       "short_ship": {
@@ -1820,7 +2862,8 @@
         "dispute_window_days": null,
         "auto_deduct": false,
         "evidence_required": [
-          "promo_agreement"
+          "promo_agreement",
+          "deal_sheet"
         ],
         "typical_recovery_rate": 0.4,
         "notes": "Regional fragmentation — different practices per region"
@@ -1834,22 +2877,90 @@
         "typical_recovery_rate": 0.1,
         "notes": "Cost-feed mismatches drive opaque deductions"
       },
-      "spoilage": {
+      "early_delivery": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "pod",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.3,
+        "notes": "Regional variability; some DCs strict"
+      },
+      "freight_routing": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "carrier_tracking"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Regional; some DCs enforce routing guides"
+      },
+      "warehouse_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol",
+          "temperature_log"
+        ],
+        "typical_recovery_rate": 0.35,
+        "notes": "Strict quality program; perishable focus"
+      },
+      "store_spoils": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "signed_bol"
+        ],
+        "typical_recovery_rate": 0.25,
+        "notes": "Specialty velocity issues; wrong stores"
+      },
+      "pricing_invoice": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "purchase_order",
+          "invoice"
+        ],
+        "typical_recovery_rate": 0.45,
+        "notes": "Cost-feed mismatches across regions"
+      },
+      "returns_unsaleables": {
         "dispute_window_days": null,
         "auto_deduct": false,
         "evidence_required": [
           "signed_bol",
           "photo"
         ],
-        "typical_recovery_rate": 0.4,
-        "notes": "Strict quality program; regional fragmentation drives variability"
+        "typical_recovery_rate": 0.3,
+        "notes": "Quality claims at store level"
       },
-      "slotting": {
+      "duplicate_deduction": {
         "dispute_window_days": null,
-        "auto_deduct": true,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice"
+        ],
+        "typical_recovery_rate": 0.8,
+        "notes": "Regional systems increase duplicate risk"
+      },
+      "wrong_brand": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
+        "evidence_required": [
+          "remittance_advice",
+          "purchase_order"
+        ],
+        "typical_recovery_rate": 0.85,
+        "notes": "Retailer-side error"
+      },
+      "placement_fees": {
+        "dispute_window_days": null,
+        "auto_deduct": false,
         "evidence_required": [],
-        "typical_recovery_rate": 0.0,
-        "notes": "New-item slotting + reset placement fees by region; non-disputable"
+        "typical_recovery_rate": 0.05,
+        "notes": "New-item slotting + reset fees by region; non-disputable"
       }
     },
     "codes": [
@@ -1858,6 +2969,27 @@
         "code": "DMG",
         "name": "Damaged product",
         "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_duplicate",
+        "code": "DUP",
+        "name": "Duplicate deduction",
+        "deduction_type": "duplicate_deduction",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_early",
+        "code": "EARLY",
+        "name": "Early delivery",
+        "deduction_type": "early_delivery",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_freight",
+        "code": "FRT",
+        "name": "Freight noncompliance",
+        "deduction_type": "freight_routing",
         "is_published": false
       },
       {
@@ -1889,10 +3021,24 @@
         "is_published": false
       },
       {
+        "code_id": "wholefoods_pricing",
+        "code": "PRC",
+        "name": "Pricing / invoice error",
+        "deduction_type": "pricing_invoice",
+        "is_published": false
+      },
+      {
         "code_id": "wholefoods_promo_billback",
         "code": "PROMO",
         "name": "Promo billback",
         "deduction_type": "promo_billback",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_returns",
+        "code": "RET",
+        "name": "Returns / unsaleables",
+        "deduction_type": "returns_unsaleables",
         "is_published": false
       },
       {
@@ -1903,17 +3049,31 @@
         "is_published": false
       },
       {
-        "code_id": "wholefoods_slotting",
+        "code_id": "wholefoods_placement",
         "code": "SLOT",
-        "name": "New-item / placement fee",
-        "deduction_type": "slotting",
+        "name": "Placement fee",
+        "deduction_type": "placement_fees",
         "is_published": false
       },
       {
-        "code_id": "wholefoods_spoilage",
-        "code": "SPL",
-        "name": "Spoilage / quality at receipt",
-        "deduction_type": "spoilage",
+        "code_id": "wholefoods_store_spoils",
+        "code": "SPL-S",
+        "name": "Store spoilage",
+        "deduction_type": "store_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_warehouse_spoils",
+        "code": "SPL-W",
+        "name": "Warehouse spoilage",
+        "deduction_type": "warehouse_spoils",
+        "is_published": false
+      },
+      {
+        "code_id": "wholefoods_wrong_brand",
+        "code": "WRB",
+        "name": "Wrong brand",
+        "deduction_type": "wrong_brand",
         "is_published": false
       }
     ],

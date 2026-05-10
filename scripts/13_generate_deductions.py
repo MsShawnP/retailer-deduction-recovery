@@ -1,36 +1,18 @@
 """Generate the `deductions` table.
 
-The central deduction record. Drives a realistic distribution of:
-  - short_ship (correlates with bol_signed_short, pick_pack_mismatch,
-    AND non-scannable labels at Walmart/Costco where receiving hand-
-    counts and undercounts — the Code 22 perceived-shortage path)
-  - label_fine (generic labels at strict retailers — SQEP-style)
-  - pallet_fine (low base rate per retailer)
-  - damaged (bol_signed_damaged drives most of these)
-  - late_delivery (retailer-aware: only when delivery missed window
-    AND sampled at late_pct so volume stays realistic)
-  - promo_billback (random per retailer; tied to promo activity)
-  - vague (Walmart Code 87/99 catch-all; MISC at others; opaque
-    descriptions for the "vague/undecodable" feature)
-  - spoilage (product-condition disputes at receiving — temperature,
-    expiration, quality, damage-in-transit; flows through the same
-    failure pipeline as the other operational types)
-  - slotting (negotiated cost — new-item / planogram / shelf placement
-    fees; NOT an operational failure, generated as periodic per-retailer
-    events outside the per-order loop, no order_id / shipment_id, no
-    dispute_deadline, recovery_rate=0)
+16-type taxonomy (expanded from 9). Types 1-7 are the original operational
+types; 8-12 are new operational types; 13 is mixed; 14-15 are retailer
+errors; 16 is a planning failure.
 
-Volume target: $750K-$1.2M annualized (3-5% of $25M wholesale revenue).
-Roughly 3,500-5,500 standard deductions over 18 months, plus ~50-70
-slotting events.
+Volume target: ~$1.5M over 20 months (~6% of $25M revenue, center of
+SPS Commerce 5-7% benchmark). Roughly 2,800-3,300 standard deductions
+plus periodic non-order events.
 
-Deduction date is set 14-45 days after delivery_date (retailer-aware
-remittance cadence). dispute_deadline is calculated from
-retailer_rules.dispute_window_days where published, NULL otherwise.
-
-Post-audit deductions (is_post_audit=TRUE) are added by a separate
-script (17_generate_post_audit_claims.py) — this generator only
-produces standard deductions.
+Root cause mapping:
+  Types 1-12: Cinderhaven internal process failures
+  Type 13 (returns_unsaleables): mixed — some legitimate, some overstated
+  Types 14-15 (duplicate_deduction, wrong_brand): retailer_error
+  Type 16 (placement_fees): forecasting/planning failure
 """
 
 from __future__ import annotations
@@ -43,30 +25,39 @@ from pathlib import Path
 DB_PATH = Path(__file__).resolve().parent.parent / "data" / "cinderhaven_deductions.db"
 SEED = 45
 
-# Per-retailer deduction probability + amount config.
-# rates: probability that THIS deduction type fires for an order, given
-#   the necessary precondition (e.g., short_ship requires either bol-short,
-#   pick/pack mismatch, or non-scannable label at strict retailers).
-# Calibrated against $750K-$1.2M annualized volume target.
+ALL_TYPES = [
+    "short_ship", "label_fine", "pallet_fine", "damaged",
+    "late_delivery", "promo_billback", "vague",
+    "early_delivery", "freight_routing", "warehouse_spoils",
+    "store_spoils", "pricing_invoice", "returns_unsaleables",
+    "duplicate_deduction", "wrong_brand", "placement_fees",
+]
+
+# Global probability multiplier. Applied to all per-order generation rates
+# to control total volume without distorting type mix. 0.80 → ~20% fewer
+# deductions, landing at ~$1.5M total (6% of $25M revenue).
+VOLUME_SCALE = 0.80
+
 PROFILES = {
-    # short_perceived: extra rate of perceived-shortage deductions when label
-    # is non-scannable at strict retailers (Walmart Code 22 driver)
-    # spoilage: per-order base rate of product-condition deductions
-    # slotting_events: integer count of slotting events to generate per
-    #   retailer across the data window (not per-order)
-    # slotting_amount_range: (min, max) dollars per slotting event
     "walmart": {
-        "short_ship_real":         0.85,   # of bol-short or pick-mismatch
-        "short_ship_perceived":    0.45,   # of non-scannable-label orders
-        "label_fine":              0.20,   # of generic-label orders (sampled)
+        "short_ship_real":         0.85,
+        "short_ship_perceived":    0.45,
+        "label_fine":              0.20,
         "pallet_fine":             0.04,
-        "damaged":                 0.85,   # of bol-damaged
-        "late_delivery_window":    0.55,   # of orders that missed window
+        "damaged":                 0.85,
+        "late_delivery_window":    0.55,
         "promo_billback":          0.06,
         "vague":                   0.03,
-        "spoilage":                0.025,
-        "slotting_events":         3,
-        "slotting_amount_range":   (5500, 13000),
+        "early_delivery":          0.12,
+        "freight_routing":         0.04,
+        "warehouse_spoils":        0.018,
+        "store_spoils":            0.012,
+        "pricing_invoice":         0.03,
+        "returns_unsaleables":     0.02,
+        "duplicate_deduction":     0.008,
+        "wrong_brand":             0.005,
+        "placement_events":        3,
+        "placement_amount_range":  (5500, 13000),
         "remittance_lag":          (28, 42),
     },
     "costco": {
@@ -78,24 +69,38 @@ PROFILES = {
         "late_delivery_window":    0.50,
         "promo_billback":          0.04,
         "vague":                   0.03,
-        "spoilage":                0.030,
-        "slotting_events":         3,
-        "slotting_amount_range":   (8000, 18000),
+        "early_delivery":          0.15,
+        "freight_routing":         0.03,
+        "warehouse_spoils":        0.020,
+        "store_spoils":            0.015,
+        "pricing_invoice":         0.025,
+        "returns_unsaleables":     0.015,
+        "duplicate_deduction":     0.006,
+        "wrong_brand":             0.004,
+        "placement_events":        3,
+        "placement_amount_range":  (8000, 18000),
         "remittance_lag":          (30, 45),
     },
     "whole_foods": {
         "short_ship_real":         0.65,
-        "short_ship_perceived":    0.0,    # not strict-label
+        "short_ship_perceived":    0.0,
         "label_fine":              0.05,
         "pallet_fine":             0.02,
         "damaged":                 0.70,
         "late_delivery_window":    0.30,
         "promo_billback":          0.05,
         "vague":                   0.05,
-        "spoilage":                0.035,  # strict quality program
-        "slotting_events":         4,
-        "slotting_amount_range":   (3000, 6500),
-        "remittance_lag":          (21, 35)
+        "early_delivery":          0.08,
+        "freight_routing":         0.03,
+        "warehouse_spoils":        0.025,
+        "store_spoils":            0.020,
+        "pricing_invoice":         0.035,
+        "returns_unsaleables":     0.018,
+        "duplicate_deduction":     0.007,
+        "wrong_brand":             0.004,
+        "placement_events":        4,
+        "placement_amount_range":  (3000, 6500),
+        "remittance_lag":          (21, 35),
     },
     "unfi": {
         "short_ship_real":         0.70,
@@ -104,15 +109,22 @@ PROFILES = {
         "pallet_fine":             0.02,
         "damaged":                 0.65,
         "late_delivery_window":    0.30,
-        "promo_billback":          0.10,   # MCB-heavy
+        "promo_billback":          0.10,
         "vague":                   0.06,
-        "spoilage":                0.025,  # unsaleables on natural side
-        "slotting_events":         5,
-        "slotting_amount_range":   (2000, 4500),
-        "remittance_lag":          (7, 21),  # weekly cadence
+        "early_delivery":          0.06,
+        "freight_routing":         0.04,
+        "warehouse_spoils":        0.022,
+        "store_spoils":            0.015,
+        "pricing_invoice":         0.03,
+        "returns_unsaleables":     0.020,
+        "duplicate_deduction":     0.007,
+        "wrong_brand":             0.005,
+        "placement_events":        5,
+        "placement_amount_range":  (2000, 4500),
+        "remittance_lag":          (7, 21),
     },
     "kehe": {
-        "short_ship_real":         0.85,   # 48hr UDR locks fast
+        "short_ship_real":         0.85,
         "short_ship_perceived":    0.0,
         "label_fine":              0.06,
         "pallet_fine":             0.02,
@@ -120,10 +132,17 @@ PROFILES = {
         "late_delivery_window":    0.30,
         "promo_billback":          0.10,
         "vague":                   0.06,
-        "spoilage":                0.020,
-        "slotting_events":         5,
-        "slotting_amount_range":   (1500, 3500),
-        "remittance_lag":          (10, 21),  # biweekly
+        "early_delivery":          0.08,
+        "freight_routing":         0.04,
+        "warehouse_spoils":        0.018,
+        "store_spoils":            0.012,
+        "pricing_invoice":         0.03,
+        "returns_unsaleables":     0.018,
+        "duplicate_deduction":     0.008,
+        "wrong_brand":             0.005,
+        "placement_events":        5,
+        "placement_amount_range":  (1500, 3500),
+        "remittance_lag":          (10, 21),
     },
     "southside_grocers": {
         "short_ship_real":         0.55,
@@ -134,9 +153,16 @@ PROFILES = {
         "late_delivery_window":    0.20,
         "promo_billback":          0.04,
         "vague":                   0.04,
-        "spoilage":                0.015,
-        "slotting_events":         2,
-        "slotting_amount_range":   (500, 1300),
+        "early_delivery":          0.04,
+        "freight_routing":         0.02,
+        "warehouse_spoils":        0.012,
+        "store_spoils":            0.010,
+        "pricing_invoice":         0.02,
+        "returns_unsaleables":     0.012,
+        "duplicate_deduction":     0.005,
+        "wrong_brand":             0.003,
+        "placement_events":        2,
+        "placement_amount_range":  (500, 1300),
         "remittance_lag":          (21, 40),
     },
     "green_basket_market": {
@@ -146,11 +172,18 @@ PROFILES = {
         "pallet_fine":             0.01,
         "damaged":                 0.55,
         "late_delivery_window":    0.25,
-        "promo_billback":          0.10,   # Free Fill / Fair Share
+        "promo_billback":          0.10,
         "vague":                   0.05,
-        "spoilage":                0.018,
-        "slotting_events":         3,
-        "slotting_amount_range":   (400, 1100),
+        "early_delivery":          0.05,
+        "freight_routing":         0.02,
+        "warehouse_spoils":        0.015,
+        "store_spoils":            0.012,
+        "pricing_invoice":         0.025,
+        "returns_unsaleables":     0.015,
+        "duplicate_deduction":     0.006,
+        "wrong_brand":             0.004,
+        "placement_events":        3,
+        "placement_amount_range":  (400, 1100),
         "remittance_lag":          (21, 40),
     },
     "prairie_provisions": {
@@ -162,9 +195,16 @@ PROFILES = {
         "late_delivery_window":    0.25,
         "promo_billback":          0.04,
         "vague":                   0.04,
-        "spoilage":                0.012,
-        "slotting_events":         2,
-        "slotting_amount_range":   (300, 850),
+        "early_delivery":          0.04,
+        "freight_routing":         0.02,
+        "warehouse_spoils":        0.010,
+        "store_spoils":            0.008,
+        "pricing_invoice":         0.02,
+        "returns_unsaleables":     0.010,
+        "duplicate_deduction":     0.005,
+        "wrong_brand":             0.003,
+        "placement_events":        2,
+        "placement_amount_range":  (300, 850),
         "remittance_lag":          (21, 40),
     },
     "mountain_pantry_co": {
@@ -176,9 +216,16 @@ PROFILES = {
         "late_delivery_window":    0.25,
         "promo_billback":          0.04,
         "vague":                   0.04,
-        "spoilage":                0.012,
-        "slotting_events":         2,
-        "slotting_amount_range":   (300, 850),
+        "early_delivery":          0.04,
+        "freight_routing":         0.02,
+        "warehouse_spoils":        0.010,
+        "store_spoils":            0.008,
+        "pricing_invoice":         0.02,
+        "returns_unsaleables":     0.010,
+        "duplicate_deduction":     0.005,
+        "wrong_brand":             0.003,
+        "placement_events":        2,
+        "placement_amount_range":  (300, 850),
         "remittance_lag":          (21, 40),
     },
     "harbor_fresh": {
@@ -190,32 +237,41 @@ PROFILES = {
         "late_delivery_window":    0.20,
         "promo_billback":          0.04,
         "vague":                   0.04,
-        "spoilage":                0.012,
-        "slotting_events":         2,
-        "slotting_amount_range":   (300, 850),
+        "early_delivery":          0.04,
+        "freight_routing":         0.02,
+        "warehouse_spoils":        0.010,
+        "store_spoils":            0.008,
+        "pricing_invoice":         0.02,
+        "returns_unsaleables":     0.010,
+        "duplicate_deduction":     0.004,
+        "wrong_brand":             0.003,
+        "placement_events":        2,
+        "placement_amount_range":  (300, 850),
         "remittance_lag":          (21, 40),
     },
 }
 
-# Spoilage descriptions encode the sub-cause as a keyword the Sankey
-# rootCauseFor function reads. Keep keywords stable: 'temperature',
-# 'expired'/'short-dated', 'quality', 'damage in transit'.
-SPOILAGE_TEMPLATES = [
-    "Spoilage — temperature abuse in transit",
-    "Spoilage — expired or short-dated at receiving",
-    "Spoilage — quality complaint at receiving",
-    "Spoilage — damage in transit affecting condition",
+WAREHOUSE_SPOILS_TEMPLATES = [
+    "Warehouse spoilage — product expired in DC before pull",
+    "Warehouse spoilage — shelf-life agreement violation",
+    "Warehouse spoilage — oversized PO vs actual sell-through",
+    "Warehouse spoilage — slow-turn SKU past code date",
 ]
 
-SLOTTING_TEMPLATES = [
+STORE_SPOILS_TEMPLATES = [
+    "Store spoilage — expired at retail, velocity mismatch",
+    "Store spoilage — wrong stores for this SKU's turns",
+    "Store spoilage — insufficient velocity vs shelf-life",
+    "Store spoilage — seasonal overstock past season",
+]
+
+PLACEMENT_TEMPLATES = [
     "New-item slotting fee — placement allowance",
     "Planogram reset — placement billback",
     "Shelf placement / new-item program",
     "Category-reset placement billback",
 ]
 
-# Vague deduction descriptions that read like real remittance lines —
-# the "Code 99 / promo -$X with no PO reference" reality.
 VAGUE_TEMPLATES = [
     "Code {code}: {label}",
     "Promo allowance",
@@ -229,9 +285,29 @@ VAGUE_TEMPLATES = [
     "Compliance fee",
 ]
 
+FREIGHT_TEMPLATES = [
+    "Freight routing noncompliance — wrong carrier",
+    "Collect vs prepaid confusion — freight deduction",
+    "Accessorial charges — liftgate / residential",
+    "Routing guide violation — unapproved lane",
+]
+
+PRICING_TEMPLATES = [
+    "Pricing error — old cost loaded on PO",
+    "Invoice mismatch — new cost not updated in system",
+    "Off-invoice allowance mismatch",
+    "Item setup error — wrong UPC/cost mapping",
+]
+
+RETURNS_TEMPLATES = [
+    "Customer return — defective product claim",
+    "Quality claim — product not meeting spec",
+    "Expired product return — past best-by at store",
+    "Unsaleable — packaging damage at store level",
+]
+
 
 def code_id_for(retailer_id: str, deduction_type: str, codes_by_retailer: dict) -> tuple[str | None, str]:
-    """Pick a code_id and return (code_id, code_as_remitted)."""
     matches = [
         (cid, code) for (cid, code, dt) in codes_by_retailer.get(retailer_id, [])
         if dt == deduction_type
@@ -243,13 +319,11 @@ def code_id_for(retailer_id: str, deduction_type: str, codes_by_retailer: dict) 
 
 
 def short_ship_amount(rng: random.Random, units_short: int, line_value_avg: float) -> float:
-    """Dollar value of short ship — recoup of unsupplied units."""
     base = units_short * line_value_avg * rng.uniform(0.9, 1.05)
     return round(max(75.0, base), 2)
 
 
 def label_fine_amount(rng: random.Random, retailer_id: str, total_units: int) -> float:
-    """Walmart SQEP Phase 2: $200 admin + $1/case. Other retailers smaller."""
     if retailer_id == "walmart":
         return round(200.0 + total_units * rng.uniform(0.8, 1.2), 2)
     if retailer_id == "costco":
@@ -264,38 +338,74 @@ def pallet_fine_amount(rng: random.Random, retailer_id: str, pallets: int) -> fl
 
 
 def damaged_amount(rng: random.Random, total_value: float) -> float:
-    """Damage refund — small percentage of order value (5-15%)."""
     return round(total_value * rng.uniform(0.05, 0.15), 2)
 
 
 def late_amount(rng: random.Random, retailer_id: str, total_value: float) -> float:
-    """Late-delivery / OTIF fines."""
     if retailer_id == "walmart":
-        # Walmart OTIF: 3% of COGS (approximate as 3% of wholesale)
         return round(total_value * 0.03, 2)
     if retailer_id == "unfi":
-        # UNFI flat fines: $250 late, $500 no-show
         return round(rng.choice([250.0, 250.0, 500.0]), 2)
     return round(total_value * rng.uniform(0.015, 0.03), 2)
 
 
 def promo_amount(rng: random.Random, total_value: float) -> float:
-    """Promo billback — 5-15% of order value."""
     return round(total_value * rng.uniform(0.05, 0.15), 2)
 
 
 def vague_amount(rng: random.Random) -> float:
-    """Vague deductions span small fees to mystery big-tickets."""
     if rng.random() < 0.6:
         return round(rng.uniform(50.0, 600.0), 2)
     return round(rng.uniform(800.0, 4500.0), 2)
 
 
-def spoilage_amount(rng: random.Random, total_value: float) -> float:
-    """Spoilage refund — partial credit for product condition issues at
-    receiving. Typically 8-22% of order value (a portion of the order
-    rejected, not the whole load)."""
-    return round(total_value * rng.uniform(0.08, 0.22), 2)
+def early_delivery_amount(rng: random.Random, retailer_id: str, total_value: float) -> float:
+    if retailer_id in ("walmart", "costco"):
+        return round(total_value * rng.uniform(0.02, 0.04), 2)
+    return round(rng.uniform(100.0, 400.0), 2)
+
+
+def freight_amount(rng: random.Random, total_value: float) -> float:
+    return round(rng.uniform(150.0, 800.0) + total_value * rng.uniform(0.0, 0.02), 2)
+
+
+def warehouse_spoils_amount(rng: random.Random, total_value: float) -> float:
+    return round(total_value * rng.uniform(0.10, 0.30), 2)
+
+
+def store_spoils_amount(rng: random.Random, total_value: float) -> float:
+    return round(total_value * rng.uniform(0.08, 0.20), 2)
+
+
+def pricing_amount(rng: random.Random, total_value: float) -> float:
+    return round(total_value * rng.uniform(0.02, 0.08), 2)
+
+
+def returns_amount(rng: random.Random, total_value: float) -> float:
+    return round(total_value * rng.uniform(0.05, 0.18), 2)
+
+
+def duplicate_amount(rng: random.Random, existing_amount: float) -> float:
+    return round(existing_amount * rng.uniform(0.95, 1.05), 2)
+
+
+def wrong_brand_amount(rng: random.Random) -> float:
+    return round(rng.uniform(200.0, 3000.0), 2)
+
+
+def retrieval_cost_hours(rng: random.Random, deduction_type: str, has_order: bool) -> float:
+    if deduction_type in ("duplicate_deduction", "wrong_brand"):
+        return round(rng.uniform(0.5, 2.0), 2)
+    if deduction_type == "placement_fees":
+        return round(rng.uniform(0.25, 1.0), 2)
+    if not has_order:
+        return round(rng.uniform(2.0, 6.0), 2)
+    base = rng.uniform(1.0, 4.0)
+    if deduction_type in ("freight_routing", "pricing_invoice"):
+        base += rng.uniform(0.5, 2.0)
+    if deduction_type in ("warehouse_spoils", "store_spoils"):
+        base += rng.uniform(1.0, 3.0)
+    return round(base, 2)
 
 
 def deduction_date_for(rng: random.Random, delivery_date: date, lag_range: tuple[int, int]) -> date:
@@ -312,7 +422,6 @@ def main() -> None:
 
     cur.execute("DELETE FROM deductions")
 
-    # Lookup tables
     codes_by_retailer: dict[str, list[tuple[str, str, str]]] = {}
     for cid, rid, code, dt in cur.execute(
         "SELECT code_id, retailer_id, code, deduction_type FROM deduction_codes"
@@ -326,13 +435,13 @@ def main() -> None:
         ).fetchall()
     }
 
-    # Pull denormalized order/shipment/pack data — one query, in-memory join
     rows = cur.execute("""
         SELECT
             o.order_id, o.retailer_id, o.total_units, o.total_value,
-            o.requested_delivery_window_end,
+            o.requested_delivery_window_start, o.requested_delivery_window_end,
             s.shipment_id, s.delivery_date, s.units_shipped,
             s.bol_signed_short, s.bol_signed_damaged, s.pallets_shipped,
+            s.ship_date,
             p.units_picked, p.units_packed, p.units_pick_pack_match,
             p.label_type_used, p.label_scannable
         FROM orders o
@@ -342,11 +451,7 @@ def main() -> None:
 
     deductions = []
     seq = 0
-    counters = {k: 0 for k in (
-        "short_ship", "label_fine", "pallet_fine", "damaged",
-        "late_delivery", "promo_billback", "vague",
-        "spoilage", "slotting",
-    )}
+    counters = {t: 0 for t in ALL_TYPES}
 
     def add_deduction(retailer_id, dt, order_id, shipment_id, amount,
                       code_id, code_remitted, description,
@@ -356,34 +461,40 @@ def main() -> None:
         deduction_id = f"DED-{seq:07d}"
         window = rules.get((retailer_id, dt), (None, None))[0]
         deadline = (deduction_dt + timedelta(days=window)).isoformat() if window else None
+        cost_hours = retrieval_cost_hours(rng, dt, order_id is not None)
         deductions.append((
             deduction_id, retailer_id, order_id, shipment_id, dt,
             code_id, code_remitted, description,
             amount, deduction_dt.isoformat(), deadline,
             is_vague, 0,  # is_post_audit
-            None,  # remittance_id — populated later
+            None,  # remittance_id
+            cost_hours,
         ))
         counters[dt] += 1
 
     for row in rows:
         (order_id, retailer_id, total_units, total_value,
-         window_end_str,
+         window_start_str, window_end_str,
          shipment_id, delivery_date_str, units_shipped,
          bol_short, bol_damaged, pallets,
+         ship_date_str,
          units_picked, units_packed, pick_pack_match,
          label_type, label_scannable) = row
 
         profile = PROFILES.get(retailer_id)
         if not profile:
             continue
+        vs = VOLUME_SCALE
         delivery_date = date.fromisoformat(delivery_date_str)
+        ship_date = date.fromisoformat(ship_date_str)
+        window_start = date.fromisoformat(window_start_str) if window_start_str else None
         window_end = date.fromisoformat(window_end_str) if window_end_str else None
         ded_dt = deduction_date_for(rng, delivery_date, profile["remittance_lag"])
         line_value_avg = total_value / max(1, total_units)
 
         # 1. SHORT SHIP — real (bol-short OR pick-mismatch)
         units_short = max(0, units_packed - units_shipped) + max(0, units_picked - units_packed)
-        if (bol_short or not pick_pack_match) and rng.random() < profile["short_ship_real"]:
+        if (bol_short or not pick_pack_match) and rng.random() < profile["short_ship_real"] * vs:
             cid, code = code_id_for(retailer_id, "short_ship", codes_by_retailer)
             amt = short_ship_amount(rng, max(units_short, 1), line_value_avg)
             add_deduction(retailer_id, "short_ship", order_id, shipment_id,
@@ -392,7 +503,7 @@ def main() -> None:
                           ded_dt)
 
         # 1b. SHORT SHIP — perceived (non-scannable label causes hand-count undercount)
-        elif (label_scannable == 0 and rng.random() < profile["short_ship_perceived"]):
+        elif (label_scannable == 0 and rng.random() < profile["short_ship_perceived"] * vs):
             cid, code = code_id_for(retailer_id, "short_ship", codes_by_retailer)
             phantom_short = rng.randint(2, max(3, total_units // 20))
             amt = short_ship_amount(rng, phantom_short, line_value_avg)
@@ -401,8 +512,8 @@ def main() -> None:
                           f"Short ship: receiving hand-count {phantom_short} units short",
                           ded_dt)
 
-        # 2. LABEL FINE — generic at strict retailer, sampled
-        if label_type == "generic" and rng.random() < profile["label_fine"]:
+        # 2. LABEL FINE
+        if label_type == "generic" and rng.random() < profile["label_fine"] * vs:
             cid, code = code_id_for(retailer_id, "label_fine", codes_by_retailer)
             amt = label_fine_amount(rng, retailer_id, total_units)
             add_deduction(retailer_id, "label_fine", order_id, shipment_id,
@@ -411,14 +522,14 @@ def main() -> None:
                           ded_dt)
 
         # 3. PALLET FINE
-        if rng.random() < profile["pallet_fine"]:
+        if rng.random() < profile["pallet_fine"] * vs:
             cid, code = code_id_for(retailer_id, "pallet_fine", codes_by_retailer)
             amt = pallet_fine_amount(rng, retailer_id, pallets or 1)
             add_deduction(retailer_id, "pallet_fine", order_id, shipment_id,
                           amt, cid, code, "Pallet noncompliance", ded_dt)
 
         # 4. DAMAGED
-        if bol_damaged and rng.random() < profile["damaged"]:
+        if bol_damaged and rng.random() < profile["damaged"] * vs:
             cid, code = code_id_for(retailer_id, "damaged", codes_by_retailer)
             amt = damaged_amount(rng, total_value)
             add_deduction(retailer_id, "damaged", order_id, shipment_id,
@@ -426,9 +537,9 @@ def main() -> None:
                           "Damage at receiving — BOL signed damaged",
                           ded_dt)
 
-        # 5. LATE DELIVERY — must miss window AND be sampled
+        # 5. LATE DELIVERY
         if window_end and delivery_date > window_end:
-            if rng.random() < profile["late_delivery_window"]:
+            if rng.random() < profile["late_delivery_window"] * vs:
                 cid, code = code_id_for(retailer_id, "late_delivery", codes_by_retailer)
                 amt = late_amount(rng, retailer_id, total_value)
                 days_late = (delivery_date - window_end).days
@@ -438,7 +549,7 @@ def main() -> None:
                               ded_dt)
 
         # 6. PROMO BILLBACK
-        if rng.random() < profile["promo_billback"]:
+        if rng.random() < profile["promo_billback"] * vs:
             cid, code = code_id_for(retailer_id, "promo_billback", codes_by_retailer)
             amt = promo_amount(rng, total_value)
             add_deduction(retailer_id, "promo_billback", order_id, shipment_id,
@@ -446,31 +557,88 @@ def main() -> None:
                           "Promo billback (MCB / scan-down)",
                           ded_dt)
 
-        # 7. VAGUE — small base rate, opaque description, often no order linkage
-        if rng.random() < profile["vague"]:
+        # 7. VAGUE
+        if rng.random() < profile["vague"] * vs:
             cid, code = code_id_for(retailer_id, "vague", codes_by_retailer)
             amt = vague_amount(rng)
             template = rng.choice(VAGUE_TEMPLATES)
             description = template.format(code=rng.randint(85, 99), label="Other")
-            # 30% of vague deductions have no order_id link (real remittances)
             link_order = order_id if rng.random() > 0.30 else None
             link_shipment = shipment_id if link_order else None
             add_deduction(retailer_id, "vague", link_order, link_shipment,
                           amt, cid, code, description, ded_dt, is_vague=1)
 
-        # 8. SPOILAGE — product-condition disputes at receiving. Flows
-        # through the same failure pipeline as the other operational
-        # types (root cause derived from the description keyword).
-        if rng.random() < profile["spoilage"]:
-            cid, code = code_id_for(retailer_id, "spoilage", codes_by_retailer)
-            amt = spoilage_amount(rng, total_value)
-            description = rng.choice(SPOILAGE_TEMPLATES)
-            add_deduction(retailer_id, "spoilage", order_id, shipment_id,
-                          amt, cid, code, description, ded_dt)
+        # 8. EARLY DELIVERY — arrived before delivery window start
+        if window_start and delivery_date < window_start:
+            if rng.random() < profile["early_delivery"] * vs:
+                cid, code = code_id_for(retailer_id, "early_delivery", codes_by_retailer)
+                days_early = (window_start - delivery_date).days
+                amt = early_delivery_amount(rng, retailer_id, total_value)
+                add_deduction(retailer_id, "early_delivery", order_id, shipment_id,
+                              amt, cid, code,
+                              f"Early delivery — {days_early} days before window",
+                              ded_dt)
 
-    # 9. SLOTTING — periodic, not order-tied. Negotiated cost, not an
-    # operational failure. No order_id, no shipment_id, no dispute window.
-    # Spread N events per retailer evenly across the order date window.
+        # 9. FREIGHT / ROUTING
+        if rng.random() < profile["freight_routing"] * vs:
+            cid, code = code_id_for(retailer_id, "freight_routing", codes_by_retailer)
+            amt = freight_amount(rng, total_value)
+            desc = rng.choice(FREIGHT_TEMPLATES)
+            add_deduction(retailer_id, "freight_routing", order_id, shipment_id,
+                          amt, cid, code, desc, ded_dt)
+
+        # 10. WAREHOUSE SPOILS — product expires in distributor DC
+        if rng.random() < profile["warehouse_spoils"] * vs:
+            cid, code = code_id_for(retailer_id, "warehouse_spoils", codes_by_retailer)
+            amt = warehouse_spoils_amount(rng, total_value)
+            desc = rng.choice(WAREHOUSE_SPOILS_TEMPLATES)
+            add_deduction(retailer_id, "warehouse_spoils", order_id, shipment_id,
+                          amt, cid, code, desc, ded_dt)
+
+        # 11. STORE SPOILS — product expires at store
+        if rng.random() < profile["store_spoils"] * vs:
+            cid, code = code_id_for(retailer_id, "store_spoils", codes_by_retailer)
+            amt = store_spoils_amount(rng, total_value)
+            desc = rng.choice(STORE_SPOILS_TEMPLATES)
+            add_deduction(retailer_id, "store_spoils", order_id, shipment_id,
+                          amt, cid, code, desc, ded_dt)
+
+        # 12. PRICING / INVOICE
+        if rng.random() < profile["pricing_invoice"] * vs:
+            cid, code = code_id_for(retailer_id, "pricing_invoice", codes_by_retailer)
+            amt = pricing_amount(rng, total_value)
+            desc = rng.choice(PRICING_TEMPLATES)
+            add_deduction(retailer_id, "pricing_invoice", order_id, shipment_id,
+                          amt, cid, code, desc, ded_dt)
+
+        # 13. RETURNS / UNSALEABLES
+        if rng.random() < profile["returns_unsaleables"] * vs:
+            cid, code = code_id_for(retailer_id, "returns_unsaleables", codes_by_retailer)
+            amt = returns_amount(rng, total_value)
+            desc = rng.choice(RETURNS_TEMPLATES)
+            add_deduction(retailer_id, "returns_unsaleables", order_id, shipment_id,
+                          amt, cid, code, desc, ded_dt)
+
+        # 14. DUPLICATE DEDUCTION — same deduction taken twice; references a prior deduction
+        if rng.random() < profile["duplicate_deduction"] * vs and deductions:
+            recent = deductions[-rng.randint(1, min(20, len(deductions)))]
+            cid, code = code_id_for(retailer_id, "duplicate_deduction", codes_by_retailer)
+            amt = duplicate_amount(rng, recent[8])
+            add_deduction(retailer_id, "duplicate_deduction", order_id, shipment_id,
+                          amt, cid, code,
+                          f"Duplicate of prior deduction — same PO/amount",
+                          ded_dt)
+
+        # 15. WRONG BRAND — deduction meant for another supplier
+        if rng.random() < profile["wrong_brand"] * vs:
+            cid, code = code_id_for(retailer_id, "wrong_brand", codes_by_retailer)
+            amt = wrong_brand_amount(rng)
+            add_deduction(retailer_id, "wrong_brand", order_id, shipment_id,
+                          amt, cid, code,
+                          "Deduction for item not in Cinderhaven catalog — retailer error",
+                          ded_dt)
+
+    # 16. PLACEMENT FEES — periodic, not order-tied. Planning failure.
     window = cur.execute(
         "SELECT MIN(po_date), MAX(po_date) FROM orders"
     ).fetchone()
@@ -479,38 +647,39 @@ def main() -> None:
         we = date.fromisoformat(window[1])
         total_days = max(1, (we - ws).days)
         for retailer_id, profile in PROFILES.items():
-            n_events = profile["slotting_events"]
-            amount_lo, amount_hi = profile["slotting_amount_range"]
-            cid, code = code_id_for(retailer_id, "slotting", codes_by_retailer)
+            n_events = profile["placement_events"]
+            amount_lo, amount_hi = profile["placement_amount_range"]
+            cid, code = code_id_for(retailer_id, "placement_fees", codes_by_retailer)
             for i in range(n_events):
-                # Even spread with jitter so events don't cluster on day 0
                 frac = (i + 0.5) / n_events + rng.uniform(-0.25, 0.25) / n_events
                 frac = max(0.0, min(0.999, frac))
                 ded_dt = ws + timedelta(days=int(frac * total_days))
                 amt = round(rng.uniform(amount_lo, amount_hi), 2)
-                description = rng.choice(SLOTTING_TEMPLATES)
+                description = rng.choice(PLACEMENT_TEMPLATES)
+                cost_hours = round(rng.uniform(0.25, 1.0), 2)
                 seq += 1
                 deduction_id = f"DED-{seq:07d}"
                 deductions.append((
-                    deduction_id, retailer_id, None, None, "slotting",
+                    deduction_id, retailer_id, None, None, "placement_fees",
                     cid, code, description,
-                    amt, ded_dt.isoformat(), None,  # dispute_deadline NULL
-                    0, 0,  # is_vague=0, is_post_audit=0
-                    None,  # remittance_id populated later
+                    amt, ded_dt.isoformat(), None,
+                    0, 0,
+                    None,
+                    cost_hours,
                 ))
-                counters["slotting"] += 1
+                counters["placement_fees"] += 1
 
     cur.executemany("""
         INSERT INTO deductions (
             deduction_id, retailer_id, order_id, shipment_id, deduction_type,
             code_id, code_as_remitted, remittance_description,
             amount, deduction_date, dispute_deadline,
-            is_vague, is_post_audit, remittance_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            is_vague, is_post_audit, remittance_id,
+            evidence_retrieval_cost_hours
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, deductions)
     con.commit()
 
-    # Summary
     n = len(deductions)
     total = sum(d[8] for d in deductions)
     months = 18
@@ -518,15 +687,17 @@ def main() -> None:
 
     print(f"Inserted {n:,} deductions.")
     print(f"Total deduction value: ${total:,.0f}")
-    print(f"Annualized:            ${annualized:,.0f}  (target $750K-$1.2M)")
+    print(f"Annualized:            ${annualized:,.0f}  (target ~$1.5M)")
     print()
     print("By type:")
     type_amounts: dict[str, float] = {}
     for d in deductions:
         type_amounts[d[4]] = type_amounts.get(d[4], 0.0) + d[8]
-    for dt, count in sorted(counters.items(), key=lambda x: -x[1]):
+    for dt in ALL_TYPES:
+        count = counters[dt]
         amt = type_amounts.get(dt, 0)
-        print(f"  {dt:<16} {count:>5,}  ${amt:>10,.0f}")
+        if count > 0:
+            print(f"  {dt:<22} {count:>5,}  ${amt:>10,.0f}")
     print()
     print("By retailer:")
     by_ret_count: dict[str, int] = {}
@@ -539,7 +710,6 @@ def main() -> None:
         a = by_ret_amt.get(slug, 0)
         print(f"  {slug:<22} {c:>5,}  ${a:>10,.0f}")
 
-    # Sanity: vague + post-audit visibility
     vague_n = sum(1 for d in deductions if d[11])
     no_order = sum(1 for d in deductions if d[2] is None)
     print(f"\nVague deductions:   {vague_n:,}")
