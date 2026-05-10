@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { ByRetailer, ByType, Deduction, RetailersById, Summary } from "./types";
 import { loadDeductions, loadRetailers, loadSummary, formatDollars, formatPercent, formatCount } from "./data";
 import SankeyView from "./sankey/SankeyView";
+import CohortTableView from "./cohort/CohortTableView";
 import ExplorerView from "./explorer/ExplorerView";
 import CausationTraceView from "./causation/CausationTraceView";
 import RecoverySimulationView from "./simulation/RecoverySimulationView";
@@ -44,6 +45,7 @@ export default function App() {
   const [selection, setSelection] = useState<Selection | null>(null);
   const [dateRange, setDateRange] = useState<DateRange>(null);
   const [tracedDeductionId, setTracedDeductionId] = useState<string | null>(null);
+  const [focusedDeductionId, setFocusedDeductionId] = useState<string | null>(null);
   const traceRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -201,11 +203,18 @@ export default function App() {
 
       <SankeyView deductions={deductions} selection={selection} onSelect={setSelection} />
 
+      <CohortTableView
+        cohort={filteredDeductions ?? deductions}
+        onSelectDeduction={setFocusedDeductionId}
+        activeDeductionId={focusedDeductionId}
+      />
+
       <ExplorerView
         cohort={filteredDeductions ?? deductions}
         allDeductions={deductions}
         onTrace={setTracedDeductionId}
         tracedDeductionId={tracedDeductionId}
+        focusedDeductionId={focusedDeductionId}
       />
 
       <div ref={traceRef}>

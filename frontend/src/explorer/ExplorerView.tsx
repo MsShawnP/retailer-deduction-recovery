@@ -9,6 +9,7 @@ interface Props {
   allDeductions: Deduction[];
   onTrace?: (deductionId: string) => void;
   tracedDeductionId?: string | null;
+  focusedDeductionId?: string | null;
 }
 
 const TODAY = new Date("2026-05-31");
@@ -18,6 +19,7 @@ export default function ExplorerView({
   allDeductions,
   onTrace,
   tracedDeductionId,
+  focusedDeductionId,
 }: Props) {
   const sorted = useMemo(
     () => [...cohort].sort((a, b) => b.amount - a.amount),
@@ -29,6 +31,12 @@ export default function ExplorerView({
   useEffect(() => {
     setIndex(0);
   }, [sorted]);
+
+  useEffect(() => {
+    if (!focusedDeductionId) return;
+    const idx = sorted.findIndex((d) => d.deduction_id === focusedDeductionId);
+    if (idx >= 0) setIndex(idx);
+  }, [focusedDeductionId, sorted]);
 
   if (sorted.length === 0) {
     return (
