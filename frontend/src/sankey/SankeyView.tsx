@@ -14,6 +14,91 @@ import "./SankeyView.css";
 
 const SLOTTING_BAND_COLOR = "#9E7E3A";  // muted gold — matches OUTCOME_COLORS for the terminal
 
+// Fixed node orderings per layer. Nodes are sorted top→bottom by their
+// rank here. Nodes not listed get a high default rank (pushed to bottom
+// of their layer). Slotting is always last in layer 0 so its long band
+// to the terminal doesn't cross through other flows. Middle-layer orders
+// are chosen so semantically related nodes stay adjacent and parent→child
+// connections align, minimizing band crossings.
+const LAYER_SORT_ORDER: Record<number, string[]> = {
+  0: [
+    "Short ship",
+    "Label fine",
+    "Late delivery",
+    "Promo billback",
+    "Vague",
+    "Damaged",
+    "Pallet fine",
+    "Spoilage",
+    "Slotting",
+  ],
+  1: [
+    "Non-scannable label",
+    "Generic label",
+    "Other label issue",
+    "BOL signed short",
+    "Pack/pick mismatch",
+    "Other shortage",
+    "Delivery missed window",
+    "Promo program",
+    "Opaque remittance",
+    "Pallet noncompliance",
+    "Damage at receiving",
+    "Temperature abuse in transit",
+    "Expired / short-dated at receiving",
+    "Quality complaint at receiving",
+    "Damage in transit",
+    "Other spoilage",
+    "Post-audit clawback",
+  ],
+  2: [
+    "Digital, complete",
+    "Digital, partial",
+    "Handwritten only",
+    "No evidence",
+    "Never filed",
+  ],
+  3: [
+    "Digital system",
+    "Filing cabinet",
+    "Warehouse clipboard",
+    "Lost",
+    "No verification",
+    "n/a — never filed",
+  ],
+  4: [
+    "On time",
+    "No published deadline",
+    "Past deadline",
+    "Never filed",
+  ],
+  5: [
+    "Won full",
+    "Won partial",
+    "Pending",
+    "Lost — evidence",
+    "Lost — deadline",
+    "Lost — no response",
+    "Lost — other",
+    "Abandoned",
+    "Never filed",
+    "Not disputable — negotiated cost",
+  ],
+};
+
+const LAYER_RANK_MAPS: Map<number, Map<string, number>> = new Map(
+  Object.entries(LAYER_SORT_ORDER).map(([layer, labels]) => [
+    Number(layer),
+    new Map(labels.map((label, i) => [label, i])),
+  ])
+);
+
+function nodeRank(node: { layer: number; label: string }): number {
+  const map = LAYER_RANK_MAPS.get(node.layer);
+  if (!map) return 999;
+  return map.get(node.label) ?? 999;
+}
+
 interface Props {
   deductions: Deduction[];
   selection: Selection | null;
@@ -100,8 +185,9 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
     const generator = sankey<any, any>()
       .nodeId((d: any) => d.id)
       .nodeAlign(sankeyJustify)
+      .nodeSort((a: any, b: any) => nodeRank(a) - nodeRank(b))
       .nodeWidth(14)
-      .nodePadding(10)
+      .nodePadding(12)
       .extent([
         [MARGIN.left, MARGIN.top],
         [WIDTH - MARGIN.right, HEIGHT - MARGIN.bottom],
