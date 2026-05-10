@@ -159,16 +159,7 @@ function outcomeFor(d: Deduction): string {
 }
 
 export function disputeReadinessFor(d: Deduction): string {
-  // Binary split: filed disputes classify by outcome, unfiled by
-  // current evidence state. No filed dispute in an unfiled bucket,
-  // no unfiled deduction in a disputed bucket.
-  if (d.dispute) {
-    const o = d.dispute.outcome;
-    if (o === "won_full" || o === "won_partial") return "Disputed — won";
-    if (o === "pending") return "Disputed — pending";
-    if (o === "abandoned") return "Disputed — abandoned";
-    return "Disputed — lost";
-  }
+  if (d.dispute) return "Disputed";
 
   if (d.is_vague) return "Never assessed";
 
