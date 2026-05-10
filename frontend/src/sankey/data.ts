@@ -1,25 +1,13 @@
-// Compute the 6-layer Sankey data from the denormalized deductions array.
+// Compute the 3-layer Sankey data from the denormalized deductions array.
 //
 // Layers (in order):
-//   0. type            — deduction_type (short_ship, label_fine, etc.)
-//   1. root_cause      — derived from pack/ship signals (non-scannable
-//                         label, real shortage, generic label, etc.)
-//   2. evidence_quality — from dispute.evidence_quality, or "Never filed"
-//   3. accessibility   — pack_record.evidence_location label, or "n/a"
-//   4. timeliness      — was_within_deadline, with NULL and never-filed
-//                         buckets
-//   5. outcome         — dispute.outcome, or "Never filed"
+//   0. type             — deduction_type (short_ship, label_fine, etc.)
+//   1. dispute_readiness — collapsed assessment: Ready / Needs work /
+//                          Can't dispute / Never assessed
+//   2. outcome          — dispute.outcome, or "Never filed"
 //
-// Link value = sum of deduction.amount. Each deduction contributes one
-// path through all six layers, so total value flowing OUT of the type
-// layer equals total deductions value.
-//
-// Slotting is the exception: it's a negotiated cost (new-item / planogram
-// / shelf-placement fees), not an operational failure. It enters at
-// layer 0 like every other type but routes directly to a single terminal
-// node at layer 5 ("Not disputable — negotiated cost") — bypassing the
-// failure pipeline entirely. The visual: a single long band crosses the
-// chart, making the categorical difference legible at a glance.
+// Slotting is excluded from the Sankey (shown as a callout below the
+// chart) since it's a negotiated cost, not an operational failure.
 
 import type { Deduction } from "../types";
 
@@ -88,11 +76,7 @@ export function isOperational(d: Deduction): boolean {
   return OPERATIONAL_TYPES.has(d.deduction_type);
 }
 
-// Terminal node for slotting deductions in the Sankey. Stored at layer 5
-// (the outcome column) so it renders alongside the win/loss outcomes; the
-// label and color make the categorical difference clear.
 export const SLOTTING_TERMINAL_LABEL = "Not disputable — negotiated cost";
-export const SLOTTING_TERMINAL_NODE_ID = `5:${SLOTTING_TERMINAL_LABEL}`;
 
 const OUTCOME_LABELS: Record<string, string> = {
   won_full: "Won full",
@@ -151,18 +135,18 @@ export function rootCauseFor(d: Deduction): string {
   return "Other";
 }
 
-function evidenceQualityFor(d: Deduction): string {
+export function evidenceQualityFor(d: Deduction): string {
   if (!d.dispute) return "Never filed";
   return EVIDENCE_QUALITY_LABELS[d.dispute.evidence_quality] || d.dispute.evidence_quality;
 }
 
-function accessibilityFor(d: Deduction): string {
+export function accessibilityFor(d: Deduction): string {
   if (!d.dispute) return "n/a — never filed";
   if (!d.pack_record?.evidence_location) return "No verification";
   return LOCATION_LABELS[d.pack_record.evidence_location] || d.pack_record.evidence_location;
 }
 
-function timelinessFor(d: Deduction): string {
+export function timelinessFor(d: Deduction): string {
   if (!d.dispute) return "Never filed";
   if (d.dispute.was_within_deadline === true) return "On time";
   if (d.dispute.was_within_deadline === false) return "Past deadline";
@@ -174,8 +158,37 @@ function outcomeFor(d: Deduction): string {
   return OUTCOME_LABELS[d.dispute.outcome] || d.dispute.outcome;
 }
 
+export function disputeReadinessFor(d: Deduction): string {
+  if (d.is_vague) return "Never assessed";
+
+  // Past deadline — can't dispute regardless of evidence
+  if (d.dispute?.was_within_deadline === false) return "Can't dispute";
+  if (!d.dispute && d.dispute_deadline) {
+    const deadline = new Date(d.dispute_deadline);
+    if (deadline < new Date()) return "Can't dispute";
+  }
+
+  // Evidence assessment
+  const eq = d.dispute?.evidence_quality;
+  const loc = d.pack_record?.evidence_location;
+  const verification = d.pack_record?.pack_verification;
+
+  // No evidence at all
+  if (eq === "none") return "Can't dispute";
+  if (!d.pack_record && !d.dispute) return "Can't dispute";
+  if (loc === "lost") return "Can't dispute";
+  if (!eq && verification === "none") return "Can't dispute";
+
+  // Digital + accessible = ready
+  if ((eq === "digital_complete" || eq === "digital_partial") && loc === "system")
+    return "Ready to dispute";
+  if (!eq && verification === "digital_log" && loc === "system")
+    return "Ready to dispute";
+
+  return "Needs work";
+}
+
 export function buildSankeyData(deductions: Deduction[]): SankeyData {
-  // Aggregate (sourceLayer, sourceLabel, targetLayer, targetLabel) -> $
   const linkAcc = new Map<string, number>();
   const nodeIds = new Set<string>();
 
@@ -192,27 +205,12 @@ export function buildSankeyData(deductions: Deduction[]): SankeyData {
 
   for (const d of deductions) {
     if (d.amount <= 0) continue;
-    const t  = TYPE_LABELS[d.deduction_type] || d.deduction_type;
-
-    if (d.deduction_type === "slotting") {
-      // Slotting branches off immediately to its terminal node and
-      // skips the failure-pipeline columns. d3-sankey will draw a single
-      // band crossing the chart from layer 0 (type) to layer 5 (terminal).
-      addEdge(0, t, 5, SLOTTING_TERMINAL_LABEL, d.amount);
-      continue;
-    }
-
-    const rc = rootCauseFor(d);
-    const eq = evidenceQualityFor(d);
-    const ac = accessibilityFor(d);
-    const tm = timelinessFor(d);
+    const t = TYPE_LABELS[d.deduction_type] || d.deduction_type;
+    const readiness = disputeReadinessFor(d);
     const oc = outcomeFor(d);
 
-    addEdge(0, t,  1, rc, d.amount);
-    addEdge(1, rc, 2, eq, d.amount);
-    addEdge(2, eq, 3, ac, d.amount);
-    addEdge(3, ac, 4, tm, d.amount);
-    addEdge(4, tm, 5, oc, d.amount);
+    addEdge(0, t, 1, readiness, d.amount);
+    addEdge(1, readiness, 2, oc, d.amount);
   }
 
   const nodes: SankeyNode[] = [...nodeIds].map((id) => {
@@ -228,40 +226,19 @@ export function buildSankeyData(deductions: Deduction[]): SankeyData {
   return { nodes, links };
 }
 
-// Abbreviated to keep all six column titles on one line at common
-// viewport widths: "Evidence quality" → "Evidence",
-// "Evidence accessibility" → "Accessibility",
-// "Dispute timeliness" → "Timeliness".
 export const LAYER_TITLES = [
   "Deduction type",
-  "Root cause",
-  "Evidence",
-  "Accessibility",
-  "Timeliness",
+  "Dispute readiness",
   "Outcome",
 ];
 
 // ---- Path helpers for click-to-zoom and table filtering ----
 
 export function pathIds(d: Deduction): string[] {
-  const t  = TYPE_LABELS[d.deduction_type] || d.deduction_type;
-  if (d.deduction_type === "slotting") {
-    // Slotting bypasses layers 1–4; its only edge is type → terminal.
-    return [`0:${t}`, SLOTTING_TERMINAL_NODE_ID];
-  }
-  const rc = rootCauseFor(d);
-  const eq = evidenceQualityFor(d);
-  const ac = accessibilityFor(d);
-  const tm = timelinessFor(d);
+  const t = TYPE_LABELS[d.deduction_type] || d.deduction_type;
+  const readiness = disputeReadinessFor(d);
   const oc = outcomeFor(d);
-  return [
-    `0:${t}`,
-    `1:${rc}`,
-    `2:${eq}`,
-    `3:${ac}`,
-    `4:${tm}`,
-    `5:${oc}`,
-  ];
+  return [`0:${t}`, `1:${readiness}`, `2:${oc}`];
 }
 
 export type Selection =
@@ -371,22 +348,14 @@ export function selectionLabel(sel: Selection | null, retailerName?: string): st
   return `${srcRest.join(":")} → ${tgtRest.join(":")}`;
 }
 
-// Outcomes split into three categorical buckets:
-//   - Wins  — green (#0A7B3E)
-//   - Pending — neutral gray
-//   - Lost / abandoned / never_filed — Economist red
-//   - Not disputable (slotting) — muted gold; categorically not a loss
-// Within-bucket detail comes from the node label, not the color.
-// Wins use one shade so won_full and won_partial both read as "won".
 export const OUTCOME_COLORS: Record<string, string> = {
-  "Won full":           "#0A7B3E",  // green
-  "Won partial":        "#0A7B3E",  // green (same — winning is winning)
-  Pending:              "#8B95A1",  // neutral gray
-  Abandoned:            "#E3120B",  // red — gave up = loss
+  "Won full":           "#0A7B3E",
+  "Won partial":        "#0A7B3E",
+  Pending:              "#8B95A1",
+  Abandoned:            "#E3120B",
   "Lost — evidence":    "#E3120B",
   "Lost — deadline":    "#E3120B",
   "Lost — no response": "#E3120B",
   "Lost — other":       "#E3120B",
   "Never filed":        "#E3120B",
-  [SLOTTING_TERMINAL_LABEL]: "#9E7E3A",  // muted gold — negotiated, not a loss
 };
