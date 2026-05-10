@@ -11,49 +11,6 @@ import {
 } from "./data";
 import "./SankeyView.css";
 
-// Fixed node orderings for layers 0 and 5. Slotting is always last in
-// layer 0 so its long band to the terminal doesn't cross through other
-// flows. Layer 5 groups wins/losses/terminal for readability.
-// Layers 1–4 are sorted by value descending at layout time — the biggest
-// bands stay adjacent and dominate the flow, which reduces visual crossing
-// chaos more effectively than semantic grouping.
-const LAYER_SORT_ORDER: Record<number, string[]> = {
-  0: [
-    "Short ship",
-    "Label fine",
-    "Late delivery",
-    "Promo billback",
-    "Vague",
-    "Damaged",
-    "Pallet fine",
-    "Spoilage",
-  ],
-  5: [
-    "Won full",
-    "Won partial",
-    "Pending",
-    "Lost — evidence",
-    "Lost — deadline",
-    "Lost — no response",
-    "Lost — other",
-    "Abandoned",
-    "Never filed",
-  ],
-};
-
-const LAYER_RANK_MAPS: Map<number, Map<string, number>> = new Map(
-  Object.entries(LAYER_SORT_ORDER).map(([layer, labels]) => [
-    Number(layer),
-    new Map(labels.map((label, i) => [label, i])),
-  ])
-);
-
-function nodeRank(node: { layer: number; label: string; value?: number }): number {
-  const map = LAYER_RANK_MAPS.get(node.layer);
-  if (map) return map.get(node.label) ?? 999;
-  // Layers 1–4: sort by value descending (biggest nodes on top)
-  return -(node.value || 0);
-}
 
 interface Props {
   deductions: Deduction[];
@@ -62,21 +19,13 @@ interface Props {
 }
 
 const WIDTH = 1600;
-const HEIGHT = 1200;
+const HEIGHT = 700;
 const MARGIN = { top: 44, right: 260, bottom: 20, left: 32 };
 
-// Single-hue teal gradient that DARKENS L→R, so the darkest teal
-// (Timeliness, layer 4) sits adjacent to the categorical outcome
-// column for maximum contrast. Outcome nodes are overridden per-bucket
-// by OUTCOME_COLORS — red for losses, green for wins, gray for pending.
 const LAYER_COLORS = [
-  "#9CD7D4", // type        — lightest teal
-  "#6BBFC8",
-  "#43A4B5",
-  "#26829A",
-  "#125F77", // timeliness  — darkest teal, abuts outcome
-  "#053D52", // outcome     — placeholder; layer 5 is rendered via
-              //               OUTCOME_COLORS, so this value is unused
+  "#6BBFC8", // type
+  "#26829A", // dispute readiness
+  "#053D52", // outcome — overridden per-node by OUTCOME_COLORS
 ];
 
 function dollarsCompact(n: number): string {
@@ -86,8 +35,8 @@ function dollarsCompact(n: number): string {
 }
 
 function nodeColor(node: { layer: number; label: string }): string {
-  if (node.layer === 5) {
-    return OUTCOME_COLORS[node.label] || LAYER_COLORS[5];
+  if (node.layer === 2) {
+    return OUTCOME_COLORS[node.label] || LAYER_COLORS[2];
   }
   return LAYER_COLORS[node.layer];
 }
@@ -117,7 +66,6 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
     const generator = sankey<any, any>()
       .nodeId((d: any) => d.id)
       .nodeAlign(sankeyJustify)
-      .nodeSort((a: any, b: any) => nodeRank(a) - nodeRank(b))
       .nodeWidth(14)
       .nodePadding(12)
       .extent([
@@ -169,18 +117,12 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
 
   return (
     <div className="sankey">
-      <h2>Deduction flow — every dollar, traced through five compounding failures</h2>
+      <h2>Deduction flow — type, readiness, outcome</h2>
       <p className="section-description">
-        Every dollar retailers deducted from Cinderhaven's payments starts at
-        the top and flows down through six stages: what type of deduction it
-        was, what caused it, whether good evidence existed, whether that
-        evidence was findable, whether a dispute was filed on time, and what
-        happened in the end. The width of each band is proportional to the
-        dollar amount — wider bands mean more money. Click any band or node
-        to isolate that path; everything else fades so you can follow the
-        money. Click again to reset. The dropdown above lets you filter to
-        a single deduction type. The tables below update automatically to
-        match whatever you've selected.
+        Every deducted dollar flows left to right through three stages: what
+        type it was, whether Cinderhaven could realistically dispute it, and
+        what happened. Band width is proportional to dollars. Click any node
+        or band to isolate that path; click again to reset.
       </p>
 
       <svg
