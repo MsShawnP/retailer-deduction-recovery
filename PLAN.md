@@ -214,8 +214,7 @@ views for each feature before moving to the next.
 - User authentication
 - Mobile-first design (responsive is fine, mobile-optimized is not
   required)
-- Folding extensions back into cinderhaven-data repo (separate task
-  after this arc)
+- ~~Folding extensions back into cinderhaven-data repo~~ (done 2026-05-10)
 
 ## Definition of done for this arc
 

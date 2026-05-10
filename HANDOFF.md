@@ -562,3 +562,36 @@ fixing before the prospect intro. After that the original arc is
 done.
 
 ---
+
+## 2026-05-10
+
+**What changed:** Migrated deduction pipeline to cinderhaven-data;
+this repo now consumes rather than generates.
+
+**Why:** cinderhaven-data is the canonical dataset for all Cinderhaven
+projects. Generation scripts, schema DDL, static seeds, and research
+files now live there. This repo copies the built DB and runs only its
+own JSON export + demo-specific validator.
+
+**State:** cinderhaven-data commit `6eb3cbb` had already integrated the
+pipeline scripts (07–15). This session added research files (`c55664a`,
+pushed) and updated this repo (`babffe0`): removed 9 files (7 generators
++ 2 SQL), rewrote `build_deductions_db.py` as a copy-from-sibling script,
+updated validator for double-dip deductions. Verified end-to-end:
+`build_db.py --force` in cinderhaven-data → copy → export → validate
+(37 PASS / 0 FAIL) → frontend build clean.
+
+Deduction count is now 3,087 (was 3,333) because the canonical
+cinderhaven-data scripts produce slightly lower volume. Annualized
+dollar amount ($802K) still in the $750K–$1.2M target band.
+
+**Remaining scripts in this repo:**
+- `scripts/build_deductions_db.py` — copies DB from `../cinderhaven-data/`
+- `scripts/20_export_json.py` — transforms SQLite to static JSON
+- `scripts/21_validate_dataset.py` — demo-specific validation (37 checks)
+
+**Next:** Phase 4 task 4 (friend preview) is still the next step in
+the original arc. Separately, deploy needs redeployment to Cloudflare
+Pages with the updated data.
+
+---
