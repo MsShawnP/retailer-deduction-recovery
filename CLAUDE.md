@@ -23,9 +23,10 @@ shows what each one is costing them and what it takes to fix it.
 
 ## Stack and tools
 
-- Data source: SQLite database from cinderhaven-data repo, extended
-  with deduction-specific tables
-- Data pipeline: Python (extend synthetic data, export to static JSON)
+- Data source: SQLite database from cinderhaven-data repo (includes
+  all deduction tables as of May 2026)
+- Data pipeline: Python (export to static JSON only — generation
+  lives in cinderhaven-data)
 - Frontend: React + HTML
 - Deployment: Cloudflare Pages
 - No live backend — React app consumes pre-built JSON files
@@ -33,24 +34,26 @@ shows what each one is costing them and what it takes to fix it.
 ## Data architecture
 
 The cinderhaven-data repo (https://github.com/MsShawnP/cinderhaven-data)
-is the base dataset. This project clones/consumes that database and
-extends it with:
+is the single source of truth for all data generation, including
+deduction tables. As of May 2026, data generation scripts that
+previously lived in this repo's `scripts/` directory have been merged
+upstream into cinderhaven-data (scripts 07–15 in its build pipeline).
+The scripts in this repo's `scripts/` directory are superseded —
+kept for reference but no longer the canonical versions.
 
-- Full deduction records across taxonomy (short ship, labeling fines,
-  pallet noncompliance, promo disputes, damaged product, late delivery)
-- EDI order requirements per retailer (label specs, pallet specs,
-  delivery windows, dispute deadlines, portal details)
-- Pack/ship records (what was actually picked, packed, labeled)
-- Dispute records (timelines, evidence submitted, outcomes)
-- Retailer-specific dispute rules and deadline windows
-- Remittance data (some clear, some vague/requires investigation)
+This repo now only consumes the built database. The database includes:
 
-Retailer-specific behaviors (Walmart, Costco, Whole Foods, UNFI, KeHE,
-regional chains) should be modeled as realistically as possible —
-actual dispute processes, deadlines, portal quirks, deduction codes.
+- Base tables: product_master, stores, distribution_log, sku_costs,
+  promotions (with promo_cost and funding_mechanism), price_history,
+  scan_data, chargebacks
+- Deduction tables: retailers, retailer_rules, deduction_codes,
+  edi_requirements, orders, order_lines, pack_records, shipments,
+  deductions (with is_double_dip flag), remittances, disputes,
+  dispute_evidence, post_audit_claims
 
-The built database is not committed. A Python export script transforms
-the extended SQLite data into JSON structures the React app consumes.
+To regenerate the database, run `python scripts/build_db.py` in the
+cinderhaven-data repo. A Python export script in this repo transforms
+the SQLite data into JSON structures the React app consumes.
 
 ## Features (all ship in V1)
 
