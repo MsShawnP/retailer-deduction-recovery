@@ -563,96 +563,39 @@ done.
 
 ---
 
-## 2026-05-10 — /wrap (session 1)
+## 2026-05-09 16:45 — /wrap
 
-**Started from:** Phase 4 task 3 done (deployed to Cloudflare Pages).
-All 9 Phase 3 features and Phase 4 tasks 1–3 complete.
+**Started from:** Spoilage/slotting deduction types had just been
+added across the pipeline and all views (commit `e295958`). Phase 4
+polish in progress — waiting on peer reviewer feedback.
 
-**Did:**
+**Did:** Two things this session:
 
-- Migrated deduction pipeline from this repo to cinderhaven-data
-  (canonical dataset). This repo now copies the built DB and runs
-  only JSON export + demo-specific validator.
-- Collapsed Sankey from 6 layers to 3 (Type → Dispute readiness →
-  Outcome). New `disputeReadinessFor()` scoring function with five
-  buckets: Disputed — won, Disputed — lost, Ready to dispute, Needs
-  work, Can't dispute, Never assessed. All custom nodeSort logic
-  removed. SVG height 1200→700.
-- Pulled slotting out of Sankey into callout box above the chart.
-  Slotting excluded from Sankey-driven cohort filters.
-- Fixed dispute readiness classification — resolved disputes now
-  classify by actual outcome (won→"Disputed — won", lost→"Disputed
-  — lost") instead of re-scoring on current evidence state.
-- Fixed KPI consistency — "Total deductions" headline now matches
-  Sankey window totals; annualized figure moved to subtitle.
-- Fixed labor KPI — shows "from N filed" or "no disputes filed in
-  this cohort" instead of misleading FTE figure on undisputed cohorts.
-- Fixed cold-chain references — all 90 SKUs are shelf-stable (sauces,
-  condiments, pantry staples). "Temperature abuse in transit" →
-  "Heat exposure in transit". Explorer prose rewritten. Costco SPL
-  code updated in cinderhaven-data.
-- CSS fixes: section intro text width, Sankey label contrast (white
-  halo knockout), italic text width, always-show node labels.
-- Full data rebuild with updated spoilage templates. Validator: 37
-  PASS / 2 WARN / 0 FAIL. Frontend builds clean.
+1. Added plain-language section descriptions to all 10 views.
+   `.section-description` class in App.css (15px, `--ink-soft`,
+   780px max-width, no container). Exact user-provided copy
+   inserted below each h2 in both empty-state and populated-state
+   branches. Removed the old `.sankey-sub` italic paragraph
+   (superseded by the new Sankey description). Verified via
+   Playwright: 10 descriptions rendered, correct computed styles,
+   zero JS errors.
 
-**State:** All changes on branch `claude/determined-keller-c1455e`,
-committed and pushed. Needs merge to master and Cloudflare Pages
-redeploy. 3,087 deductions / $1.54M total / $802K annualized.
+2. Cleaned up verification artifacts. Deleted `.claude/launch.json`,
+   `screenshot-sankey-top.mjs`, `screenshot-slotting-filter.mjs`
+   (commit `5b4dd98`). PNGs were already gitignored — deleted from
+   disk only. Confirmed `netlify.toml` already removed,
+   `wrangler.jsonc` has SPA routing, DECISIONS.md Cloudflare Pages
+   entry already in place.
 
-**Next:** Merge to master, redeploy to Cloudflare Pages, then Phase 4
-task 4 (friend preview).
+**State:** Two commits on master ahead of origin: `e295958`
+(spoilage/slotting) and `5b4dd98` (artifact cleanup). Not pushed
+yet. Build passes. Dev server running on port 5174. All 10 feature
+views live with section descriptions. Cloudflare Pages dashboard
+configured (root: `frontend`, output: `dist`, build: `npm run
+build`). Awaiting peer reviewer feedback before next moves.
 
----
-
-## 2026-05-10 — /wrap (session 2)
-
-**Started from:** Session 1 wrap done. Sankey had 3-layer structure
-but node/link sorting still needed work — ribbons crossing within
-nodes, layer 2 node ordering fighting topology.
-
-**Did:**
-
-- **Sankey node sorting overhaul:**
-  - Layers 0 and 1: dynamic sort by dollar value descending (largest
-    node at top). Replaced layer 0's disputed-share proportion sort
-    and layer 1's fixed READINESS_ORDER.
-  - Layer 2: grouped dynamic sort by group total (losses, wins,
-    abandoned, pending, never filed). Within-group sort by value
-    descending. Replaced static OUTCOME_ORDER.
-  - Post-layout barycenter reposition of layer 2 nodes — each node's
-    weighted average source y-position determines vertical placement.
-    "Never filed" moves to the bottom (its sources are the unfiled
-    nodes in the lower part of layer 1). Disputed outcomes stay at
-    top, matching "Disputed" at top of layer 1. Eliminates the
-    structural crossings caused by value-based ordering.
-
-- **Sankey link sorting:**
-  - Generator `linkSort` doesn't control attachment order (fires
-    before node positions are finalized). Replaced with post-layout
-    two-pass sort: pass 1 sorts each node's `sourceLinks` by
-    `target.y0` and recomputes `link.y0`; pass 2 sorts each node's
-    `targetLinks` by `source.y0` and recomputes `link.y1`. Ribbons
-    now attach in vertical order of their partner node, eliminating
-    within-node crossings.
-
-- **Cohort table:** New `CohortTableView` between Sankey and explorer.
-  8 columns (ID, date, retailer, type, amount, readiness, outcome,
-  retrieval hours). Sortable by any column (default: amount desc).
-  Paginated at 25 rows. Click a row to jump the explorer to that
-  deduction via new `focusedDeductionId` prop on ExplorerView.
-
-- **Slotting callout styling:** 15px → 17px, bold, centered.
-
-- Removed unused `TYPE_LABELS` import from SankeyView (caught by
-  `tsc -b` in Cloudflare build).
-
-**State:** All changes on branch `claude/determined-keller-c1455e`,
-committed and pushed (15 commits this session, head at `415de47`).
-Needs merge to master and Cloudflare Pages redeploy.
-
-**Next:** Merge to master, redeploy to Cloudflare Pages. Visual
-verification of the barycenter reposition on the live site. Then
-Phase 4 task 4 (friend preview).
+**Next:** Push to origin and trigger Cloudflare Pages deploy. Then
+Phase 4 task 4 — friend preview handoff. Peer reviewer feedback
+may generate additional polish items before that.
 
 ---
