@@ -1,7 +1,9 @@
-"""Export the deduction-extended SQLite database to static JSON files
+"""Export the Cinderhaven deductions data to static JSON files
 that the React app will consume.
 
-Three files in data/json/:
+Reads from the Cinderhaven Data Platform (Postgres).
+
+Three files in frontend/public/json/:
   - summary.json        Top-line metrics for the landing view.
   - deductions.json     Denormalized array of all deductions with
                          linked order / pack / shipment / dispute /
@@ -10,50 +12,80 @@ Three files in data/json/:
                          simulation, and timeline pressure features.
   - retailers.json      Retailer metadata + rules + codes + EDI
                          requirements for retailer-card rendering.
-
-Run after `build_deductions_db.py --full`.
 """
 
 from __future__ import annotations
 
 import json
-import sqlite3
+import os
 from collections import defaultdict
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
+import psycopg2
+import psycopg2.extras
+
 ROOT = Path(__file__).resolve().parent.parent
-DB_PATH = ROOT / "data" / "cinderhaven_deductions.db"
 OUT_DIR = ROOT / "frontend" / "public" / "json"
 
 
-def dict_factory(cursor, row):
-    return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+class _ChainCursor:
+    """Wraps a psycopg2 RealDictCursor so execute() returns self (chainable)."""
+
+    def __init__(self, cur):
+        self._cur = cur
+
+    def execute(self, sql, params=None):
+        self._cur.execute(sql, params)
+        return self
+
+    def fetchone(self):
+        return self._cur.fetchone()
+
+    def fetchall(self):
+        return self._cur.fetchall()
 
 
-def connect() -> sqlite3.Connection:
-    if not DB_PATH.exists():
-        raise FileNotFoundError(f"Database not found at {DB_PATH}")
-    con = sqlite3.connect(DB_PATH)
-    con.row_factory = dict_factory
-    return con
+class _Connection:
+    """Wraps psycopg2 connection to return chainable dict cursors."""
+
+    def __init__(self, dsn: str):
+        self._conn = psycopg2.connect(dsn, cursor_factory=psycopg2.extras.RealDictCursor)
+        self._conn.autocommit = True
+
+    def cursor(self):
+        return _ChainCursor(self._conn.cursor())
+
+    def close(self):
+        self._conn.close()
 
 
-def build_summary(con: sqlite3.Connection) -> dict:
+def connect():
+    url = os.environ.get("DATABASE_URL")
+    if not url:
+        raise RuntimeError(
+            "DATABASE_URL environment variable is not set. "
+            "Copy .env.example to .env and configure."
+        )
+    return _Connection(url)
+
+
+def build_summary(con) -> dict:
     cur = con.cursor()
 
     window = cur.execute(
-        "SELECT MIN(deduction_date) AS start, MAX(deduction_date) AS end FROM deductions"
+        "SELECT MIN(deduction_date) AS start, MAX(deduction_date) AS end FROM stg_deductions"
     ).fetchone()
-    window_start = date.fromisoformat(window["start"])
-    window_end = date.fromisoformat(window["end"])
+    window_start = window["start"] if isinstance(window["start"], date) else date.fromisoformat(window["start"])
+    window_end = window["end"] if isinstance(window["end"], date) else date.fromisoformat(window["end"])
     window_months = (window_end.year - window_start.year) * 12 + (window_end.month - window_start.month) + 1
 
     totals_row = cur.execute("""
         SELECT
             COUNT(*) AS deductions_count,
             ROUND(SUM(amount), 2) AS deductions_dollar
-        FROM deductions
+        FROM stg_deductions
     """).fetchone()
 
     disputes_row = cur.execute("""
@@ -61,14 +93,14 @@ def build_summary(con: sqlite3.Connection) -> dict:
             COUNT(*) AS disputes_filed,
             ROUND(SUM(recovered_amount), 2) AS disputes_recovered,
             ROUND(SUM(labor_hours), 1) AS labor_hours
-        FROM disputes
+        FROM stg_disputes
     """).fetchone()
 
     orders_row = cur.execute("""
         SELECT
             COUNT(*) AS orders_count,
             ROUND(SUM(total_value), 2) AS orders_dollar
-        FROM orders
+        FROM stg_orders
     """).fetchone()
 
     recovery_rate = (disputes_row["disputes_recovered"] or 0) / (totals_row["deductions_dollar"] or 1)
@@ -78,7 +110,7 @@ def build_summary(con: sqlite3.Connection) -> dict:
     by_type = []
     for row in cur.execute("""
         SELECT deduction_type, COUNT(*) AS count, ROUND(SUM(amount), 2) AS dollar
-        FROM deductions
+        FROM stg_deductions
         GROUP BY deduction_type
         ORDER BY dollar DESC
     """).fetchall():
@@ -95,9 +127,9 @@ def build_summary(con: sqlite3.Connection) -> dict:
             COUNT(*) AS deductions,
             ROUND(SUM(d.amount), 2) AS dollar,
             ROUND(SUM(disp.recovered_amount), 2) AS recovered
-        FROM deductions d
-        JOIN retailers r ON r.retailer_id = d.retailer_id
-        LEFT JOIN disputes disp ON disp.deduction_id = d.deduction_id
+        FROM stg_deductions d
+        JOIN stg_retailers r ON r.retailer_id = d.retailer_id
+        LEFT JOIN stg_disputes disp ON disp.deduction_id = d.deduction_id
         GROUP BY d.retailer_id
         ORDER BY dollar DESC
     """).fetchall():
@@ -109,7 +141,7 @@ def build_summary(con: sqlite3.Connection) -> dict:
     by_outcome = []
     for row in cur.execute("""
         SELECT outcome, COUNT(*) AS count, ROUND(SUM(recovered_amount), 2) AS dollar
-        FROM disputes
+        FROM stg_disputes
         GROUP BY outcome
         ORDER BY count DESC
     """).fetchall():
@@ -118,7 +150,7 @@ def build_summary(con: sqlite3.Connection) -> dict:
     by_evidence_quality = []
     for row in cur.execute("""
         SELECT evidence_quality, COUNT(*) AS count
-        FROM disputes
+        FROM stg_disputes
         GROUP BY evidence_quality
         ORDER BY count DESC
     """).fetchall():
@@ -126,8 +158,8 @@ def build_summary(con: sqlite3.Connection) -> dict:
 
     deductions_no_dispute = cur.execute("""
         SELECT COUNT(*) AS n, ROUND(SUM(d.amount), 2) AS dollar
-        FROM deductions d
-        LEFT JOIN disputes disp ON disp.deduction_id = d.deduction_id
+        FROM stg_deductions d
+        LEFT JOIN stg_disputes disp ON disp.deduction_id = d.deduction_id
         WHERE disp.dispute_id IS NULL
     """).fetchone()
 
@@ -159,20 +191,20 @@ def build_summary(con: sqlite3.Connection) -> dict:
     return summary
 
 
-def build_deductions(con: sqlite3.Connection) -> list[dict]:
+def build_deductions(con) -> list[dict]:
     cur = con.cursor()
 
     # Pre-fetch the lookups that will be repeatedly joined
-    retailers = {r["retailer_id"]: r for r in cur.execute("SELECT * FROM retailers").fetchall()}
-    codes = {c["code_id"]: c for c in cur.execute("SELECT * FROM deduction_codes").fetchall()}
-    orders = {o["order_id"]: o for o in cur.execute("SELECT * FROM orders").fetchall()}
-    pack_records = {p["order_id"]: p for p in cur.execute("SELECT * FROM pack_records").fetchall()}
-    shipments = {s["shipment_id"]: s for s in cur.execute("SELECT * FROM shipments").fetchall()}
-    disputes = {d["deduction_id"]: d for d in cur.execute("SELECT * FROM disputes").fetchall()}
+    retailers = {r["retailer_id"]: r for r in cur.execute("SELECT * FROM stg_retailers").fetchall()}
+    codes = {c["code_id"]: c for c in cur.execute("SELECT * FROM stg_deduction_codes").fetchall()}
+    orders = {o["order_id"]: o for o in cur.execute("SELECT * FROM stg_orders").fetchall()}
+    pack_records = {p["order_id"]: p for p in cur.execute("SELECT * FROM stg_pack_records").fetchall()}
+    shipments = {s["shipment_id"]: s for s in cur.execute("SELECT * FROM stg_shipments").fetchall()}
+    disputes = {d["deduction_id"]: d for d in cur.execute("SELECT * FROM stg_disputes").fetchall()}
 
     # dispute_evidence grouped by dispute_id
     evidence_by_dispute: dict[str, list[dict]] = defaultdict(list)
-    for ev in cur.execute("SELECT * FROM dispute_evidence").fetchall():
+    for ev in cur.execute("SELECT * FROM stg_dispute_evidence").fetchall():
         ev_clean = {
             "type": ev["evidence_type"],
             "submitted": bool(ev["was_submitted"]),
@@ -183,10 +215,10 @@ def build_deductions(con: sqlite3.Connection) -> list[dict]:
         evidence_by_dispute[ev["dispute_id"]].append(ev_clean)
 
     # post_audit_claims by deduction_id
-    audit_by_deduction = {a["deduction_id"]: a for a in cur.execute("SELECT * FROM post_audit_claims").fetchall()}
+    audit_by_deduction = {a["deduction_id"]: a for a in cur.execute("SELECT * FROM stg_post_audit_claims").fetchall()}
 
     out = []
-    for d in cur.execute("SELECT * FROM deductions").fetchall():
+    for d in cur.execute("SELECT * FROM stg_deductions").fetchall():
         retailer = retailers.get(d["retailer_id"], {})
         code = codes.get(d["code_id"]) if d["code_id"] else None
         order = orders.get(d["order_id"]) if d["order_id"] else None
@@ -281,11 +313,11 @@ def build_deductions(con: sqlite3.Connection) -> list[dict]:
     return out
 
 
-def build_retailers(con: sqlite3.Connection) -> dict:
+def build_retailers(con) -> dict:
     cur = con.cursor()
 
     rules_by_retailer: dict[str, dict[str, dict]] = defaultdict(dict)
-    for r in cur.execute("SELECT * FROM retailer_rules").fetchall():
+    for r in cur.execute("SELECT * FROM stg_retailer_rules").fetchall():
         evidence_list = [e.strip() for e in (r["evidence_required"] or "").split(",") if e.strip()]
         rules_by_retailer[r["retailer_id"]][r["deduction_type"]] = {
             "dispute_window_days": r["dispute_window_days"],
@@ -296,7 +328,7 @@ def build_retailers(con: sqlite3.Connection) -> dict:
         }
 
     codes_by_retailer: dict[str, list[dict]] = defaultdict(list)
-    for c in cur.execute("SELECT * FROM deduction_codes ORDER BY retailer_id, code").fetchall():
+    for c in cur.execute("SELECT * FROM stg_deduction_codes ORDER BY retailer_id, code").fetchall():
         codes_by_retailer[c["retailer_id"]].append({
             "code_id": c["code_id"],
             "code": c["code"],
@@ -306,7 +338,7 @@ def build_retailers(con: sqlite3.Connection) -> dict:
         })
 
     edi_by_retailer: dict[str, list[dict]] = defaultdict(list)
-    for e in cur.execute("SELECT * FROM edi_requirements ORDER BY retailer_id, category").fetchall():
+    for e in cur.execute("SELECT * FROM stg_edi_requirements ORDER BY retailer_id, category").fetchall():
         edi_by_retailer[e["retailer_id"]].append({
             "category": e["category"],
             "requirement": e["requirement"],
@@ -316,7 +348,7 @@ def build_retailers(con: sqlite3.Connection) -> dict:
         })
 
     out = {}
-    for r in cur.execute("SELECT * FROM retailers ORDER BY retailer_id").fetchall():
+    for r in cur.execute("SELECT * FROM stg_retailers ORDER BY retailer_id").fetchall():
         rid = r["retailer_id"]
         out[rid] = {
             "name": r["name"],
@@ -332,13 +364,21 @@ def build_retailers(con: sqlite3.Connection) -> dict:
     return out
 
 
+def _json_default(obj):
+    if isinstance(obj, date):
+        return obj.isoformat()
+    if isinstance(obj, Decimal):
+        return float(obj)
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+
 def write_json(obj, path: Path, indent: int | None = 2) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         if indent is None:
-            json.dump(obj, f, separators=(",", ":"), ensure_ascii=False)
+            json.dump(obj, f, separators=(",", ":"), ensure_ascii=False, default=_json_default)
         else:
-            json.dump(obj, f, indent=indent, ensure_ascii=False)
+            json.dump(obj, f, indent=indent, ensure_ascii=False, default=_json_default)
     size_kb = path.stat().st_size / 1024
     print(f"  Wrote {path.relative_to(ROOT)}  ({size_kb:,.1f} KB)")
 
