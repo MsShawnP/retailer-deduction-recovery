@@ -24,7 +24,15 @@ from decimal import Decimal
 from pathlib import Path
 
 import psycopg2
+import psycopg2.extensions
 import psycopg2.extras
+
+DEC2FLOAT = psycopg2.extensions.new_type(
+    psycopg2.extensions.DECIMAL.values,
+    'DEC2FLOAT',
+    lambda value, curs: float(value) if value is not None else None,
+)
+psycopg2.extensions.register_type(DEC2FLOAT)
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT_DIR = ROOT / "frontend" / "public" / "json"
@@ -130,7 +138,7 @@ def build_summary(con) -> dict:
         FROM stg_deductions d
         JOIN stg_retailers r ON r.retailer_id = d.retailer_id
         LEFT JOIN stg_disputes disp ON disp.deduction_id = d.deduction_id
-        GROUP BY d.retailer_id
+        GROUP BY d.retailer_id, r.name, r.channel_type
         ORDER BY dollar DESC
     """).fetchall():
         recovered = row["recovered"] or 0
