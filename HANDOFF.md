@@ -656,3 +656,39 @@ verification of the barycenter reposition on the live site. Then
 Phase 4 task 4 (friend preview).
 
 ---
+
+## 2026-05-14 13:20
+
+**What changed:** Ran a four-track project audit (pre-preview readiness,
+doc-vs-code parity, code quality, data/numbers credibility) and applied
+the resulting fixes.
+
+**Why:** Sweep before the friend-preview handoff. Wanted to catch
+anything that would erode credibility once the demo URL is out in the
+wild, while the working tree was clean enough to make targeted edits.
+
+**State:** Two P0 bug fixes landed — three retailer profile keys
+(`southside_market` → `southside_grocers`, `green_basket` →
+`green_basket_market`) renamed across `PostAuditRiskView` and
+`RetailerScorecardView` so those cards render their narrative blurbs;
+`WIN_PROB.none` reconciled across the simulation and cost-to-dispute
+views (both now resolve through `src/constants.ts` at `0.0`). P2
+cleanup: `TODAY`, `TODAY_LABEL`, `DAY_MS`, `WIN_PROB` centralized into
+`src/constants.ts` (eliminated 3 `TODAY` duplicates, 2 `DAY_MS`
+duplicates, one literal `86_400_000`); `AUDIT_RISK.missing` (0.85)
+comment expanded to explain the burden-of-proof rationale;
+`find-overflow.mjs` and `verify-sankey-contrast.mjs` deleted as
+served-their-purpose diagnostics. PLAN.md reconciled to the actual
+Cloudflare URL (`https://retailer-deduction-recovery.msshawnp.workers.dev/`)
+in both the Phase 4 deploy task and the Definition of done.
+`npm run build` passes; lint reports 28 pre-existing errors
+(`no-explicit-any` in sankey data plumbing, two setState-in-effect
+cases) that predate this session and were out of audit scope. All
+work pushed to `claude/audit-project-GHqF9` as commits `176e299` and
+`b0241b5`.
+
+**Next:** Phase 4 task 4 — hand the Cloudflare URL to the friend for
+preview, capture feedback, decide what (if any) fixes precede the
+prospect intro.
+
+---
