@@ -131,7 +131,7 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
   }, [items]);
 
   const list = useMemo(() => {
-    let filtered =
+    const filtered =
       selectedBucket === "all"
         ? items.filter(
             (i) => i.bucket === "critical" || i.bucket === "expiring"

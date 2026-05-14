@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type {
   Deduction,
   Evidence,
@@ -284,21 +284,28 @@ export default function DisputeBuilderView({
     return [...filtered].sort((a, b) => b.d.amount - a.d.amount);
   }, [items, filter]);
 
-  // Reset to top of list whenever the cohort or filter changes.
-  useEffect(() => {
-    setIndex(0);
-  }, [cohort, filter]);
-
-  // When something else activates a trace anchor (cost view's "Trace →",
-  // explorer's "Trace this order →"), sync the builder's pointer to it
-  // so the user can see both views on the same deduction.
-  useEffect(() => {
-    if (!tracedDeductionId) return;
-    const i = sorted.findIndex(
-      (s) => s.d.deduction_id === tracedDeductionId
-    );
-    if (i >= 0 && i !== index) setIndex(i);
-  }, [tracedDeductionId, sorted, index]);
+  // Adjust index during render when `sorted` or `tracedDeductionId`
+  // change: reset to 0 on cohort/filter change, then sync to the trace
+  // anchor if one is set and present in the current sorted list. React
+  // batches the conditional setState-during-render calls and re-runs
+  // before committing, so consumers never see a stale index.
+  const [prevSorted, setPrevSorted] = useState(sorted);
+  const [prevTrace, setPrevTrace] = useState<string | null>(
+    tracedDeductionId
+  );
+  if (prevSorted !== sorted || prevTrace !== tracedDeductionId) {
+    const sortedChanged = prevSorted !== sorted;
+    let next = sortedChanged ? 0 : index;
+    if (tracedDeductionId) {
+      const i = sorted.findIndex(
+        (s) => s.d.deduction_id === tracedDeductionId
+      );
+      if (i >= 0) next = i;
+    }
+    setPrevSorted(sorted);
+    setPrevTrace(tracedDeductionId);
+    if (next !== index) setIndex(next);
+  }
 
   if (sorted.length === 0) {
     return (

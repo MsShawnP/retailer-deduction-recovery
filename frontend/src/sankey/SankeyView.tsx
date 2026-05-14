@@ -40,6 +40,48 @@ const OUTCOME_GROUP: Record<string, string> = {
   "Won partial":        "wins",
 };
 
+// d3-sankey generics. NodeProps are user-side fields layered on top of
+// the layout-computed ones (x0/x1/y0/y1, sourceLinks/targetLinks, etc.)
+// from SankeyNodeMinimal. _bary is added by the barycenter pass below.
+interface NodeProps {
+  id: string;
+  layer: number;
+  label: string;
+  _bary?: number;
+}
+
+// No user-defined link extras — source/target/value live in
+// SankeyLinkMinimal. Record<string, unknown> satisfies the
+// SankeyExtraProperties constraint without claiming any concrete fields.
+type LinkProps = Record<string, unknown>;
+
+// Resolved post-layout shapes. After the generator runs, optional fields
+// are populated and link.source / link.target are node refs (not the
+// pre-layout string ids). Two casts at the boundary save us from
+// littering the layout pipeline with `any`.
+type LayoutNode = NodeProps & {
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+  value: number;
+  depth: number;
+  height: number;
+  index: number;
+  sourceLinks: LayoutLink[];
+  targetLinks: LayoutLink[];
+};
+
+type LayoutLink = {
+  source: LayoutNode;
+  target: LayoutNode;
+  value: number;
+  width: number;
+  y0: number;
+  y1: number;
+  index: number;
+};
+
 function dollarsCompact(n: number): string {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
@@ -77,17 +119,17 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       }
     }
 
-    const nodesCopy = nodes.map((n) => ({ ...n }));
+    const nodesCopy: NodeProps[] = nodes.map((n) => ({ ...n }));
     const linksCopy = links.map((l) => ({
       source: l.source,
       target: l.target,
       value: l.value,
     }));
 
-    const generator = sankey<any, any>()
-      .nodeId((d: any) => d.id)
+    const generator = sankey<NodeProps, LinkProps>()
+      .nodeId((d) => d.id)
       .nodeAlign(sankeyJustify)
-      .nodeSort((a: any, b: any) => {
+      .nodeSort((a, b) => {
         if (a.layer === 0 && b.layer === 0)
           return (b.value || 0) - (a.value || 0);
         if (a.layer === 1 && b.layer === 1)
@@ -99,7 +141,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
             return (groupTotals.get(gB) || 0) - (groupTotals.get(gA) || 0);
           return (b.value || 0) - (a.value || 0);
         }
-        return null as any;
+        return 0;
       })
       .linkSort(null)
       .nodeWidth(14)
@@ -109,11 +151,13 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
         [WIDTH - MARGIN.right, HEIGHT - MARGIN.bottom],
       ]);
 
-    const result = generator({ nodes: nodesCopy as any, links: linksCopy as any });
+    const result = generator({ nodes: nodesCopy, links: linksCopy });
+    const resultNodes = result.nodes as LayoutNode[];
+    const resultLinks = result.links as LayoutLink[];
 
     // Reorder layer 2 nodes by source barycenter so ribbons from the
     // top of layer 1 land at the top of layer 2, minimizing crossings.
-    const layer2 = (result.nodes as any[]).filter((n: any) => n.layer === 2);
+    const layer2 = resultNodes.filter((n) => n.layer === 2);
     for (const node of layer2) {
       let sumY = 0, sumW = 0;
       for (const link of node.targetLinks) {
@@ -123,8 +167,10 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       }
       node._bary = sumW > 0 ? sumY / sumW : 0;
     }
-    layer2.sort((a: any, b: any) => {
-      if (Math.abs(a._bary - b._bary) > 0.5) return a._bary - b._bary;
+    layer2.sort((a, b) => {
+      const ab = a._bary ?? 0;
+      const bb = b._bary ?? 0;
+      if (Math.abs(ab - bb) > 0.5) return ab - bb;
       const gA = OUTCOME_GROUP[a.label] || "other";
       const gB = OUTCOME_GROUP[b.label] || "other";
       if (gA !== gB)
@@ -141,16 +187,16 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
     }
 
     // Recompute link attachment positions after node reordering.
-    for (const node of result.nodes as any[]) {
-      node.sourceLinks.sort((a: any, b: any) => a.target.y0 - b.target.y0);
+    for (const node of resultNodes) {
+      node.sourceLinks.sort((a, b) => a.target.y0 - b.target.y0);
       let y = node.y0;
       for (const link of node.sourceLinks) {
         link.y0 = y + link.width / 2;
         y += link.width;
       }
     }
-    for (const node of result.nodes as any[]) {
-      node.targetLinks.sort((a: any, b: any) => a.source.y0 - b.source.y0);
+    for (const node of resultNodes) {
+      node.targetLinks.sort((a, b) => a.source.y0 - b.source.y0);
       let y = node.y0;
       for (const link of node.targetLinks) {
         link.y1 = y + link.width / 2;
@@ -158,11 +204,11 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       }
     }
 
-    const totalIn = result.links
-      .filter((l: any) => l.source.layer === 0)
-      .reduce((s: number, l: any) => s + l.value, 0);
+    const totalIn = resultLinks
+      .filter((l) => l.source.layer === 0)
+      .reduce((s, l) => s + l.value, 0);
 
-    return { nodes: result.nodes, links: result.links, total: totalIn };
+    return { nodes: resultNodes, links: resultLinks, total: totalIn };
   }, [operationalDeductions]);
 
   // For the current selection, compute which links should be highlighted.
@@ -172,7 +218,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
     return highlightedLinkSet(filtered);
   }, [deductions, selection]);
 
-  const linkPath = sankeyLinkHorizontal();
+  const linkPath = sankeyLinkHorizontal<NodeProps, LinkProps>();
 
   function clearSelection(e: React.MouseEvent) {
     if (e.target === e.currentTarget) onSelect(null);
@@ -243,7 +289,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
 
         {/* Links */}
         <g className="sankey-links">
-          {layout.links.map((link: any, i) => {
+          {layout.links.map((link, i) => {
             const sourceLayer = link.source.layer;
             const linkKey = `${link.source.id}>>${link.target.id}`;
             const isHighlighted = highlightLinks
@@ -277,7 +323,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
 
         {/* Nodes */}
         <g className="sankey-nodes">
-          {layout.nodes.map((node: any) => {
+          {layout.nodes.map((node) => {
             const isSelected =
               selection?.kind === "node" && selection.nodeId === node.id;
             const isOnPath = highlightLinks
