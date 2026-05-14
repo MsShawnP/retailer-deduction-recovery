@@ -202,8 +202,9 @@ views for each feature before moving to the next.
       scroll containers like the cost view), added
       `overflow-x: hidden` on body as defense. All three viewports
       now match document width to viewport.
-- [x] Deploy to Netlify — live at
-      https://retailer-deduction-recovery.netlify.app/
+- [x] Deploy — initially Netlify, migrated to Cloudflare per
+      DECISIONS.md 2026-05-09. Live at
+      https://retailer-deduction-recovery.msshawnp.workers.dev/
 - [ ] Friend preview — hand off for feedback
 
 ## Out of scope for this arc
@@ -223,7 +224,7 @@ views for each feature before moving to the next.
 - [ ] All views update when user navigates from one to another
 - [ ] Synthetic data feels realistic for a ~$25M food manufacturer
 - [ ] Retailer-specific behaviors are recognizable (not generic)
-- [ ] Deployed to Cloudflare Pages with a shareable URL
+- [ ] Deployed to Cloudflare with a shareable URL
 - [ ] Friend has previewed and given feedback
 - [ ] Feedback incorporated
 
