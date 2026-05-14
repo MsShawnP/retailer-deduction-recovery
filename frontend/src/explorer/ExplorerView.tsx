@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Deduction, Evidence } from "../types";
 import { OUTCOME_COLORS, rootCauseFor } from "../sankey/data";
 import { formatCount, formatDollars, formatPercent } from "../data";
+import { TODAY, DAY_MS } from "../constants";
 import "./ExplorerView.css";
 
 interface Props {
@@ -11,8 +12,6 @@ interface Props {
   tracedDeductionId?: string | null;
   focusedDeductionId?: string | null;
 }
-
-const TODAY = new Date("2026-05-31");
 
 export default function ExplorerView({
   cohort,
@@ -416,7 +415,7 @@ function timelinessHeadline(d: Deduction): string {
   const deadline = new Date(d.dispute_deadline);
 
   if (!d.dispute) {
-    const days = Math.floor((deadline.getTime() - TODAY.getTime()) / 86_400_000);
+    const days = Math.floor((deadline.getTime() - TODAY.getTime()) / DAY_MS);
     if (days < 0) return `Past deadline ${Math.abs(days)} days ago — never filed`;
     if (days === 0) return "Deadline is today — never filed";
     return `${days} days to deadline — never filed`;
@@ -424,7 +423,7 @@ function timelinessHeadline(d: Deduction): string {
 
   if (d.dispute.was_within_deadline === false && d.dispute.filed_date) {
     const filed = new Date(d.dispute.filed_date);
-    const days = Math.floor((filed.getTime() - deadline.getTime()) / 86_400_000);
+    const days = Math.floor((filed.getTime() - deadline.getTime()) / DAY_MS);
     return `Filed ${days} days past deadline`;
   }
 

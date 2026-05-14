@@ -2,16 +2,13 @@ import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars } from "../data";
 import { isOperational } from "../sankey/data";
+import { TODAY, TODAY_LABEL, DAY_MS } from "../constants";
 import "./TimelinePressureView.css";
 
 interface Props {
   cohort: Deduction[];
   onTrace: (id: string) => void;
 }
-
-const TODAY = new Date("2026-05-31");
-const TODAY_LABEL = "2026-05-31";
-const DAY_MS = 86_400_000;
 
 type Bucket = "critical" | "expiring" | "active" | "expired" | "no_deadline";
 type EvidenceCategory = "digital" | "paper" | "missing";

@@ -15,7 +15,10 @@ type EvidenceCategory = "digital" | "paper" | "missing";
 // given the supplier's current evidence quality. Calibrated against
 // the research notes in research/retailers/ — auditors win the lion's
 // share of the time when the supplier has only paper or no records,
-// and almost never when records are digital and timestamped.
+// and almost never when records are digital and timestamped. The
+// missing-evidence number sits high (0.85) because the burden of
+// proof in a vendor audit is on the supplier; absent any record,
+// auditors typically prevail on the disputed line.
 const AUDIT_RISK: Record<EvidenceCategory, number> = {
   digital: 0.1,
   paper: 0.6,
@@ -39,8 +42,10 @@ const AUDIT_PROFILE: Record<string, string> = {
   unfi: "Audit deductions can be pulled directly from future invoices.",
   kehe: "Pass-through audits from the underlying retailers.",
   whole_foods: "Amazon-backed audit capabilities; strict quality program.",
-  southside_market: "Less formal but accepted as long as records exist.",
-  green_basket: "Sprouts-style buyer relationship; informal audit posture.",
+  southside_grocers:
+    "Less formal but accepted as long as records exist.",
+  green_basket_market:
+    "Sprouts-style buyer relationship; informal audit posture.",
 };
 
 function evidenceCategoryFor(d: Deduction): EvidenceCategory {
