@@ -45,7 +45,7 @@ const RETAILER_PROFILE: Record<string, string> = {
     "Two parallel systems (Natural / Conventional); Excel-only dispute forms by email; deductions can pull directly from future invoices.",
   kehe:
     "Distributor — pass-through audits from underlying retailers add complexity; granular per-incident compliance fines.",
-  southside_market:
+  southside_grocers:
     "Less formal but expects records to exist; buyer relationship matters more than a portal process.",
   green_basket_market:
     "Sprouts-style buyer relationship; informal but documentable; promo deductions often vague.",
