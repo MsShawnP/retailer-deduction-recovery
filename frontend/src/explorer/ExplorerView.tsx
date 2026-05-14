@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Deduction, Evidence } from "../types";
 import { OUTCOME_COLORS, rootCauseFor } from "../sankey/data";
 import { formatCount, formatDollars, formatPercent } from "../data";
@@ -26,16 +26,30 @@ export default function ExplorerView({
   );
 
   const [index, setIndex] = useState(0);
+  const [prevSorted, setPrevSorted] = useState(sorted);
+  const [prevFocus, setPrevFocus] = useState<string | null>(
+    focusedDeductionId ?? null
+  );
 
-  useEffect(() => {
-    setIndex(0);
-  }, [sorted]);
-
-  useEffect(() => {
-    if (!focusedDeductionId) return;
-    const idx = sorted.findIndex((d) => d.deduction_id === focusedDeductionId);
-    if (idx >= 0) setIndex(idx);
-  }, [focusedDeductionId, sorted]);
+  // Adjust index during render when `sorted` or `focusedDeductionId`
+  // change: reset to 0 on cohort change, then jump to the focused
+  // deduction if one is set and present. React batches the conditional
+  // setState-during-render calls and re-runs before committing, so
+  // consumers never see a stale index.
+  const currentFocus = focusedDeductionId ?? null;
+  if (prevSorted !== sorted || prevFocus !== currentFocus) {
+    const sortedChanged = prevSorted !== sorted;
+    let next = sortedChanged ? 0 : index;
+    if (focusedDeductionId) {
+      const idx = sorted.findIndex(
+        (d) => d.deduction_id === focusedDeductionId
+      );
+      if (idx >= 0) next = idx;
+    }
+    setPrevSorted(sorted);
+    setPrevFocus(currentFocus);
+    if (next !== index) setIndex(next);
+  }
 
   if (sorted.length === 0) {
     return (

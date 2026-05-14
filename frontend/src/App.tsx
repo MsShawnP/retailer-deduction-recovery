@@ -73,25 +73,27 @@ export default function App() {
     });
   }, [deductions, selection, dateRange]);
 
-  // If the cohort changes and the traced deduction is no longer in it,
-  // clear the trace so the view doesn't show a stale anchor.
-  useEffect(() => {
-    if (
-      tracedDeductionId &&
-      filteredDeductions &&
-      !filteredDeductions.some((d) => d.deduction_id === tracedDeductionId)
-    ) {
-      setTracedDeductionId(null);
-    }
-  }, [filteredDeductions, tracedDeductionId]);
+  // Derived: the trace anchor visible to child views. If the user sets
+  // a trace and then filters to a cohort that excludes it, child views
+  // see null and render their empty state. The underlying intent stays
+  // in state so toggling the filter back restores the trace.
+  const effectiveTracedDeductionId = useMemo(() => {
+    if (!tracedDeductionId || !filteredDeductions) return tracedDeductionId;
+    return filteredDeductions.some(
+      (d) => d.deduction_id === tracedDeductionId
+    )
+      ? tracedDeductionId
+      : null;
+  }, [tracedDeductionId, filteredDeductions]);
 
-  // Scroll the trace section into view whenever a new trace is set from
-  // the explorer.
+  // Scroll the trace section into view whenever the visible trace anchor
+  // becomes set — covers both an explicit set and the "filter back to
+  // include it again" case.
   useEffect(() => {
-    if (tracedDeductionId && traceRef.current) {
+    if (effectiveTracedDeductionId && traceRef.current) {
       traceRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }, [tracedDeductionId]);
+  }, [effectiveTracedDeductionId]);
 
   const byType: ByType[] = useMemo(() => {
     if (!filteredDeductions || !summary) return [];
@@ -213,13 +215,13 @@ export default function App() {
         cohort={filteredDeductions ?? deductions}
         allDeductions={deductions}
         onTrace={setTracedDeductionId}
-        tracedDeductionId={tracedDeductionId}
+        tracedDeductionId={effectiveTracedDeductionId}
         focusedDeductionId={focusedDeductionId}
       />
 
       <div ref={traceRef}>
         <CausationTraceView
-          tracedDeductionId={tracedDeductionId}
+          tracedDeductionId={effectiveTracedDeductionId}
           cohort={filteredDeductions ?? deductions}
           onChange={setTracedDeductionId}
         />
@@ -235,7 +237,7 @@ export default function App() {
       <DisputeBuilderView
         cohort={filteredDeductions ?? deductions}
         retailers={retailers}
-        tracedDeductionId={tracedDeductionId}
+        tracedDeductionId={effectiveTracedDeductionId}
         onTrace={setTracedDeductionId}
       />
 
