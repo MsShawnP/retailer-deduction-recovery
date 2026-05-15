@@ -1,12 +1,11 @@
 .sankey {
-  /* Break out of the .app container's max-width — the Sankey is the
-     hero chart and benefits from full viewport. */
   width: 100vw;
   margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
   padding: 8px 48px 32px;
   margin-top: 36px;
   border-top: 1px solid var(--rule);
+  overflow-x: auto;
 }
 
 .sankey h2 {
@@ -17,6 +16,7 @@
 
 .sankey-svg {
   width: 100%;
+  min-width: 900px;
   height: auto;
   display: block;
   background: var(--panel);
