@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars, formatPercent } from "../data";
-import { ORIGIN_DIMENSIONS, clusterValueFor, isOperational } from "../sankey/data";
+import { ORIGIN_DIMENSIONS, clusterValueFor, isOperational } from "../sankey/domain";
 import "./OriginClusteringView.css";
 
 interface Props {

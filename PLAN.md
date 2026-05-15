@@ -7,204 +7,192 @@ session. For session-by-session state, see HANDOFF.md.
 
 ## Goal
 
-Build the extended synthetic dataset and deliver all ten interactive
-features in a deployable React app consuming static JSON.
+Restructure the demo from a flat 16-section scroll into a
+narrative-driven, chapter-based tool that guides a CEO through
+the five compounding failures — revealing the unique diagnostic
+capabilities that no commercial deduction platform offers.
 
 ## Why this arc, why now
 
-Friend is ready to make the introduction. The sooner a working demo
-exists, the sooner friend can preview it, give feedback, and
-recommend to the prospect. Two-week target window.
+The demo is functionally complete (10 views, all connected) but
+the "busy" UX is hiding the competitive advantage. The audit
+(AUDIT.md, 2026-05-15) found five features unique in a 15-tool
+landscape: root cause tracing, evidence quality assessment,
+recovery simulation, cost-to-dispute triage, and executive
+visualization. A prospect CEO opening this cold sees 16 sections
+and bounces before discovering any of it. The narrative refactor
+is the highest-leverage move — fixing the UX IS the strategic
+differentiation.
 
 ## Business question this arc answers
 
-Cinderhaven has outgrown its ability to manage retailer deductions.
-This project makes visible the five compounding failures and shows
-what each one is costing them and what it takes to fix it.
+Same as the original: make visible the five compounding failures
+and what each one costs. This arc changes HOW the answer is
+delivered — from "here are 10 tools, go explore" to "here is
+what's happening, and each screen shows you why it's getting
+worse."
 
 ## Tasks
 
-Work in vertical slices — data → export → React component → connected
-views for each feature before moving to the next.
+### Phase A: Clear the path (< 1 hour)
 
-### Phase 1: Data foundation
+- [ ] Remove vestigial bottom tables — delete the 3 by-type /
+      by-retailer / by-distributor tables from App.tsx (lines
+      288–378). Data already visible in Sankey + scorecard. Zero
+      information loss, instant noise reduction.
+- [ ] Rename sankey/data.ts → domain.ts — this is the shared
+      domain module (Selection, isOnSelectedPath, rootCauseFor,
+      etc.) imported by 7+ views. Update all imports.
+- [ ] Extract App.tsx inline components — pull Kpi, CohortBar,
+      TimeRangeSelector, computeKpis, aggregateByType,
+      aggregateByRetailer into separate files. Keeps App.tsx
+      focused on layout and state before adding navigation.
 
-- [x] Research retailer-specific dispute processes, deadlines, portals,
-      and deduction codes for Walmart, Costco, Whole Foods, UNFI, KeHE,
-      and representative regional chains
-      (Wegmans, Sprouts) — see `research/retailers/`
-- [x] Design deduction data schema — deduction records, EDI
-      requirements, pack/ship records, dispute records, retailer
-      rules, remittance data (including vague/undecodable entries)
-      — see `data/schema.md`
-- [x] Build Python scripts to extend the cinderhaven-data SQLite
-      database with deduction-specific tables — schema DDL + static
-      seeds (retailers, retailer_rules, deduction_codes,
-      edi_requirements) via `scripts/build_deductions_db.py`. Dynamic
-      generators (orders, deductions, disputes, etc.) are the next
-      tasks below.
-- [x] Generate synthetic deduction data — realistic mix of types
-      (short ship, labeling fines, pallet noncompliance, promo
-      disputes, damaged product, late delivery, vague codes) — 3,333
-      deductions, $1.4M including post-audit claims, distribution
-      across all 7 types
-- [x] Generate synthetic dispute data — timelines, evidence submitted
-      (handwritten notes vs. digital records), outcomes, missed
-      deadlines — 1,505 disputes (45% file rate), $99K recovered
-      (8.6%), 75% handwritten-only evidence
-- [x] Generate synthetic pack/ship records — what was actually picked,
-      packed, and labeled per order — 5,838 pack_records and 5,838
-      shipments, encoding generic-label / paper-only / lost-evidence
-      reality
-- [x] Build JSON export script — transform SQLite into the JSON
-      structures the React app needs — `scripts/20_export_json.py`
-      writes summary.json (5KB), deductions.json (4.8MB compact,
-      3,333 denormalized records), retailers.json (47KB)
-- [x] Validate synthetic data — deduction volumes and dollar amounts
-      feel realistic for a ~$25M manufacturer — `scripts/21_validate_dataset.py`
-      runs 36 checks (row counts, FK integrity, design conventions,
-      $/recovery targets, channel split, type mix, JSON parity);
-      36 PASS / 0 WARN / 0 FAIL on current dataset
+### Phase B: Narrative chapter structure (main effort)
 
-### Phase 2: React app scaffold + Sankey
+- [x] Design chapter navigation component — tab bar or chapter
+      nav below the persistent header (Sankey + KPIs + filters +
+      cohort bar). One piece of state: activeChapter. Only the
+      active chapter's views render. Simple, no React Router.
+- [x] Implement Chapter 1: The Problem — Sankey + KPIs + cohort
+      table. "Here is the shape of your losses." This is the
+      landing state.
+- [x] Implement Chapter 2: Why This Happens — Explorer + causation
+      trace + origin clustering. "Each deduction traces back to a
+      specific operational failure."
+- [x] Implement Chapter 3: The Evidence Gap — Dispute builder +
+      post-audit risk + retailer scorecard. "You don't have what
+      you need to win, and here's what that costs."
+- [x] Implement Chapter 4: What to Do About It — Recovery
+      simulation + cost-to-dispute + timeline pressure. "These
+      fixes, in this order, recover this much money."
+- [x] Wire cross-links to switch chapters — Trace →, Filter →,
+      and other cross-view links navigate to the correct chapter
+      when the target view lives in a different chapter. Same
+      selection/trace state, just also sets activeChapter.
+- [x] Verify chapter navigation end-to-end — walk every cross-link,
+      filter, and drill-down path. Confirm Sankey selection +
+      chapter switching compose correctly. Screenshot verification.
+- [x] Responsive check — verify chapter nav works at iPad portrait
+      (768), MacBook (1366), wide (1680).
+- [ ] Deploy updated version to Cloudflare Pages.
 
-- [x] Set up React project, build system, Netlify deployment config —
-      Vite + React + TypeScript scaffold under `frontend/`, JSON
-      export now lands at `frontend/public/json/`, root `netlify.toml`
-      points the build at `frontend/dist/`. Minimal landing page
-      renders KPIs, by-type, and by-retailer tables from summary.json.
-      Build passes; runtime data fetches verified via dev server.
-- [x] Build Sankey flow — full deduction view on landing, all branch
-      points (type → root cause → evidence quality → accessibility →
-      timeliness → outcome) — d3-sankey rendering 41 nodes, $1.33M
-      total flow, hue-distinct outcome layer
-- [x] Implement zoom-on-click — user clicks a node or link, that
-      path stays at full opacity and the rest dims to ~4% (context
-      preserved, not removed)
-- [x] Connect Sankey branches to downstream views — selection state
-      lifted to App.tsx; KPIs, by_type, and by_retailer tables
-      recompute from the filtered subset. Phase 3 feature views
-      will plug into the same selection state.
+### Phase C: Harden
 
-### Phase 3: Feature views (vertical slices)
+- [ ] Add component tests for navigation state — chapter switching,
+      cross-link chapter transitions, selection persistence across
+      chapter changes.
+- [ ] Friend preview — hand off for feedback.
+- [ ] Incorporate feedback.
 
-- [x] Deduction explorer — six-layer drill-down for individual
-      deductions (the deduction, visibility/pattern, root cause,
-      evidence quality, accessibility, timeliness) — `ExplorerView`
-      reads from `selection` state, sorts cohort by amount, prev /
-      next / random nav. 3-column card grid with red-numbered
-      headers and color-coded timeliness.
-- [x] Causation tracing — follow a single order from label → short
-      count → deduction → failed dispute, end to end — `CausationTraceView`
-      reads `tracedDeductionId` from App.tsx (set from explorer's "Trace
-      this order" button), renders a chronological timeline of PO → pack
-      & label → ship → delivery → deduction → dispute → outcome with
-      severity-colored markers (red/gold/green) and per-step failure
-      flags. Post-audit claims get a parallel audit-period path. Cohort
-      nav (prev/next/random) on the trace itself.
-- [x] Recovery simulation — toggle operational and administrative
-      fixes on/off, watch portfolio-wide recovery rate and dollar
-      amounts shift in real time — `RecoverySimulationView` runs
-      against the `selection`-filtered cohort, five toggles
-      (compliant labels, digital pack verification, systematic
-      filing, deadline tracking, EDI/ASN compliance) drive an
-      evidence-quality-calibrated win-probability model
-      (digital_complete 65% / digital_partial 35% / handwritten 12%
-      / none 5%). Per-toggle solo-impact previews and a current-vs-
-      projected comparison panel update live.
-- [x] Cost-to-dispute profitability filter — calculate whether a
-      deduction is worth fighting given labor cost to gather evidence
-      and dispute — `CostToDisputeView` runs against the
-      selection-filtered cohort with an adjustable hourly-rate slider
-      ($20–$100) and a "project with digital evidence" toggle. Three
-      buckets (fight / marginal / write off) computed per deduction
-      from amount × win-prob (digital_complete 65% / digital_partial
-      35% / handwritten 12% / none 0% / past-deadline 0%) minus
-      labor (hours by evidence quality × rate). Selectable bucket
-      cards drive a sortable top-25 table with a cross-link to the
-      causation trace.
-- [x] Dispute builder — evidence readiness view showing what exists
-      vs. what's needed for each deduction, mock dispute package —
-      `DisputeBuilderView` reads retailer rules from `retailers.json`,
-      assesses each required evidence item against dispute.evidence /
-      pack_record / shipment chain, scores each deduction as ready /
-      needs work / not disputable. Filter tabs by readiness, prev/
-      next/random nav, two-column layout (requirements gap analysis +
-      mock dispute package), cross-link "View causation trace →" that
-      drives `tracedDeductionId`. Builder syncs to that anchor when
-      set externally so explorer/cost-view entries land on the same
-      deduction.
-- [x] Timeline pressure view — deductions mapped against
-      retailer-specific dispute deadlines, showing what's still
-      in window, what's expiring, what's already dead —
-      `TimelinePressureView` filters the cohort to unfiled +
-      unresolved, computes days-to-deadline against TODAY
-      (2026-05-31), and buckets each (Critical ≤7d / Expiring 8–30d
-      / Active >30d / Expired / No deadline) with count + dollar
-      tiles. A pressure × evidence-quality cross-tab tells the
-      compounding story (urgent + paper/missing cells highlighted
-      red). Selectable bucket cards drive a top-25 urgent-first
-      table with a Trace cross-link.
-- [x] Post-audit risk exposure — based on current evidence gaps,
-      calculate and visualize retroactive clawback vulnerability —
-      `PostAuditRiskView` runs an evidence-quality risk model
-      (digital 10% / paper 60% / missing 85% probability of
-      successful clawback) against forward-looking (non-post-audit)
-      deductions in the cohort. Headline exposure number, "project
-      with digital evidence" toggle showing the reduction delta,
-      "already happened" panel with stats and a top-10 table of
-      realized post-audit claims, exposure-by-retailer table with
-      hardcoded retailer audit profiles, and exposure-by-evidence-
-      bucket breakdown. Trace cross-link on realized claims.
-- [x] Retailer scorecard — deduction patterns, dispute acceptance
-      rates, deadline strictness, aggressiveness by retailer —
-      `RetailerScorecardView` renders 2-column cards per retailer
-      with net loss, volume, top deduction type, filed→won rates,
-      recovery, dispute window, evidence demand, past-deadline
-      counts, and a research-grounded behavioral profile blurb.
-      Selection union extended with a `retailer` kind so the
-      "Filter →" button on each card writes back to the same
-      lifted state that drives every other view; the scorecard
-      itself special-cases retailer filters (so the comparative
-      view survives) but respects every other filter kind.
-- [x] Root cause clustering by origin point — deductions grouped by
-      warehouse, packing line, carrier, or system —
-      `OriginClusteringView` clusters the cohort across five
-      operational dimensions (carrier, label decision, pack
-      verification, evidence format, packer) and ranks them by
-      top-cluster share so the user sees which dimensions are
-      systemic vs. targeted. Selection union extended once more
-      with a `cluster` kind keyed on (dimension, value); each
-      cluster row has a Filter that writes back to lifted state and
-      a Trace top → that pivots the causation view to the cluster's
-      largest deduction. `ORIGIN_DIMENSIONS` is the single source
-      of truth shared between the view and `isOnSelectedPath`.
+---
 
-### Phase 4: Polish + deploy
+## Decomposition: Narrative chapter restructure
 
-- [x] Cross-view navigation — verify all views are connected, click
-      paths work end to end — `screenshot-crossview.mjs` walks every
-      filter / drill-down / trace path through all 9 feature views
-      (dropdown, Sankey, retailer scorecard click-to-filter, origin
-      cluster click-to-filter, time range presets + custom dates,
-      trace cross-link from cost view); zero JS errors. Three polish
-      improvements landed alongside: (a) retailer scorecard sort
-      switched to Worst recovery so the order visibly changes, (b)
-      cohort bar always renders, sticky-positioned, shows combined
-      filter + time range, (c) time range filter (6mo / 1yr / All /
-      custom) added next to the type dropdown, composes with all
-      other filters via `filteredDeductions`. KPI / aggregation
-      gating fixed so dateRange-only filters propagate.
-- [x] Responsive design check — verify it works on the devices the
-      CEO would use — `screenshot-responsive.mjs` checks iPad
-      portrait (768), MacBook (1366), wide (1680). Found and fixed
-      origin-section overflow at 768 (wrapped both origin tables in
-      scroll containers like the cost view), added
-      `overflow-x: hidden` on body as defense. All three viewports
-      now match document width to viewport.
-- [x] Deploy to Netlify — live at
-      https://retailer-deduction-recovery.netlify.app/
-- [ ] Friend preview — hand off for feedback
+Goal: Transform the flat 16-section scroll into 4 narrative
+chapters with persistent Sankey/KPIs and cross-chapter navigation.
+
+### Phase A — Clear the path (all independent, < 30 min each)
+
+- [x] **A1: Remove vestigial bottom tables**
+    - Depends on: none
+    - Delete the 3 `<section className="break">` blocks in App.tsx
+      (by-type, by-retailer, by-distributor tables) and the
+      `byRetailer` / `byDistributor` derived values, `byType` /
+      `byChannel` useMemos, and `aggregateByType` /
+      `aggregateByRetailer` functions they depend on.
+    - Done when: `npm run build` passes, dev server renders with
+      no bottom tables, zero console errors.
+
+- [x] **A2: Rename sankey/data.ts → domain.ts**
+    - Depends on: none
+    - Move `frontend/src/sankey/data.ts` →
+      `frontend/src/sankey/domain.ts`. Update imports in 10 files:
+      App.tsx, SankeyView.tsx, ExplorerView.tsx,
+      CausationTraceView.tsx, CohortTableView.tsx,
+      RecoverySimulationView.tsx, CostToDisputeView.tsx,
+      DisputeBuilderView.tsx, TimelinePressureView.tsx,
+      PostAuditRiskView.tsx, OriginClusteringView.tsx.
+    - Done when: `npm run build` passes, all imports resolve.
+
+- [x] **A3: Extract App.tsx inline components**
+    - Depends on: A1 (so the extracted code matches the cleaned-up
+      state, not the pre-deletion state)
+    - Pull into separate files:
+      `Kpi.tsx`, `CohortBar.tsx`, `TimeRangeSelector.tsx`,
+      `computeKpis.ts` (if aggregation functions survive A1).
+    - App.tsx after extraction should be: data loading, state,
+      layout, and view rendering — no business logic functions or
+      standalone UI components.
+    - Done when: `npm run build` passes, App.tsx < 300 lines,
+      dev server renders identically.
+
+### Phase B — Narrative chapters (sequential)
+
+- [x] **B1: Add chapter state + ChapterNav component**
+    - Depends on: A3
+    - Add `activeChapter: 1|2|3|4` state to App.tsx (default 1).
+      Create `ChapterNav.tsx` — a tab bar with 4 labeled tabs:
+      "The Problem" / "Why This Happens" / "The Evidence Gap" /
+      "What to Do About It". Render it below the persistent header
+      (KPIs + filters + cohort bar), above the view area.
+      Clicking a tab sets activeChapter. No conditional rendering
+      yet — all views still render below.
+    - Done when: tab bar renders, clicking tabs changes the active
+      state (visible via active-tab styling), all existing views
+      still render below, `npm run build` passes.
+
+- [x] **B2: Group views into 4 chapters**
+    - Depends on: B1
+    - Wrap view groups in conditional blocks keyed on
+      activeChapter. The persistent header (Sankey, KPIs, filters,
+      cohort bar) stays outside the conditional — always visible.
+      Chapter contents:
+        - Ch1: CohortTableView (Sankey is persistent, not in a
+          chapter)
+        - Ch2: ExplorerView + CausationTraceView +
+          OriginClusteringView
+        - Ch3: DisputeBuilderView + PostAuditRiskView +
+          RetailerScorecardView
+        - Ch4: RecoverySimulationView + CostToDisputeView +
+          TimelinePressureView
+    - Done when: each tab shows only its chapter's views, all 10
+      views accessible across the 4 tabs, selection/filter state
+      persists across tab switches, `npm run build` passes.
+
+- [x] **B3: Wire cross-links to switch chapters**
+    - Depends on: B2
+    - When `tracedDeductionId` is set from a view outside Ch2
+      (CostToDisputeView in Ch4, DisputeBuilderView in Ch3,
+      TimelinePressureView in Ch4, PostAuditRiskView in Ch3),
+      also set activeChapter to 2 so the trace view is visible.
+    - When `focusedDeductionId` is set from CohortTableView
+      (Ch1), also set activeChapter to 2 so the explorer is
+      visible.
+    - Approach: wrap `setTracedDeductionId` and
+      `setFocusedDeductionId` in helper functions that also set
+      the chapter, then pass those helpers as the `onTrace` /
+      `onSelectDeduction` props.
+    - Done when: clicking "Trace →" from cost-to-dispute (Ch4)
+      switches to Ch2 and shows the trace; clicking a row in the
+      cohort table (Ch1) switches to Ch2 and shows the explorer
+      focused on that deduction; `npm run build` passes.
+
+- [ ] **B4: End-to-end verification + responsive + deploy**
+    - Depends on: B3
+    - Walk every filter path: dropdown → Sankey click → scorecard
+      filter → origin filter → time range. Confirm KPIs, cohort
+      bar, and Sankey update across all chapters.
+    - Walk every cross-link: Trace → from Ch3 and Ch4, cohort
+      table row from Ch1, explorer Trace → within Ch2.
+    - Responsive check at 768 / 1366 / 1680 — chapter nav must
+      not overflow or stack poorly.
+    - Deploy to Cloudflare Pages.
+    - Done when: all cross-links land on the correct chapter,
+      all filters compose across chapters, responsive at 3
+      viewports, live on Cloudflare Pages, zero console errors.
+
+---
 
 ## Out of scope for this arc
 
@@ -212,18 +200,25 @@ views for each feature before moving to the next.
 - Client data upload functionality
 - Real dispute submission workflows
 - User authentication
-- Mobile-first design (responsive is fine, mobile-optimized is not
-  required)
-- ~~Folding extensions back into cinderhaven-data repo~~ (done 2026-05-10)
+- Mobile-first design (responsive is fine, not required)
+- Adding new views — the problem is too many sections, not too few
+- CSS consolidation — wait until chapter structure is stable
+- React Router or URL-based routing — four chapters with local state
+- Guided tour or onboarding overlay — the narrative structure should
+  make the tool self-explanatory
 
 ## Definition of done for this arc
 
-- [ ] All ten features are functional and connected
-- [ ] Sankey flow renders full deduction picture and zooms on click
-- [ ] All views update when user navigates from one to another
-- [ ] Synthetic data feels realistic for a ~$25M food manufacturer
-- [ ] Retailer-specific behaviors are recognizable (not generic)
-- [ ] Deployed to Cloudflare Pages with a shareable URL
+- [ ] Demo opens to Chapter 1 (The Problem) — Sankey + KPIs only
+- [ ] CEO can navigate forward through 4 chapters that tell the
+      five-failure story in sequence
+- [ ] Cross-links between views switch chapters automatically
+- [ ] Sankey, KPIs, filters, and cohort bar stay persistent across
+      all chapters
+- [ ] No view is lost — all 10 features are accessible, just
+      organized into chapters instead of a flat scroll
+- [ ] Responsive at iPad / MacBook / wide viewports
+- [ ] Deployed to Cloudflare Pages
 - [ ] Friend has previewed and given feedback
 - [ ] Feedback incorporated
 
@@ -234,3 +229,13 @@ views for each feature before moving to the next.
 When an arc completes, archive its goal, completion date, and outcome
 here. Then start a new arc above. Provides continuity without bloating
 the active plan.
+
+### Arc 1: Build the demo (2025-05-07 → 2026-05-13)
+**Goal:** Build the extended synthetic dataset and deliver all ten
+interactive features in a deployable React app consuming static JSON.
+**Outcome:** Functionally complete. All 10 views built and connected,
+synthetic dataset validated (3,333 deductions, $1.4M, 36 checks pass),
+deployed to Cloudflare Pages. Friend preview still pending. Audit
+(2026-05-15) found the demo has five unique capabilities in a 15-tool
+competitive landscape — but the flat 16-section scroll hides them.
+Arc 2 addresses this.
