@@ -172,14 +172,15 @@ export default function App() {
 
       <ChapterNav active={activeChapter} onChange={setActiveChapter} />
 
-      <SankeyView deductions={deductions} selection={selection} onSelect={setSelection} />
-
       {activeChapter === 1 && (
-        <CohortTableView
-          cohort={filteredDeductions ?? deductions}
-          onSelectDeduction={focusAndNavigate}
-          activeDeductionId={focusedDeductionId}
-        />
+        <>
+          <SankeyView deductions={deductions} selection={selection} onSelect={setSelection} />
+          <CohortTableView
+            cohort={filteredDeductions ?? deductions}
+            onSelectDeduction={focusAndNavigate}
+            activeDeductionId={focusedDeductionId}
+          />
+        </>
       )}
 
       {activeChapter === 2 && (
