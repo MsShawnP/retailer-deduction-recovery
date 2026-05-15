@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Deduction, Evidence } from "../types";
-import { OUTCOME_COLORS, rootCauseFor } from "../sankey/data";
+import { OUTCOME_COLORS, rootCauseFor } from "../sankey/domain";
 import { formatCount, formatDollars, formatPercent } from "../data";
 import "./ExplorerView.css";
 

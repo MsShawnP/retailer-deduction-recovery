@@ -85,6 +85,115 @@ worse."
 - [ ] Friend preview — hand off for feedback.
 - [ ] Incorporate feedback.
 
+---
+
+## Decomposition: Narrative chapter restructure
+
+Goal: Transform the flat 16-section scroll into 4 narrative
+chapters with persistent Sankey/KPIs and cross-chapter navigation.
+
+### Phase A — Clear the path (all independent, < 30 min each)
+
+- [x] **A1: Remove vestigial bottom tables**
+    - Depends on: none
+    - Delete the 3 `<section className="break">` blocks in App.tsx
+      (by-type, by-retailer, by-distributor tables) and the
+      `byRetailer` / `byDistributor` derived values, `byType` /
+      `byChannel` useMemos, and `aggregateByType` /
+      `aggregateByRetailer` functions they depend on.
+    - Done when: `npm run build` passes, dev server renders with
+      no bottom tables, zero console errors.
+
+- [x] **A2: Rename sankey/data.ts → domain.ts**
+    - Depends on: none
+    - Move `frontend/src/sankey/data.ts` →
+      `frontend/src/sankey/domain.ts`. Update imports in 10 files:
+      App.tsx, SankeyView.tsx, ExplorerView.tsx,
+      CausationTraceView.tsx, CohortTableView.tsx,
+      RecoverySimulationView.tsx, CostToDisputeView.tsx,
+      DisputeBuilderView.tsx, TimelinePressureView.tsx,
+      PostAuditRiskView.tsx, OriginClusteringView.tsx.
+    - Done when: `npm run build` passes, all imports resolve.
+
+- [x] **A3: Extract App.tsx inline components**
+    - Depends on: A1 (so the extracted code matches the cleaned-up
+      state, not the pre-deletion state)
+    - Pull into separate files:
+      `Kpi.tsx`, `CohortBar.tsx`, `TimeRangeSelector.tsx`,
+      `computeKpis.ts` (if aggregation functions survive A1).
+    - App.tsx after extraction should be: data loading, state,
+      layout, and view rendering — no business logic functions or
+      standalone UI components.
+    - Done when: `npm run build` passes, App.tsx < 300 lines,
+      dev server renders identically.
+
+### Phase B — Narrative chapters (sequential)
+
+- [ ] **B1: Add chapter state + ChapterNav component**
+    - Depends on: A3
+    - Add `activeChapter: 1|2|3|4` state to App.tsx (default 1).
+      Create `ChapterNav.tsx` — a tab bar with 4 labeled tabs:
+      "The Problem" / "Why This Happens" / "The Evidence Gap" /
+      "What to Do About It". Render it below the persistent header
+      (KPIs + filters + cohort bar), above the view area.
+      Clicking a tab sets activeChapter. No conditional rendering
+      yet — all views still render below.
+    - Done when: tab bar renders, clicking tabs changes the active
+      state (visible via active-tab styling), all existing views
+      still render below, `npm run build` passes.
+
+- [ ] **B2: Group views into 4 chapters**
+    - Depends on: B1
+    - Wrap view groups in conditional blocks keyed on
+      activeChapter. The persistent header (Sankey, KPIs, filters,
+      cohort bar) stays outside the conditional — always visible.
+      Chapter contents:
+        - Ch1: CohortTableView (Sankey is persistent, not in a
+          chapter)
+        - Ch2: ExplorerView + CausationTraceView +
+          OriginClusteringView
+        - Ch3: DisputeBuilderView + PostAuditRiskView +
+          RetailerScorecardView
+        - Ch4: RecoverySimulationView + CostToDisputeView +
+          TimelinePressureView
+    - Done when: each tab shows only its chapter's views, all 10
+      views accessible across the 4 tabs, selection/filter state
+      persists across tab switches, `npm run build` passes.
+
+- [ ] **B3: Wire cross-links to switch chapters**
+    - Depends on: B2
+    - When `tracedDeductionId` is set from a view outside Ch2
+      (CostToDisputeView in Ch4, DisputeBuilderView in Ch3,
+      TimelinePressureView in Ch4, PostAuditRiskView in Ch3),
+      also set activeChapter to 2 so the trace view is visible.
+    - When `focusedDeductionId` is set from CohortTableView
+      (Ch1), also set activeChapter to 2 so the explorer is
+      visible.
+    - Approach: wrap `setTracedDeductionId` and
+      `setFocusedDeductionId` in helper functions that also set
+      the chapter, then pass those helpers as the `onTrace` /
+      `onSelectDeduction` props.
+    - Done when: clicking "Trace →" from cost-to-dispute (Ch4)
+      switches to Ch2 and shows the trace; clicking a row in the
+      cohort table (Ch1) switches to Ch2 and shows the explorer
+      focused on that deduction; `npm run build` passes.
+
+- [ ] **B4: End-to-end verification + responsive + deploy**
+    - Depends on: B3
+    - Walk every filter path: dropdown → Sankey click → scorecard
+      filter → origin filter → time range. Confirm KPIs, cohort
+      bar, and Sankey update across all chapters.
+    - Walk every cross-link: Trace → from Ch3 and Ch4, cohort
+      table row from Ch1, explorer Trace → within Ch2.
+    - Responsive check at 768 / 1366 / 1680 — chapter nav must
+      not overflow or stack poorly.
+    - Deploy to Cloudflare Pages.
+    - Done when: all cross-links land on the correct chapter,
+      all filters compose across chapters, responsive at 3
+      viewports, live on Cloudflare Pages, zero console errors.
+
+---
+
 ## Out of scope for this arc
 
 - Live backend / API

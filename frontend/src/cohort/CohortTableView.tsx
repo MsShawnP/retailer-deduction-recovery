@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
-import { disputeReadinessFor, TYPE_LABELS } from "../sankey/data";
+import { disputeReadinessFor, TYPE_LABELS } from "../sankey/domain";
 import { formatDollars } from "../data";
 import "./CohortTableView.css";
 

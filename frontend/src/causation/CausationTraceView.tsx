@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { Deduction } from "../types";
-import { OUTCOME_COLORS, rootCauseFor } from "../sankey/data";
+import { OUTCOME_COLORS, rootCauseFor } from "../sankey/domain";
 import { formatCount, formatDollars } from "../data";
 import "./CausationTraceView.css";
 

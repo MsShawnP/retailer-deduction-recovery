@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars } from "../data";
-import { isOperational } from "../sankey/data";
+import { isOperational } from "../sankey/domain";
 import "./TimelinePressureView.css";
 
 interface Props {
