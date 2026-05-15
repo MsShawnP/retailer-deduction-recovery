@@ -599,3 +599,15 @@ Phase 4 task 4 — friend preview handoff. Peer reviewer feedback
 may generate additional polish items before that.
 
 ---
+
+## 2026-05-15 17:44
+
+**What changed:** Full project audit completed (AUDIT.md). Four phases: baseline assessment, internal review (UX + Architecture), landscape scan (15 tools across 5 categories), and synthesis. Found 5 unique capabilities no competitor offers, hidden by busy 16-section flat scroll. New PLAN.md arc: narrative chapter restructure (Phase A cleanup → Phase B 4-chapter structure → Phase C harden). Archived Arc 1.
+
+**Why:** Demo was ideated before structured workflow. Audit retroactively applies rigor — the "busy" feeling is the #1 internal problem hiding the #1 competitive advantage. Fixing UX IS the strategic move.
+
+**State:** AUDIT.md written with all 4 phases. PLAN.md updated: Arc 1 archived, new arc defined with Phase A (remove tables, rename domain module, extract App.tsx), Phase B (4-chapter narrative navigation), Phase C (tests + friend preview). No code changes yet — this session was analysis only.
+
+**Next:** Phase A task 1 — remove the 3 vestigial bottom tables from App.tsx (lines 288–378). Then rename sankey/data.ts → domain.ts, then extract App.tsx inline components. All < 1 hour.
+
+---
