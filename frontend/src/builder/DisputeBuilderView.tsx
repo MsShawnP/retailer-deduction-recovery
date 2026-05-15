@@ -6,7 +6,7 @@ import type {
   RetailersById,
 } from "../types";
 import { formatCount, formatDollars } from "../data";
-import { isOperational } from "../sankey/data";
+import { isOperational } from "../sankey/domain";
 import "./DisputeBuilderView.css";
 
 interface Props {

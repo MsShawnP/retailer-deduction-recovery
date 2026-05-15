@@ -8,7 +8,7 @@ import {
   highlightedLinkSet,
   isOnSelectedPath,
   type Selection,
-} from "./data";
+} from "./domain";
 import "./SankeyView.css";
 
 
