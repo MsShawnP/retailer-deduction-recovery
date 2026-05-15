@@ -50,30 +50,30 @@ worse."
 
 ### Phase B: Narrative chapter structure (main effort)
 
-- [ ] Design chapter navigation component — tab bar or chapter
+- [x] Design chapter navigation component — tab bar or chapter
       nav below the persistent header (Sankey + KPIs + filters +
       cohort bar). One piece of state: activeChapter. Only the
       active chapter's views render. Simple, no React Router.
-- [ ] Implement Chapter 1: The Problem — Sankey + KPIs + cohort
+- [x] Implement Chapter 1: The Problem — Sankey + KPIs + cohort
       table. "Here is the shape of your losses." This is the
       landing state.
-- [ ] Implement Chapter 2: Why This Happens — Explorer + causation
+- [x] Implement Chapter 2: Why This Happens — Explorer + causation
       trace + origin clustering. "Each deduction traces back to a
       specific operational failure."
-- [ ] Implement Chapter 3: The Evidence Gap — Dispute builder +
+- [x] Implement Chapter 3: The Evidence Gap — Dispute builder +
       post-audit risk + retailer scorecard. "You don't have what
       you need to win, and here's what that costs."
-- [ ] Implement Chapter 4: What to Do About It — Recovery
+- [x] Implement Chapter 4: What to Do About It — Recovery
       simulation + cost-to-dispute + timeline pressure. "These
       fixes, in this order, recover this much money."
-- [ ] Wire cross-links to switch chapters — Trace →, Filter →,
+- [x] Wire cross-links to switch chapters — Trace →, Filter →,
       and other cross-view links navigate to the correct chapter
       when the target view lives in a different chapter. Same
       selection/trace state, just also sets activeChapter.
-- [ ] Verify chapter navigation end-to-end — walk every cross-link,
+- [x] Verify chapter navigation end-to-end — walk every cross-link,
       filter, and drill-down path. Confirm Sankey selection +
       chapter switching compose correctly. Screenshot verification.
-- [ ] Responsive check — verify chapter nav works at iPad portrait
+- [x] Responsive check — verify chapter nav works at iPad portrait
       (768), MacBook (1366), wide (1680).
 - [ ] Deploy updated version to Cloudflare Pages.
 
@@ -129,7 +129,7 @@ chapters with persistent Sankey/KPIs and cross-chapter navigation.
 
 ### Phase B — Narrative chapters (sequential)
 
-- [ ] **B1: Add chapter state + ChapterNav component**
+- [x] **B1: Add chapter state + ChapterNav component**
     - Depends on: A3
     - Add `activeChapter: 1|2|3|4` state to App.tsx (default 1).
       Create `ChapterNav.tsx` — a tab bar with 4 labeled tabs:
@@ -142,7 +142,7 @@ chapters with persistent Sankey/KPIs and cross-chapter navigation.
       state (visible via active-tab styling), all existing views
       still render below, `npm run build` passes.
 
-- [ ] **B2: Group views into 4 chapters**
+- [x] **B2: Group views into 4 chapters**
     - Depends on: B1
     - Wrap view groups in conditional blocks keyed on
       activeChapter. The persistent header (Sankey, KPIs, filters,
@@ -160,7 +160,7 @@ chapters with persistent Sankey/KPIs and cross-chapter navigation.
       views accessible across the 4 tabs, selection/filter state
       persists across tab switches, `npm run build` passes.
 
-- [ ] **B3: Wire cross-links to switch chapters**
+- [x] **B3: Wire cross-links to switch chapters**
     - Depends on: B2
     - When `tracedDeductionId` is set from a view outside Ch2
       (CostToDisputeView in Ch4, DisputeBuilderView in Ch3,

@@ -611,3 +611,15 @@ may generate additional polish items before that.
 **Next:** Phase A task 1 — remove the 3 vestigial bottom tables from App.tsx (lines 288–378). Then rename sankey/data.ts → domain.ts, then extract App.tsx inline components. All < 1 hour.
 
 ---
+
+## 2026-05-15 18:09
+
+**What changed:** Phase B complete — 4-chapter narrative navigation implemented (ChapterNav component, conditional chapter rendering, cross-chapter trace/focus links). All verified via dev server.
+
+**Why:** Core deliverable of the narrative restructure arc. Transforms the flat 16-section scroll into 4 guided chapters so the five-failure story reads in sequence instead of overwhelming at once.
+
+**State:** ChapterNav.tsx renders 4 tabs below the persistent header. App.tsx conditionally renders views by activeChapter (Ch1: Cohort, Ch2: Explorer+Causation+Origin, Ch3: Dispute+PostAudit+Scorecard, Ch4: Recovery+Cost+Timeline). Cross-links: Trace from Ch3/Ch4 → Ch2, cohort row from Ch1 → Ch2. Filters persist across tabs. Responsive at 768/1366/1680. Zero console errors. Build passes. Deploy to Cloudflare Pages pending.
+
+**Next:** Deploy updated version to Cloudflare Pages, then Phase C — component tests for navigation state, friend preview, and feedback incorporation.
+
+---

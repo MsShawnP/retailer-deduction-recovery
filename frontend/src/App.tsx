@@ -7,6 +7,7 @@ import { computeKpis } from "./computeKpis";
 import Kpi from "./Kpi";
 import CohortBar from "./CohortBar";
 import TimeRangeSelector from "./TimeRangeSelector";
+import ChapterNav, { type ChapterId } from "./ChapterNav";
 import SankeyView from "./sankey/SankeyView";
 import CohortTableView from "./cohort/CohortTableView";
 import ExplorerView from "./explorer/ExplorerView";
@@ -29,6 +30,7 @@ export default function App() {
   const [dateRange, setDateRange] = useState<DateRange>(null);
   const [tracedDeductionId, setTracedDeductionId] = useState<string | null>(null);
   const [focusedDeductionId, setFocusedDeductionId] = useState<string | null>(null);
+  const [activeChapter, setActiveChapter] = useState<ChapterId>(1);
   const traceRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,6 +83,16 @@ export default function App() {
   function onDropdownChange(value: string) {
     if (value === "all") setSelection(null);
     else setSelection({ kind: "node", nodeId: `0:${value}` });
+  }
+
+  function traceAndNavigate(id: string | null) {
+    setTracedDeductionId(id);
+    if (id) setActiveChapter(2);
+  }
+
+  function focusAndNavigate(id: string | null) {
+    setFocusedDeductionId(id);
+    if (id) setActiveChapter(2);
   }
 
   if (error) return <div className="error">Error loading data: {error}</div>;
@@ -158,89 +170,105 @@ export default function App() {
         />
       </div>
 
+      <ChapterNav active={activeChapter} onChange={setActiveChapter} />
+
       <SankeyView deductions={deductions} selection={selection} onSelect={setSelection} />
 
-      <CohortTableView
-        cohort={filteredDeductions ?? deductions}
-        onSelectDeduction={setFocusedDeductionId}
-        activeDeductionId={focusedDeductionId}
-      />
-
-      <ExplorerView
-        cohort={filteredDeductions ?? deductions}
-        allDeductions={deductions}
-        onTrace={setTracedDeductionId}
-        tracedDeductionId={tracedDeductionId}
-        focusedDeductionId={focusedDeductionId}
-      />
-
-      <div ref={traceRef}>
-        <CausationTraceView
-          tracedDeductionId={tracedDeductionId}
+      {activeChapter === 1 && (
+        <CohortTableView
           cohort={filteredDeductions ?? deductions}
-          onChange={setTracedDeductionId}
+          onSelectDeduction={focusAndNavigate}
+          activeDeductionId={focusedDeductionId}
         />
-      </div>
+      )}
 
-      <RecoverySimulationView cohort={filteredDeductions ?? deductions} />
+      {activeChapter === 2 && (
+        <>
+          <ExplorerView
+            cohort={filteredDeductions ?? deductions}
+            allDeductions={deductions}
+            onTrace={setTracedDeductionId}
+            tracedDeductionId={tracedDeductionId}
+            focusedDeductionId={focusedDeductionId}
+          />
 
-      <CostToDisputeView
-        cohort={filteredDeductions ?? deductions}
-        onTrace={setTracedDeductionId}
-      />
+          <div ref={traceRef}>
+            <CausationTraceView
+              tracedDeductionId={tracedDeductionId}
+              cohort={filteredDeductions ?? deductions}
+              onChange={setTracedDeductionId}
+            />
+          </div>
 
-      <DisputeBuilderView
-        cohort={filteredDeductions ?? deductions}
-        retailers={retailers}
-        tracedDeductionId={tracedDeductionId}
-        onTrace={setTracedDeductionId}
-      />
+          <OriginClusteringView
+            cohort={
+              selection?.kind === "cluster"
+                ? deductions
+                : filteredDeductions ?? deductions
+            }
+            activeCluster={
+              selection?.kind === "cluster"
+                ? { dimension: selection.dimension, value: selection.value }
+                : null
+            }
+            onSelectCluster={(dimension, value) =>
+              setSelection(
+                dimension && value
+                  ? { kind: "cluster", dimension, value }
+                  : null
+              )
+            }
+            onTrace={setTracedDeductionId}
+          />
+        </>
+      )}
 
-      <TimelinePressureView
-        cohort={filteredDeductions ?? deductions}
-        onTrace={setTracedDeductionId}
-      />
+      {activeChapter === 3 && (
+        <>
+          <DisputeBuilderView
+            cohort={filteredDeductions ?? deductions}
+            retailers={retailers}
+            tracedDeductionId={tracedDeductionId}
+            onTrace={traceAndNavigate}
+          />
 
-      <PostAuditRiskView
-        cohort={filteredDeductions ?? deductions}
-        onTrace={setTracedDeductionId}
-      />
+          <PostAuditRiskView
+            cohort={filteredDeductions ?? deductions}
+            onTrace={traceAndNavigate}
+          />
 
-      <RetailerScorecardView
-        cohort={
-          selection?.kind === "retailer"
-            ? deductions
-            : filteredDeductions ?? deductions
-        }
-        retailers={retailers}
-        activeRetailerId={
-          selection?.kind === "retailer" ? selection.retailerId : null
-        }
-        onSelectRetailer={(id) =>
-          setSelection(id ? { kind: "retailer", retailerId: id } : null)
-        }
-      />
+          <RetailerScorecardView
+            cohort={
+              selection?.kind === "retailer"
+                ? deductions
+                : filteredDeductions ?? deductions
+            }
+            retailers={retailers}
+            activeRetailerId={
+              selection?.kind === "retailer" ? selection.retailerId : null
+            }
+            onSelectRetailer={(id) =>
+              setSelection(id ? { kind: "retailer", retailerId: id } : null)
+            }
+          />
+        </>
+      )}
 
-      <OriginClusteringView
-        cohort={
-          selection?.kind === "cluster"
-            ? deductions
-            : filteredDeductions ?? deductions
-        }
-        activeCluster={
-          selection?.kind === "cluster"
-            ? { dimension: selection.dimension, value: selection.value }
-            : null
-        }
-        onSelectCluster={(dimension, value) =>
-          setSelection(
-            dimension && value
-              ? { kind: "cluster", dimension, value }
-              : null
-          )
-        }
-        onTrace={setTracedDeductionId}
-      />
+      {activeChapter === 4 && (
+        <>
+          <RecoverySimulationView cohort={filteredDeductions ?? deductions} />
+
+          <CostToDisputeView
+            cohort={filteredDeductions ?? deductions}
+            onTrace={traceAndNavigate}
+          />
+
+          <TimelinePressureView
+            cohort={filteredDeductions ?? deductions}
+            onTrace={traceAndNavigate}
+          />
+        </>
+      )}
     </div>
   );
 }
