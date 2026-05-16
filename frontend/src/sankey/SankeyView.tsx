@@ -19,7 +19,7 @@ interface Props {
 }
 
 const WIDTH = 1600;
-const HEIGHT = 700;
+const MIN_HEIGHT = 700;
 const MARGIN = { top: 44, right: 260, bottom: 20, left: 32 };
 
 const LAYER_COLORS = [
@@ -106,7 +106,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       .nodePadding(12)
       .extent([
         [MARGIN.left, MARGIN.top],
-        [WIDTH - MARGIN.right, HEIGHT - MARGIN.bottom],
+        [WIDTH - MARGIN.right, MIN_HEIGHT - MARGIN.bottom],
       ]);
 
     const result = generator({ nodes: nodesCopy as any, links: linksCopy as any });
@@ -162,7 +162,13 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       .filter((l: any) => l.source.layer === 0)
       .reduce((s: number, l: any) => s + l.value, 0);
 
-    return { nodes: result.nodes, links: result.links, total: totalIn };
+    let maxY = 0;
+    for (const node of result.nodes as any[]) {
+      if (node.y1 > maxY) maxY = node.y1;
+    }
+    const height = Math.max(MIN_HEIGHT, maxY + MARGIN.bottom);
+
+    return { nodes: result.nodes, links: result.links, total: totalIn, height };
   }, [operationalDeductions]);
 
   // For the current selection, compute which links should be highlighted.
@@ -215,7 +221,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
       )}
 
       <svg
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        viewBox={`0 0 ${WIDTH} ${layout.height}`}
         className="sankey-svg"
         onClick={clearSelection}
       >
@@ -224,7 +230,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
           x={0}
           y={0}
           width={WIDTH}
-          height={HEIGHT}
+          height={layout.height}
           fill="transparent"
           onClick={() => onSelect(null)}
         />
