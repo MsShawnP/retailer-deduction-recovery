@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars, formatPercent } from "../data";
-import { isOperational } from "../sankey/domain";
+import { isOperational, WIN_PROB } from "../sankey/domain";
 import "./RecoverySimulationView.css";
 
 interface Props {
@@ -26,15 +26,6 @@ const ALL_OFF: SimToggles = {
   edi_asn: false,
 };
 
-// Evidence-quality → expected win probability for an on-time, filed
-// dispute. Calibrated to the research notes in
-// docs (per-retailer dispute outcome ranges, see research/retailers/).
-const WIN_PROB: Record<string, number> = {
-  digital_complete: 0.65,
-  digital_partial: 0.35,
-  handwritten_only: 0.12,
-  none: 0.05,
-};
 
 interface ToggleSpec {
   key: ToggleKey;

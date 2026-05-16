@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Deduction, Evidence } from "../types";
-import { OUTCOME_COLORS, rootCauseFor } from "../sankey/domain";
+import { OUTCOME_COLORS, rootCauseFor, DEMO_DATE, readableOutcome } from "../sankey/domain";
 import { formatCount, formatDollars, formatPercent } from "../data";
 import "./ExplorerView.css";
 
@@ -12,7 +12,7 @@ interface Props {
   focusedDeductionId?: string | null;
 }
 
-const TODAY = new Date("2026-05-31");
+const TODAY = DEMO_DATE;
 
 export default function ExplorerView({
   cohort,
@@ -389,18 +389,6 @@ function readableLocation(l: string | null): string {
   } as Record<string, string>)[l] || l;
 }
 
-function readableOutcome(o: string): string {
-  return ({
-    won_full: "Won full",
-    won_partial: "Won partial",
-    pending: "Pending",
-    lost_evidence: "Lost — evidence",
-    lost_deadline: "Lost — deadline",
-    lost_no_response: "Lost — no response",
-    lost_other: "Lost — other",
-    abandoned: "Abandoned",
-  } as Record<string, string>)[o] || o;
-}
 
 function missingEvidence(items: Evidence[]): string {
   return items
