@@ -8,13 +8,21 @@
 
 .cohort-table {
   width: 100%;
-  table-layout: fixed;
   border-collapse: collapse;
   font-size: 14px;
   font-family: var(--serif);
   background: var(--panel);
   border: 1px solid var(--rule);
 }
+
+.cohort-table col.col-id        { width: 8%; }
+.cohort-table col.col-date      { width: 10%; }
+.cohort-table col.col-retailer  { width: 12%; }
+.cohort-table col.col-type      { width: 14%; }
+.cohort-table col.col-amount    { width: 9%; }
+.cohort-table col.col-readiness { width: 14%; }
+.cohort-table col.col-outcome   { width: 18%; }
+.cohort-table col.col-retrieval { width: 15%; }
 
 .cohort-table th {
   font-family: var(--serif);
