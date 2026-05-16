@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
-import { disputeReadinessFor, TYPE_LABELS } from "../sankey/domain";
+import { disputeReadinessFor, TYPE_LABELS, readableOutcome } from "../sankey/domain";
 import { formatDollars } from "../data";
 import "./CohortTableView.css";
 
@@ -35,17 +35,7 @@ function retrievalHours(d: Deduction): number | null {
 
 function outcomeLabel(d: Deduction): string {
   if (!d.dispute) return "Never filed";
-  const labels: Record<string, string> = {
-    won_full: "Won full",
-    won_partial: "Won partial",
-    pending: "Pending",
-    lost_evidence: "Lost — evidence",
-    lost_deadline: "Lost — deadline",
-    lost_no_response: "Lost — no response",
-    lost_other: "Lost — other",
-    abandoned: "Abandoned",
-  };
-  return labels[d.dispute.outcome] || d.dispute.outcome;
+  return readableOutcome(d.dispute.outcome);
 }
 
 function getSortValue(d: Deduction, key: SortKey): string | number {

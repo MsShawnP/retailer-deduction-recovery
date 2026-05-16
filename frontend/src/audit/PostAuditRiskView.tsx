@@ -1,15 +1,13 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars, formatPercent } from "../data";
-import { isOperational } from "../sankey/domain";
+import { isOperational, evidenceCategoryFor, type EvidenceCategory } from "../sankey/domain";
 import "./PostAuditRiskView.css";
 
 interface Props {
   cohort: Deduction[];
   onTrace: (id: string) => void;
 }
-
-type EvidenceCategory = "digital" | "paper" | "missing";
 
 // Probability an auditor successfully claws back this dollar amount
 // given the supplier's current evidence quality. Calibrated against
@@ -42,19 +40,6 @@ const AUDIT_PROFILE: Record<string, string> = {
   southside_market: "Less formal but accepted as long as records exist.",
   green_basket: "Sprouts-style buyer relationship; informal audit posture.",
 };
-
-function evidenceCategoryFor(d: Deduction): EvidenceCategory {
-  if (d.dispute?.evidence_quality) {
-    const q = d.dispute.evidence_quality;
-    if (q === "digital_complete" || q === "digital_partial") return "digital";
-    if (q === "handwritten_only") return "paper";
-    return "missing";
-  }
-  if (!d.pack_record) return "missing";
-  if (d.pack_record.evidence_location === "lost") return "missing";
-  if (d.pack_record.evidence_format === "digital") return "digital";
-  return "paper";
-}
 
 interface RetailerRow {
   id: string;

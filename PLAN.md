@@ -88,22 +88,22 @@ worse."
 Data bugs and duplication found in the Phase 2 internal review.
 These fix credibility issues a data-curious CEO would discover.
 
-- [ ] Fix WIN_PROB discrepancy — RecoverySimulationView uses 0.05
+- [x] Fix WIN_PROB discrepancy — RecoverySimulationView uses 0.05
       for "none" evidence, CostToDisputeView uses 0.0. Extract
-      WIN_PROB into domain.ts as single source of truth. Decide
-      on the correct value.
-- [ ] Pin DEMO_DATE — create a shared DEMO_DATE constant in
+      WIN_PROB into domain.ts as single source of truth. Decided
+      on 0.05 (research-calibrated).
+- [x] Pin DEMO_DATE — create a shared DEMO_DATE constant in
       domain.ts. Replace `new Date("2026-05-31")` in
       ExplorerView, CostToDisputeView, TimelinePressureView, and
       `new Date()` in disputeReadinessFor. All date comparisons
       use the same reference.
-- [ ] Extract shared logic to domain.ts — move readableOutcome
-      (3 copies), evidenceCategoryFor (2 copies), and any other
-      duplicated domain functions into domain.ts. Single source
-      of truth.
-- [ ] Delete dead code — remove legacy `.selection-chip` CSS
-      (~52 LOC), `.placeholder` CSS (~20 LOC), and archive or
-      delete screenshot scripts (14 files, ~1,156 LOC).
+- [x] Extract shared logic to domain.ts — move readableOutcome
+      (3 copies), evidenceCategoryFor (2 copies), WIN_PROB (2
+      copies), EvidenceCategory type (2 copies), and DEMO_DATE
+      (3 copies) into domain.ts. Single source of truth.
+- [x] Delete dead code — removed legacy `.selection-chip` CSS
+      (~52 LOC), `.placeholder` CSS (~20 LOC), and 16 screenshot/
+      verification scripts (~1,200 LOC).
 
 ### Phase E: Friend preview + feedback
 
@@ -259,8 +259,8 @@ chapters with persistent Sankey/KPIs and cross-chapter navigation.
       organized into chapters instead of a flat scroll
 - [x] Responsive at iPad / MacBook / wide viewports
 - [x] Deployed to Cloudflare Pages
-- [ ] No data discrepancies between views (WIN_PROB, dates)
-- [ ] Shared domain logic in one place (no duplicated functions)
+- [x] No data discrepancies between views (WIN_PROB, dates)
+- [x] Shared domain logic in one place (no duplicated functions)
 - [ ] Friend has previewed and given feedback
 - [ ] Feedback incorporated
 
