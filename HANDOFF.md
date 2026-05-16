@@ -635,3 +635,15 @@ may generate additional polish items before that.
 **Next:** Phase C — component tests for chapter navigation state, friend preview handoff, and feedback incorporation.
 
 ---
+
+## 2026-05-16 15:39
+
+**What changed:** Full project audit (Phase 1-4) completed. AUDIT.md rewritten with current baseline, internal review (1 bug: WIN_PROB discrepancy, 4 important issues), updated landscape scan (Glimpse $35M raise, HighRadius AI additions, 5 unique capabilities still unmatched), and ranked next moves. PLAN.md updated: Phase A checked off, Phase D (pre-preview cleanup) added with 4 tasks, Phase E/F defined. Definition of done 7/11 checked.
+
+**Why:** Second audit, one month after the first. The chapter restructure the first audit recommended has landed. This audit assesses the result and identifies the remaining gate to friend preview: two data bugs (WIN_PROB discrepancy, non-deterministic dates) and duplicated business logic across views.
+
+**State:** AUDIT.md has all 4 phases. PLAN.md updated with Phases D/E/F. Build passes, 14 tests pass, 0 vulnerabilities. No code changes this session — analysis only. Competitive position stronger: 5 unique capabilities still unmatched, market validates the space.
+
+**Next:** Phase D task 1 — fix WIN_PROB discrepancy between RecoverySimulationView (0.05) and CostToDisputeView (0.0) for "none" evidence. Extract WIN_PROB into domain.ts.
+
+---

@@ -36,14 +36,14 @@ worse."
 
 ### Phase A: Clear the path (< 1 hour)
 
-- [ ] Remove vestigial bottom tables — delete the 3 by-type /
+- [x] Remove vestigial bottom tables — delete the 3 by-type /
       by-retailer / by-distributor tables from App.tsx (lines
       288–378). Data already visible in Sankey + scorecard. Zero
       information loss, instant noise reduction.
-- [ ] Rename sankey/data.ts → domain.ts — this is the shared
+- [x] Rename sankey/data.ts → domain.ts — this is the shared
       domain module (Selection, isOnSelectedPath, rootCauseFor,
       etc.) imported by 7+ views. Update all imports.
-- [ ] Extract App.tsx inline components — pull Kpi, CohortBar,
+- [x] Extract App.tsx inline components — pull Kpi, CohortBar,
       TimeRangeSelector, computeKpis, aggregateByType,
       aggregateByRetailer into separate files. Keeps App.tsx
       focused on layout and state before adding navigation.
@@ -82,8 +82,49 @@ worse."
 - [x] Add component tests for navigation state — chapter switching,
       cross-link chapter transitions, selection persistence across
       chapter changes.
+
+### Phase D: Pre-preview cleanup (audit 2026-05-16)
+
+Data bugs and duplication found in the Phase 2 internal review.
+These fix credibility issues a data-curious CEO would discover.
+
+- [ ] Fix WIN_PROB discrepancy — RecoverySimulationView uses 0.05
+      for "none" evidence, CostToDisputeView uses 0.0. Extract
+      WIN_PROB into domain.ts as single source of truth. Decide
+      on the correct value.
+- [ ] Pin DEMO_DATE — create a shared DEMO_DATE constant in
+      domain.ts. Replace `new Date("2026-05-31")` in
+      ExplorerView, CostToDisputeView, TimelinePressureView, and
+      `new Date()` in disputeReadinessFor. All date comparisons
+      use the same reference.
+- [ ] Extract shared logic to domain.ts — move readableOutcome
+      (3 copies), evidenceCategoryFor (2 copies), and any other
+      duplicated domain functions into domain.ts. Single source
+      of truth.
+- [ ] Delete dead code — remove legacy `.selection-chip` CSS
+      (~52 LOC), `.placeholder` CSS (~20 LOC), and archive or
+      delete screenshot scripts (14 files, ~1,156 LOC).
+
+### Phase E: Friend preview + feedback
+
 - [ ] Friend preview — hand off for feedback.
 - [ ] Incorporate feedback.
+
+### Phase F: Post-feedback polish (do only if needed)
+
+Prioritize based on friend feedback. Don't do preemptively.
+
+- [ ] CSS custom properties — promote 8+ hardcoded hex values
+      (#F1F2F4, #eef0f2, etc.) to :root custom properties.
+- [ ] CSS pattern consolidation — extract shared table, section,
+      button, and tab patterns into App.css. ~465 LOC reduction.
+- [ ] Keyboard accessibility — add tabIndex, role, onKeyDown to
+      Sankey interactive elements and sortable table headers.
+- [ ] Domain logic tests — cover disputeReadinessFor,
+      buildSankeyData, isOnSelectedPath, computeKpis.
+- [ ] Performance — hoist O(n²) totalDollars in
+      OriginClusteringView, add useMemo to peer computations in
+      ExplorerView and RetailerScorecardView.
 
 ---
 
@@ -202,23 +243,24 @@ chapters with persistent Sankey/KPIs and cross-chapter navigation.
 - User authentication
 - Mobile-first design (responsive is fine, not required)
 - Adding new views — the problem is too many sections, not too few
-- CSS consolidation — wait until chapter structure is stable
 - React Router or URL-based routing — four chapters with local state
 - Guided tour or onboarding overlay — the narrative structure should
   make the tool self-explanatory
 
 ## Definition of done for this arc
 
-- [ ] Demo opens to Chapter 1 (The Problem) — Sankey + KPIs only
-- [ ] CEO can navigate forward through 4 chapters that tell the
+- [x] Demo opens to Chapter 1 (The Problem) — Sankey + KPIs only
+- [x] CEO can navigate forward through 4 chapters that tell the
       five-failure story in sequence
-- [ ] Cross-links between views switch chapters automatically
-- [ ] Sankey, KPIs, filters, and cohort bar stay persistent across
+- [x] Cross-links between views switch chapters automatically
+- [x] Sankey, KPIs, filters, and cohort bar stay persistent across
       all chapters
-- [ ] No view is lost — all 10 features are accessible, just
+- [x] No view is lost — all 10 features are accessible, just
       organized into chapters instead of a flat scroll
-- [ ] Responsive at iPad / MacBook / wide viewports
-- [ ] Deployed to Cloudflare Pages
+- [x] Responsive at iPad / MacBook / wide viewports
+- [x] Deployed to Cloudflare Pages
+- [ ] No data discrepancies between views (WIN_PROB, dates)
+- [ ] Shared domain logic in one place (no duplicated functions)
 - [ ] Friend has previewed and given feedback
 - [ ] Feedback incorporated
 
