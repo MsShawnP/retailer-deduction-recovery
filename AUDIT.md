@@ -1,605 +1,641 @@
 # Project Audit
 
 ## Phase 1: Baseline Assessment
-**Date:** 2026-05-15
+**Date:** 2026-05-16
 **Project:** Retailer Deduction Recovery
+**Previous audit:** 2026-05-15
 
 ### What Was Intended
 
-A tool that makes dirty data costs visible to a CEO — specifically,
-what outgrown bootstrap processes are costing them in unrecovered
-retailer deductions, what evidence is needed to successfully dispute,
-and where they're lacking that evidence. Interactive and explorable,
-not a static report.
+An interactive React demo that makes retailer deduction losses
+visible and actionable for a specialty food manufacturer (Cinderhaven
+Provisions). Dual purpose: working demo for a specific prospect
+introduction (friend referral, CEO who likes playing with data) and
+portfolio showcase for future clients. The tool traces each deduction
+through five compounding failures — no visibility, process gaps,
+weak evidence, inaccessible records, and missed dispute windows —
+showing what's recoverable, what's preventable, and what each
+operational fix is worth.
 
 ### What Exists Today
 
-A functionally complete React demo with 10 connected views on a
-single page:
+A functionally complete React demo with 10 connected views organized
+into 4 narrative chapters, deployed to Cloudflare Pages. Since the
+last audit (2026-05-15), the primary recommendation — restructuring
+from a flat 16-section scroll into narrative chapters — has been
+implemented.
 
-1. Sankey flow (3-layer: type → dispute readiness → outcome)
-2. Deduction explorer (6-card drill-down)
-3. Causation tracing (order timeline)
-4. Recovery simulation (toggle fixes, watch dollars shift)
-5. Cost-to-dispute profitability filter
-6. Dispute builder (evidence gap analysis)
-7. Timeline pressure (deadline urgency)
-8. Post-audit risk exposure
-9. Retailer scorecard
-10. Root cause clustering by origin
+**10 views across 4 chapters:**
+
+| Chapter | Name | Views |
+|---------|------|-------|
+| 1 | The Problem | Sankey flow + cohort table |
+| 2 | Why This Happens | Explorer + causation trace + origin clustering |
+| 3 | The Evidence Gap | Dispute builder + post-audit risk + retailer scorecard |
+| 4 | What to Do About It | Recovery simulation + cost-to-dispute + timeline pressure |
 
 All views share a single `selection` state — clicking in one view
-updates all others. Data pipeline generates synthetic deductions for
-a fictional ~$25M food manufacturer across 7 retailers.
-
-**The owner's assessment:** It works, but it feels "busy" — like
-it's asking the user to do too much.
+updates all others. KPIs, filters, and cohort bar persist across
+chapter switches. Cross-links (Trace, Filter) automatically switch
+to the target chapter.
 
 ### Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 19, TypeScript 6, Vite 8 |
-| Visualization | d3 + d3-sankey |
-| Data pipeline | Python → Postgres → static JSON export |
-| Deployment | Cloudflare Pages |
-| Verification | Playwright screenshot scripts (14 scripts) |
-| Testing | None (zero test files) |
+| Layer | Technology | Version |
+|---|---|---|
+| Frontend | React, TypeScript | 19.2.5, ~6.0.2 |
+| Build | Vite | 8.0.10 |
+| Visualization | d3 + d3-sankey | 7.9.0, 0.12.3 |
+| Data pipeline | Python → SQLite → static JSON | |
+| Deployment | Cloudflare Pages (wrangler) | 4.90.0 |
+| Testing | Vitest + Testing Library | 4.1.6 |
+| Verification | Playwright screenshot scripts (14) | 1.59.1 |
 
 ### Project Health Indicators
 
-- **Activity:** Active — last commit 2026-05-13, 94 total commits
-- **Documentation:** Excellent — CLAUDE.md, PLAN.md, HANDOFF.md,
-  DECISIONS.md, FAILURES.md, data/schema.md, 7 retailer research
-  files. Well-maintained throughout the build.
-- **Test coverage:** Zero. No unit, integration, or component tests.
-  Playwright screenshot scripts serve as visual smoke tests but are
-  not automated test suites.
-- **Dependencies:** Current — React 19, Vite 8, TypeScript 6, no
-  known vulnerabilities flagged.
-- **Code size:** ~8,900 LOC in frontend/src across 10 view
-  directories + shared types/data modules.
+| Indicator | Status | Detail |
+|-----------|--------|--------|
+| Build | Pass | 307 KB JS + 45 KB CSS (gzip: 90 KB + 7 KB) |
+| Tests | Pass | 14 tests in 2 files (5.0s) |
+| TypeScript | Clean | No type errors |
+| Dependencies | Current | 0 vulnerabilities, all major versions current |
+| Activity | Active | 113 commits, 28 since last audit (2026-05-15) |
+| Documentation | Excellent | CLAUDE.md, PLAN.md, HANDOFF.md, DECISIONS.md, FAILURES.md, AUDIT.md, data/schema.md, 7 retailer research files |
+
+### Code Metrics
+
+| Category | Files | Lines |
+|----------|-------|-------|
+| TypeScript/TSX (source) | 24 | 5,991 |
+| CSS | 13 | 3,200 |
+| Tests | 2 | 283 |
+| Screenshot/verification scripts | 14 | 1,156 |
+| **Total frontend** | **53** | **10,630** |
+
+**Largest components (TSX lines):**
+
+| File | Lines | Role |
+|------|-------|------|
+| CausationTraceView.tsx | 578 | Order lifecycle timeline |
+| DisputeBuilderView.tsx | 564 | Evidence gap analysis |
+| PostAuditRiskView.tsx | 482 | Clawback exposure model |
+| RecoverySimulationView.tsx | 453 | Toggle-based what-if |
+| ExplorerView.tsx | 439 | 6-card deduction drill-down |
+| CostToDisputeView.tsx | 427 | Fight/marginal/write-off triage |
+| OriginClusteringView.tsx | 397 | Warehouse/line/carrier clusters |
+| TimelinePressureView.tsx | 376 | Deadline urgency buckets |
+| RetailerScorecardView.tsx | 355 | Per-retailer comparison |
+| SankeyView.tsx | 340 | d3-sankey 3-layer flow |
+| App.tsx | 275 | State + layout (down from 609) |
+
+### What Changed Since Last Audit
+
+The previous audit (2026-05-15) found two critical UX problems —
+flat scroll with no hierarchy and no narrative arc — hiding five
+unique competitive capabilities. It recommended a 3-phase fix:
+clear the path (A), narrative chapter structure (B), harden (C).
+
+**Phase A (clear the path):** Complete.
+- Removed 3 vestigial bottom tables
+- Renamed sankey/data.ts → domain.ts
+- Extracted App.tsx inline components (609 → 275 lines)
+
+**Phase B (narrative chapters):** Complete.
+- 4-chapter tab navigation (ChapterNav component)
+- Views grouped into narrative sequence
+- Cross-chapter links (trace/focus) auto-switch tabs
+- Sankey dynamic viewBox height fix (barycenter reorder)
+- Layout fixes for wide viewports (1600px content width)
+- Cohort table column proportion fixes
+
+**Phase C (harden):** Partially complete.
+- Component tests added (14 tests, 2 files) — DONE
+- Friend preview — NOT DONE
+- Feedback incorporation — NOT DONE
 
 ### Gap Analysis
 
-**What was intended vs. what exists:**
+**What the last audit identified vs. where things stand:**
 
-The functional scope is delivered — all 10 features work and are
-connected. The gap isn't missing features; it's information
-architecture. The project was ideated with Claude Chat and Gemini
-before the owner adopted a structured build workflow. That shows:
+| Last Audit Finding | Severity | Status | Notes |
+|---|---|---|---|
+| Flat scroll, no hierarchy | Critical | Fixed | 4-chapter nav implemented |
+| No narrative arc | Critical | Fixed | Chapters follow 5-failure story |
+| Bottom tables redundant | Minor | Fixed | Deleted |
+| sankey/data.ts misnamed | Minor | Fixed | Renamed to domain.ts |
+| App.tsx monolith (609 LOC) | Important | Fixed | Down to 275 LOC |
+| CSS duplication (~2,700 LOC) | Minor | Open | Now 3,200 LOC — grew with new components |
+| No test coverage | Important | Partially fixed | 14 tests for nav; 0 for view components |
+| Friend preview pending | — | Open | Still unchecked in PLAN.md |
 
-1. **No UX narrative.** Ten views on one scrolling page with no
-   guided path. A data-curious CEO gets all ten tools at once
-   instead of being led through a discovery sequence (see the
-   problem → understand why → see what's fixable → decide what
-   to do). The "busy" feeling is cognitive overload from equal
-   visual weight on everything simultaneously.
+**New observations:**
 
-2. **No information hierarchy.** Every view competes for attention.
-   The Sankey is the intended entry point, but below it are 9
-   peer-level sections with no progressive disclosure. There's no
-   "start here, go deeper if you want" structure.
+1. **Design system drift.** App.css uses an "Economist palette"
+   (dark navy ink, cool grays, red accent) that diverges from the
+   Lailara Design System defined in the parent CLAUDE.md (warm
+   off-white background, Playfair Display + Source Sans 3 fonts,
+   sequential teal palette). This is a deliberate choice documented
+   in the Economist-style decisions, but it means this project
+   can't be directly showcased as a Lailara portfolio piece without
+   visual reconciliation.
 
-3. **No test coverage.** The 14 Playwright screenshot scripts
-   verify visual appearance but aren't CI-integrated tests. A
-   refactor to fix the "busy" problem (rearranging views, adding
-   tabs/navigation, changing layout) has no safety net.
+2. **Screenshot scripts are dead weight.** 14 Playwright scripts
+   (1,156 LOC) are developer verification artifacts, not automated
+   tests. They require a running dev server, produce PNGs that are
+   gitignored, and don't assert anything. The component tests added
+   in Phase C partially replace their purpose.
 
-4. **Feature-complete but not story-complete.** The five
-   compounding failures are the narrative backbone (per CLAUDE.md),
-   but the UI doesn't walk the user through that sequence. The
-   failures live in explorer cards and causation traces — they're
-   present but not foregrounded.
+3. **CSS is 35% of total code.** 3,200 lines across 13 files with
+   significant pattern repetition (card layouts, tag styles, table
+   formatting, responsive breakpoints). Each view reinvents similar
+   patterns. The previous audit flagged this as "wait until chapter
+   structure stabilizes" — it has now stabilized.
 
-5. **No user testing.** The "friend preview" task in PLAN.md is
-   still unchecked. The "busy" assessment is the owner's intuition,
-   not validated feedback — but it's a credible intuition given
-   the information density.
+4. **Test coverage is thin.** 14 tests cover chapter navigation
+   and selection state. Zero tests for: domain logic (domain.ts),
+   KPI computation (computeKpis.ts), any of the 10 view components,
+   data loading, or filtering logic.
+
+5. **Phase A tasks remain unchecked in PLAN.md.** The Phase A work
+   (remove tables, rename, extract) was completed and committed but
+   the PLAN.md checkboxes weren't updated. Minor bookkeeping gap.
 
 ### Audit Motivation
 
-The project was ideated and built before the owner had a structured
-workflow for scoping, building, and improving projects. The audit
-applies that rigor retroactively. The core concern: the tool works
-but feels busy — it's showing everything instead of guiding the
-user through the story the data tells.
+The previous audit drove a successful chapter restructure. This
+audit assesses the result: did the narrative fix land, what new
+issues surfaced, and what's left before the demo is ready for the
+friend preview (the last gate before prospect intro).
 
 ---
 
 ## Phase 2: Internal Review
-**Date:** 2026-05-15
-**Dimensions reviewed:** UX, Architecture
+**Date:** 2026-05-16
+**Dimensions reviewed:** Code quality, Architecture, UX, CSS,
+Accessibility, Performance
 
 ### Top Opportunities (by leverage)
 
 | # | Finding | Dimension | Impact | Effort | Leverage | Severity |
 |---|---------|-----------|--------|--------|----------|----------|
-| 1 | 16 sections at equal weight on one scroll — no progressive disclosure | UX | 5 | 3 | 1.67 | Critical |
-| 2 | No narrative structure guiding the CEO through the five failures | UX | 5 | 3 | 1.67 | Critical |
-| 3 | Bottom tables (by-type, by-retailer, by-distributor) are redundant with Sankey + scorecard | UX | 3 | 1 | 3.00 | Minor |
-| 4 | sankey/data.ts is the shared domain module but named as Sankey-specific | Arch | 2 | 1 | 2.00 | Minor |
-| 5 | App.tsx is a 609-line monolith owning all state + 4 inline components | Arch | 3 | 2 | 1.50 | Important |
-| 6 | CSS patterns duplicated across 11 view stylesheets (~2,700 lines total) | Arch | 2 | 3 | 0.67 | Minor |
+| 1 | WIN_PROB data discrepancy between simulation and cost views | Code | 5 | 1 | 5.00 | Critical |
+| 2 | disputeReadinessFor uses new Date() — non-deterministic | Code | 4 | 1 | 4.00 | Important |
+| 3 | Duplicated business logic across 3–4 view files | Arch | 4 | 2 | 2.00 | Important |
+| 4 | Hardcoded TODAY date in 3 files | Code | 3 | 1 | 3.00 | Important |
+| 5 | CSS duplication: ~550 lines across 13 files + spacing drift | CSS | 3 | 3 | 1.00 | Important |
+| 6 | Accessibility: clickable elements without keyboard support | A11y | 4 | 2 | 2.00 | Important |
+| 7 | Dead CSS and screenshot scripts (~1,230 LOC combined) | Arch | 2 | 1 | 2.00 | Minor |
+| 8 | Missing useMemo + O(n²) in OriginClusteringView | Perf | 2 | 1 | 2.00 | Minor |
+| 9 | 8+ hardcoded hex values should be CSS custom properties | CSS | 2 | 2 | 1.00 | Minor |
+| 10 | No fetch validation on JSON data loading | Code | 2 | 2 | 1.00 | Minor |
 
 ### Detailed Findings
 
-#### UX
+#### CRITICAL — WIN_PROB data discrepancy (two views disagree)
 
-**CRITICAL — Flat scroll with no information hierarchy**
+`RecoverySimulationView.tsx:32-37` defines win probability for
+"none" evidence as 0.05 (5%). `CostToDisputeView.tsx:17-22`
+defines the same constant as 0.0 (0%). These two views model the
+same business question — "what's the expected recovery?" — and
+give different answers for the same deduction. A CEO toggling
+between Chapter 4's simulation and cost-to-dispute views will see
+contradictory numbers.
 
-App.tsx renders 16 sections in a single scroll:
-KPIs → filter row → Sankey → cohort table → explorer → trace →
-simulation → cost → builder → pressure → post-audit → scorecard →
-origin → by-type table → by-retailer table → by-distributor table.
+**Fix:** Extract WIN_PROB into domain.ts as a single source of
+truth. Decide whether "no evidence" means 5% or 0% and use one
+value everywhere.
 
-Every section has an h2 with equal visual weight. Section
-descriptions are 15px soft-colored text that can't compete with
-the bold data above and below them. A CEO opening this cold sees
-all 16 sections simultaneously and has no guidance on where to
-start or what matters.
+#### IMPORTANT — disputeReadinessFor is non-deterministic
 
-This is the primary cause of the "busy" feeling.
+`domain.ts:167-169` calls `new Date()` to compare against dispute
+deadlines. This means the same deduction can produce different
+Sankey paths, different readiness labels, and different cohort
+memberships depending on when the code runs. If a deadline passes
+during a user's session, the Sankey and all downstream views
+silently shift. Every function that transitively calls
+`disputeReadinessFor` (buildSankeyData, pathIds,
+isOnSelectedPath) inherits this non-determinism.
 
-**CRITICAL — No narrative arc matching the five failures**
+**Fix:** Compute `now` once per render cycle in App.tsx and pass
+it through, or pin it to a shared constant. The demo uses static
+data — a stable reference date is more honest than a moving one.
 
-The CLAUDE.md defines a clear narrative: visibility → process
-gaps → evidence quality → evidence accessibility → timeliness,
-where each failure compounds the next. The UI does not walk the
-user through this sequence. Instead:
+#### IMPORTANT — Duplicated business logic across views
 
-- The Sankey shows type → readiness → outcome (compressed)
-- The explorer shows all 6 failure layers on a single deduction
-- The remaining 8 views are ordered by build sequence, not story
+Three functions are independently re-implemented in multiple
+view files:
 
-The story IS in the data. But the UI presents it as "here are 10
-tools, go explore" rather than "here is what's happening, and each
-screen shows you why it's getting worse." The value is hidden
-because the narrative structure isn't driving the layout.
+- `readableOutcome` — CausationTraceView:565, ExplorerView:392,
+  CohortTableView:36. Same outcome-label mapping, three copies.
+- `evidenceCategoryFor` — TimelinePressureView:45,
+  PostAuditRiskView:46. Same evidence categorization, two copies.
+- `WIN_PROB` — RecoverySimulationView:32, CostToDisputeView:17.
+  Same model constant, two copies with conflicting values.
 
-A possible reframe: group views into chapters that match the
-narrative. Chapter 1 (The Problem): Sankey + KPIs — the shape of
-losses. Chapter 2 (Why): Explorer + causation + origin clustering
-— what's causing this. Chapter 3 (Evidence Gaps): Builder +
-post-audit + scorecard — what you need vs. what you have.
-Chapter 4 (What to Do): Simulation + cost + pressure — the fix,
-the economics, the urgency. Each chapter visible from a nav; only
-the active chapter's views render below the Sankey. Cross-links
-still work, they just also switch chapters.
+Additionally, `RETAILER_PROFILE` (RetailerScorecardView:37) and
+`AUDIT_PROFILE` (PostAuditRiskView:33) contain research-grounded
+retailer behavioral data that lives in the view layer instead of
+the domain or data layer. `HOURS_BY_QUALITY` and triage
+thresholds in CostToDisputeView:27 are business-logic constants
+embedded in a view file.
 
-**MINOR — Bottom tables are vestigial**
+**Fix:** Extract all shared logic into domain.ts. Extract
+retailer profiles into the retailers.json data pipeline or a
+shared constants module.
 
-The by-type, by-retailer, and by-distributor tables at the bottom
-of App.tsx (lines 288–378) were the original landing view before
-the 10 feature views were built. They duplicate information
-already visible in the Sankey (by type), retailer scorecard (by
-retailer/distributor), and KPI row. Removing them shrinks the
-scroll by 3 sections with zero information loss.
+#### IMPORTANT — Hardcoded demo date in 3 files
 
-**MINOR — Cross-links create "choose your own adventure" fatigue**
+`ExplorerView.tsx:15`, `CostToDisputeView.tsx:12`, and
+`TimelinePressureView.tsx:12-13` all define
+`TODAY = new Date("2026-05-31")`. If the demo date shifts, three
+files need manual updating. This also interacts with the
+disputeReadinessFor non-determinism — that function uses
+`new Date()` (real clock) while these views use a pinned date,
+creating inconsistency.
 
-Every view invites the user to jump elsewhere: Trace →, Filter →,
-View causation trace →. This is architecturally excellent — the
-shared selection model makes it work cleanly. But with all views
-visible simultaneously, each cross-link is an interruption rather
-than a guided transition. If views were grouped into chapters, the
-same cross-links would feel like "go deeper" rather than "go
-somewhere else."
+**Fix:** Single shared `DEMO_DATE` constant in domain.ts. Use it
+everywhere, including disputeReadinessFor.
 
-#### Architecture
+#### IMPORTANT — CSS duplication (~550 lines) and drift
 
-**GOOD — View components are cleanly isolated**
+Across 13 CSS files, five major patterns are repeated:
 
-Each of the 11 views is a self-contained TSX + CSS pair in its
-own directory. No view imports from another view. All
-communication goes through App.tsx props (cohort, onTrace,
-tracedDeductionId, selection). This means views can be
-rearranged, hidden, grouped into tabs, or lazy-loaded without
-breaking each other. The architecture supports the UX fix.
+| Pattern | Files | Duplicated LOC |
+|---------|-------|----------------|
+| Table styles (th, td, .num) | 7 | ~140 |
+| Section container + h2 + subtitle + empty state | 9 | ~150 |
+| Nav button group + header row | 5 | ~85 |
+| Trace/action button | 5 | ~50 |
+| Tab bar | 3 | ~45 |
 
-**GOOD — Single selection model is the right abstraction**
+Copy-paste drift has created inconsistent spacing: td padding
+appears as 9px/10px/6px across files; card padding as
+16px/18px/14px; section margin-bottom as 18px/24px. Eight
+recurring hex values (#F1F2F4, #eef0f2, #fafafa, #f5f6f7, etc.)
+are used outside CSS custom properties.
 
-The `Selection` union type (node | link | retailer | cluster)
-in sankey/data.ts with `isOnSelectedPath` as the universal
-filter is a clean design. Every view gets the same filtered
-cohort. Adding a navigation layer wouldn't change this — it
-would just control which views are visible.
+**Fix:** Consolidate the top 5 patterns into shared classes in
+App.css. Promote hardcoded hex values to CSS custom properties.
+Estimated savings: ~465 lines.
 
-**IMPORTANT — App.tsx is a monolith**
+#### IMPORTANT — Accessibility gaps on interactive elements
 
-App.tsx (609 lines) owns: data loading, selection state, date
-range state, traced deduction state, focused deduction state,
-KPI computation, by-type aggregation, by-retailer aggregation,
-and 4 inline components (Kpi, CohortBar, TimeRangeSelector,
-render logic for 3 bottom tables). This is manageable today but
-would become the bottleneck for any navigation refactor. The
-inline components and aggregation functions should be extracted
-before adding routing or tab logic.
+Two patterns lack keyboard accessibility:
 
-**MINOR — sankey/data.ts is misnamed**
+1. **CohortTableView.tsx:120-143** — sortable `<th>` elements use
+   `onClick` but have no `role="button"`, `tabIndex`,
+   `onKeyDown`, or `aria-sort`. Screen readers and keyboard users
+   cannot sort the table.
 
-sankey/data.ts (354 lines) is the shared domain module: Selection
-type, isOnSelectedPath, rootCauseFor, evidenceQualityFor,
-accessibilityFor, timelinessFor, disputeReadinessFor,
-ORIGIN_DIMENSIONS, TYPE_LABELS, OUTCOME_COLORS. Seven of the 11
-views import from it. The name says "Sankey data" but the content
-says "domain logic." This isn't blocking but it misleads anyone
-reading imports for the first time.
+2. **SankeyView.tsx:264-315** — SVG `<rect>` and `<path>`
+   elements use `onClick` for the core interaction model but have
+   no `tabIndex`, `role="button"`, or `onKeyDown`. The Sankey is
+   the primary entry point to the tool — if it's not keyboard
+   accessible, the entire navigation model breaks for
+   non-mouse users.
 
-**MINOR — CSS duplication across views**
+**Fix:** Add tabIndex, role, onKeyDown (Enter/Space), and
+aria-label to interactive elements. Add aria-sort to sortable
+table headers.
 
-11 view CSS files total ~2,700 lines with repeated patterns:
-card layouts, tag/pill styles, table formatting, empty-state
-styling, responsive breakpoints. Each file reinvents similar
-patterns. Not blocking, but a shared component library or CSS
-utility classes would reduce drift if the visual language is
-being tightened during the narrative refactor.
+#### MINOR — Dead CSS and screenshot scripts (~1,230 LOC)
+
+- `.selection-chip` and related selectors in App.css (lines
+  234-285, ~52 LOC) — explicitly marked "Legacy alias" — dead.
+- `.placeholder` in App.css (lines 156-175, ~20 LOC) — early
+  scaffolding, likely unused with all views built.
+- 14 screenshot scripts (1,156 LOC) — require manual dev server
+  startup, produce gitignored PNGs, don't assert anything. The
+  component tests in App.test.tsx and ChapterNav.test.tsx
+  partially replace them.
+
+**Fix:** Delete dead CSS. Delete or archive screenshot scripts
+(keep 1-2 for visual regression if needed).
+
+#### MINOR — Missing memoization + O(n²) computation
+
+- `OriginClusteringView.tsx:313-316` — `totalDollars` is reduced
+  inside a `.map()` loop, recomputing over the full cohort on
+  every iteration. O(n²) for no reason.
+- `ExplorerView.tsx:134-137` — peer calculations (filter + sort
+  the full deduction array) run on every render without useMemo.
+- `RetailerScorecardView.tsx:186` — `totalNetLoss` computed on
+  every render without memoization.
+
+Not user-visible at current data size (3,333 deductions) but
+would become noticeable at 10x scale.
+
+**Fix:** Hoist totalDollars above the map. Wrap peer and
+totalNetLoss computations in useMemo.
+
+#### MINOR — Hardcoded hex values outside CSS custom properties
+
+12+ occurrences of `#F1F2F4` (th backgrounds), 10+ of `#eef0f2`
+(td borders), plus `#fafafa`, `#f5f6f7`, `#fff5f5`, `#fafdf9`
+scattered across 10 files. These should be `--th-bg`, `--td-rule`,
+`--bg-muted`, `--bg-danger-light`, `--bg-success-light` custom
+properties.
+
+**Fix:** Add 5-6 new CSS custom properties in :root and replace
+hardcoded values.
+
+#### MINOR — No fetch response validation
+
+`data.ts:3-19` — The three fetch calls return `res.json()` typed
+as the expected interface with no runtime validation. Malformed
+JSON or schema drift would produce runtime errors deep in the
+component tree rather than a clean "bad data" message at the load
+boundary.
+
+**Fix:** Add basic shape validation (check required top-level
+keys exist) in the load functions. Not worth a schema library for
+static demo data.
+
+### Additional Notes
+
+**SankeyView receives unfiltered deductions (App.tsx:177).**
+The Sankey always shows the full dataset; selections highlight
+within it but date range filters have no visual effect on the
+Sankey itself. This appears intentional (the Sankey is the
+"shape of the whole problem") but could confuse a user who sets
+a date range and expects the Sankey to narrow. If intentional,
+the Sankey needs a visual indicator that it shows all data.
+
+**filteredDeductions typing.** `filteredDeductions` can be `null`
+when `deductions` is null. Every consumer uses
+`filteredDeductions ?? deductions`, but both can be null. The
+early return guard at App.tsx:99 prevents rendering, so this is
+safe in practice but imprecise in types.
+
+**App.tsx:106 division risk.** Annualized dollar computation
+`kpiDollar * 12 / summary.window.months` would produce Infinity
+if window.months is 0. Not possible with current static data but
+a latent edge case.
 
 ### Summary
 
-The architecture is sound — isolated views, clean shared state,
-no tangled imports. It's ready for the structural change the UX
-needs. The UX problem is clear: 16 sections dumped on one scroll
-with no narrative hierarchy. The story exists in the data and in
-CLAUDE.md's five-failure framework; the UI just doesn't tell it.
-The highest-leverage move is grouping views into narrative
-chapters with progressive disclosure — and the architecture
-already supports this without a rewrite.
+The chapter restructure landed cleanly — the architecture is
+sound and the narrative improvement from the last audit is real.
+The issues are now in the details: one data-discrepancy bug
+(WIN_PROB), duplicated business logic across views, a
+non-deterministic domain function, and CSS that grew organically
+without consolidation. None of these are architectural — they're
+cleanup work that reduces surface area before the friend preview.
+
+The highest-leverage sequence:
+1. Fix the WIN_PROB discrepancy (5 minutes, fixes a real bug)
+2. Extract shared constants and functions into domain.ts
+3. Pin DEMO_DATE and use it in disputeReadinessFor
+4. Add keyboard accessibility to Sankey and sortable tables
+5. CSS consolidation (biggest effort, biggest LOC reduction)
 
 ---
 
 ## Phase 3: Landscape Scan
-**Date:** 2026-05-15
+**Date:** 2026-05-16
 **Category:** Retailer deduction management platforms for CPG/food
 manufacturers
+**Method:** Update to May 2026-05-15 scan — focused on market
+changes, new entrants, and adjacent category developments
 
-### Competitors / Similar Projects
+### Market Changes Since Last Audit
 
-| # | Name | Target | Description | Traction |
-|---|------|--------|-------------|----------|
-| 1 | HighRadius | Enterprise ($1B+) | End-to-end O2C deduction automation — portal harvesting from 100+ retailers, AI validity prediction, automated dispute routing | Market leader, 1,000+ enterprise customers |
-| 2 | iNymbus | Mid-large (1,000+ claims/mo) | Cloud RPA bots that log into 50+ retailer portals, retrieve docs, assemble dispute packages, submit claims | $0.40–$0.70/claim; volume-focused |
-| 3 | Vividly | Growth/mid-market ($5M–$200M) | TPM platform with deduction module — trade planning, deduction matching, dispute filing, managed service tier | Customers: Health-Ade, Quinn Snacks, Munk Pack |
-| 4 | Glimpse | All CPG, optimized for emerging | AI-native deduction management — ingests remittances, categorizes, disputes, reconciles into QBO/NetSuite | YC-backed, $35M Series B (Mar 2026), 200+ brands, 14x YoY |
-| 5 | Promomash / DeductionGenius | Small CPG ($2M+) | TPM suite with managed-service deduction recovery — categorize, validate, dispute on brand's behalf | Most transparent pricing: $349–$1,250/mo |
-| 6 | Inmar / DeductionsLink | SMB CPG | SaaS collaboration platform — centralized intake, AI remittance parsing, cross-functional workflows, deadline alerting | Part of broader Inmar Intelligence suite |
-| 7 | Vistex | Enterprise (SAP shops) | SAP-native revenue lifecycle platform — pricing, promotions, rebates, chargebacks, deductions | Gartner-reviewed, dominant in SAP ecosystem |
-| 8 | RetailPath | Mid-large CPG | Autonomous agents for chargeback/deduction disputes with deep 3PL and retailer portal integration | 1-2 day onboarding (vs. 6-12 months for HighRadius) |
-| 9 | CPGvision | Mid-large ($50M–$500M) | AI-forward TPM — promotion planning, deduction validation, scenario planning | ML-driven decision support |
+The previous audit (2026-05-15) mapped 9 deduction management
+platforms and 5 adjacent categories. One month later, the
+competitive landscape has shifted in two ways that reinforce this
+project's position:
 
-### Feature Matrix
+**1. Glimpse raised $35M Series A (a16z, March 2026)**
 
-| Feature | This Project | HighRadius | iNymbus | Vividly | Glimpse | Promomash | Inmar | Vistex | RetailPath | CPGvision |
-|---------|-------------|-----------|---------|---------|---------|-----------|-------|--------|------------|-----------|
-| Deduction categorization by type | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Retailer-specific rules and codes | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Dispute deadline tracking | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
-| Reporting by retailer and type | ✅ | ✅ | ❌ | ✅ | 🟡 | 🟡 | ✅ | ✅ | 🟡 | ✅ |
-| Root cause tracing (operational → deduction) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | 🟡 | ❌ |
-| Evidence quality assessment | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Recovery simulation / "what if" modeling | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | 🟡 | ❌ | 🟡 |
-| Cost-to-dispute triage | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Evidence gap analysis per deduction | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Executive-facing visualization | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Retailer portal integration | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 |
-| Automated dispute filing | ❌ | ✅ | ✅ | 🟡 | ✅ | ✅ | 🟡 | ✅ | ✅ | 🟡 |
-| ERP / accounting sync | ❌ | ✅ | 🟡 | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ |
-| Live client data ingestion | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Managed service / human expert layer | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+Glimpse is now the best-funded pure-play deduction platform for
+emerging/mid-market CPG, with ~$52M total raised and 200+ brands.
+Claims: 91% dispute win rate, 3x dispute volume, 80% manual labor
+reduction. Distribution broker partnerships (PLTFRM, PRESENCE)
+extend reach. This is the most credible competitor for
+Cinderhaven's segment (~$25M revenue).
 
-### Landscape Position
+However: Glimpse's product is recovery throughput — AI ingests
+remittances, categorizes, disputes, reconciles. **No root cause
+analysis, evidence quality scoring, or executive visualization
+confirmed in any announcement.** The Series A press release named
+no new diagnostic features. Glimpse answers "recover what you
+lost," not "why are you generating losses."
 
-#### Table Stakes (standard in category)
+**2. HighRadius added agentic AI features**
 
-Every commercial platform has:
-- Deduction categorization by type
-- Retailer-specific rules
-- Some form of dispute workflow
-- ERP or accounting integration
-- Retailer portal integration
+Three 2026 additions: Claims Backup Automation Agent (auto-
+harvests PODs and BOLs from 100+ retailer portals), Deductions
+Auto-Coding Engine (standardizes reason codes across retailers),
+and AI Deductions Validity Predictor (scores 20+ variables against
+12 months of resolution history to predict dispute outcome).
 
-This project has the first two but not the last three. That's
-appropriate — it's a diagnostic/visualization demo, not an
-operational tool. The missing table-stakes features are V2 scope,
-not V1 gaps.
+The Validity Predictor is the closest thing in the market to
+evidence quality scoring — but it is a triage likelihood score
+("will this dispute win?"), not a gap analysis ("what evidence
+exists vs. what's needed and what's the cost of each gap"). It's
+also enterprise-only — irrelevant for Cinderhaven's segment.
 
-#### Where This Project Is Stronger
+**3. "Prevention over recovery" is talked about, not built**
 
-**Five features that zero commercial platforms offer:**
+The Promomash 2026 trends piece and the UpClear CPG Deduction
+Practices Benchmark Report both explicitly name the shift from
+recovery to prevention. The UpClear benchmark found 60% of brands
+recover less than half of what they dispute. Field sales
+accountability gaps are identified as a structural root cause
+visibility failure.
 
-1. **Root cause tracing.** No platform connects an operational
-   failure (wrong label → hand count → perceived short ship →
-   deduction) back through the supply chain to the specific
-   process breakdown. Platforms categorize deductions; this demo
-   traces causation. RetailPath gets partial credit for multi-
-   source visibility on compliance fines, but nobody does full
-   order-to-deduction causation tracing.
+But no vendor has built the prevention tool. The market framing
+is "you should do prevention" — the product gap is "here is
+exactly what's causing your deductions and what each fix is
+worth." This project fills that gap.
 
-2. **Evidence quality assessment.** Platforms collect and store
-   evidence. None evaluate whether the evidence is strong enough
-   to win a dispute, or flag weak evidence before the deadline
-   passes. This demo scores every deduction's evidence quality
-   and surfaces the gap between "what you have" and "what you
-   need."
+**4. No new entrant for $5M-$50M segment**
 
-3. **Recovery simulation.** "If we fix our labeling, what happens
-   to this deduction category?" has no commercial answer. Vistex
-   and CPGvision offer scenario planning for trade promotions,
-   not for operational fixes. This demo's five-toggle simulation
-   answers that question directly.
+No new deduction management startup targeting the $5M-$50M
+revenue band was found in 2025-2026 beyond Glimpse. The segment
+remains underserved by purpose-built tooling relative to
+enterprise (HighRadius, Vistex) and budget-service (Promomash).
 
-4. **Cost-to-dispute triage.** No platform computes per-deduction
-   ROI of disputing — amount × win probability − labor cost.
-   This is a basic economic question that the entire category
-   ignores.
+### Updated Competitor Matrix
 
-5. **Executive-facing visualization.** Every reviewed platform is
-   built for AR teams, finance teams, or trade teams. None
-   produce exploratory, narrative-driven views for executives.
-   This demo is the only tool in the landscape designed for a
-   CEO to use directly.
+| Competitor | Segment | 2026 Change | Root Cause | Evidence Quality | Simulation | Exec Viz |
+|---|---|---|---|---|---|---|
+| **Glimpse** | $5M-$200M | $35M raise, 200+ brands | No | No | No | No |
+| **HighRadius** | $1B+ | Agentic AI (validity predictor) | No | Partial (triage score) | No | No |
+| **RetailPath** | Mid-large | 3PL/EDI agent focus | Partial (compliance) | No | No | No |
+| **Promomash** | $2M+ | "Prevention" content marketing | No | No | No | No |
+| **iNymbus** | 1K+ claims/mo | RPA, no change | No | No | No | No |
+| **Vividly** | $5M-$200M | TPM with deduction bolt-on | No | No | No | No |
+| **This project** | Demo/prospect | Chapter nav restructure | Yes | Yes | Yes | Yes |
 
-#### Where This Project Is Weaker
+### Adjacent Category Update
 
-- **No live data ingestion.** All competitors connect to real
-  retailer portals and accounting systems. This demo uses
-  synthetic data. (Appropriate for a prospect demo; would need
-  to change for a product.)
-- **No automated dispute filing.** The dispute builder shows
-  evidence gaps but doesn't submit disputes. Most competitors
-  make this their core value prop.
-- **No managed service component.** The market is converging on
-  software + human expert teams (Glimpse, Promomash, Vividly).
-  This is a tool, not a service.
-- **No ERP integration.** Table stakes in the category.
+| Category | Key Development | Relevance |
+|---|---|---|
+| **Compliance gap analysis** (Relyance AI, Sprinto, TrustCloud) | Pattern well-established: score requirements against evidence, show readiness %. Same UX pattern as the dispute builder. | Validates the evidence-scoring mental model — operations-adjacent audiences will find it familiar. |
+| **Executive analytics** (ThoughtSpot Spotter 3, March 2026) | Agentic analytics — AI reasons through business questions, validates its own output. Enterprise BI, not pre-built demos. | Structurally different (requires enterprise data infrastructure). No overlap with prospect-specific curated demos. |
+| **Interactive product demos** (Walnut, Navattic) | Platforms that let sales teams swap in prospect-specific data. | Structural similarity (pre-loaded data, self-guided exploration) but these show a vendor's product, not the prospect's own problem. |
+| **Sankey in finance** (SankeyArt Power BI visual) | Certified for income statement / P&L visualization. Reporting, not diagnostic. | No one uses Sankey as a compounding-failure diagnostic for executive audiences. |
+| **AI consulting deliverables** (McKinsey, BCG, PwC) | Internal AI platforms (McKinsey's Agents-at-Scale, PwC's Agent OS) but these are efficiency tools, not client-facing diagnostics. BCG reported 25% of $14.4B revenue from AI-related work. | No public-facing AI-generated interactive diagnostic product from any major consulting firm. The category remains a gap. |
 
-All four are explicitly out of scope for V1 and appropriate for
-a demo. They're the gap between "diagnostic tool" and "product."
+### Landscape Position (Updated)
 
-#### Unique Differentiators
+The five unique capabilities identified in the previous audit
+remain unmatched:
 
-The demo occupies a space that does not exist in the commercial
-landscape: **diagnostic visualization that traces the
-operational causes of deductions and models the financial impact
-of fixing them.** Every commercial tool is built to process
-deductions (categorize → dispute → recover). None are built to
-explain why deductions happen and what operational changes would
-prevent them.
+1. **Root cause tracing** — still zero competitors
+2. **Evidence quality assessment** — HighRadius added a validity
+   predictor (triage score), but it's not gap analysis and it's
+   enterprise-only. Still no competitor for the "what exists vs.
+   what's needed" view.
+3. **Recovery simulation** — still zero competitors
+4. **Cost-to-dispute triage** — still zero competitors
+5. **Executive-facing visualization** — still zero competitors
 
-This is the difference between "recover $X from your existing
-deduction backlog" (what competitors sell) and "here is why
-you're generating $X in deductions and what it costs to fix
-each cause" (what this demo shows).
+Glimpse's $35M raise and 200+ brands validate the market but
+don't touch the diagnostic space. The fundraising narrative is
+"recover money faster" — the same recovery-throughput positioning
+as every other platform. This project's narrative is "here is why
+you're generating losses and what it costs to fix each cause."
+These are complementary, not competitive — the diagnostic demo
+could lead a prospect to buy Glimpse for recovery operations
+while hiring the demo's creator for the diagnostic consulting.
 
-The five-failure framework (visibility → process gaps → evidence
-quality → accessibility → timeliness) has no commercial
-equivalent. It's a consulting insight delivered as an
-interactive tool.
+### Category Trends (Updated)
 
-#### Category Trends
+1. **Prevention talked, not built.** The Promomash and UpClear
+   2026 reports both name prevention as the future. No vendor has
+   shipped it. This project is the only tool that models
+   prevention economics (recovery simulation, cost-to-dispute).
 
-1. **Prevention over recovery.** The market is shifting from
-   "recover what you lost" to "stop generating deductions."
-   Promomash 2026 trends piece names this explicitly. This
-   demo is already positioned here — the simulation and root
-   cause views are prevention-focused.
+2. **Agentic AI is the new RPA.** HighRadius and RetailPath are
+   replacing brittle portal bots with adaptive agents. Relevant
+   for V2/product scope, not for the diagnostic demo.
 
-2. **AI agents replacing RPA.** First-gen automation (iNymbus)
-   used brittle portal bots; newer platforms (RetailPath,
-   Glimpse) use adaptive AI agents. This doesn't affect the
-   demo directly but signals where product development would
-   head.
+3. **$5M-$50M segment still underserved.** Glimpse is the only
+   credible funded option. Promomash is the budget alternative.
+   Neither offers diagnostics. A CEO in this segment has no tool
+   that explains why deductions happen — only tools that process
+   them after they happen.
 
-3. **Blended pricing models.** Glimpse's SaaS + commission
-   model aligns vendor incentive with client outcome. Newer
-   entrants are adopting this. Relevant if the demo becomes a
-   product.
-
-4. **The $5M–$50M segment is underserved.** HighRadius, Vistex,
-   iNymbus, RetailPath all skew enterprise. Glimpse and
-   Promomash are the only credible options for a ~$25M brand,
-   and neither offers the diagnostic depth this demo has.
-
-### Adjacent Category Scan
-
-The deduction management space has no direct competitors for
-what this demo does. Searching adjacent categories — data
-storytelling, scenario simulation, consulting deliverables,
-supply chain diagnostics — confirms the gap from a different
-angle.
-
-#### Data Storytelling Platforms
-
-| Tool | Overlap | What It Does Better | What It's Missing |
-|------|---------|--------------------|--------------------|
-| **Flourish** (flourish.studio) | Narrative sequencing, CEO-readable, embed-anywhere | Polished production quality, no-code authoring, responsive, mature CMS integration | No connected interactive views (clicking one chart doesn't filter another), no simulation mechanics, no domain model — it's a publishing tool, not an analytical one |
-| **Observable** (observablehq.com) | Connected reactive views, D3 power, data exploration | Full JavaScript reactivity (change one input, everything downstream recalculates), strong dev community, 1M+ notebooks | Not a deliverable format for non-technical CEOs; requires technical literacy; no narrative arc baked in; building a full app requires Framework (separate product) |
-| **Tableau Story Points** (tableau.com) | Guided narrative, executive-facing, enterprise-grade | Massive enterprise install base, IT-friendly, connects to live data | Story Points are linear slide sequences, not explorable branching narratives; no simulation; no root cause logic; Tableau Data Stories (auto-generated NLP narratives) retired Jan 2025 |
-
-**Takeaway:** Data storytelling tools do narrative OR
-interactivity, not both. Flourish tells stories but isn't
-interactive. Observable is deeply interactive but isn't a
-story. Tableau's attempt at combining both (Data Stories) was
-retired. This demo does both — it's a narrative told through
-interactive exploration.
-
-#### Scenario Simulation Tools
-
-| Tool | Overlap | What It Does Better | What It's Missing |
-|------|---------|--------------------|--------------------|
-| **Synario** (synario.com) | Toggle-on/toggle-off assumptions, board-room presentations | Financial model depth, professional scenario management, patented toggle mechanics | No operational domain model — only financial assumptions; can't model "fix label compliance" as a scenario lever; no root cause or evidence layer |
-| **Causal / Lucanet** (causal.app) | Non-technical what-if scenarios, visual comparison | Plain-English formula syntax, multi-scenario comparison, CFO-grade output | Acquired by Lucanet 2024-25, losing simplicity; no operational inputs; no deduction domain; models financial abstractions, not supply chain reality |
-
-**Takeaway:** Scenario tools model financial assumptions
-("revenue grows 10%"). This demo models operational reality
-("if we fix labeling, 73% of label fines go away and evidence
-quality upgrades from handwritten to digital"). The toggle
-mechanics look similar; the inputs are fundamentally different.
-A CEO who sees Synario thinks "spreadsheet with better UI." A
-CEO who sees this demo thinks "I can see what's broken and what
-it costs to fix."
-
-#### Consulting Firm Interactive Deliverables
-
-McKinsey Solutions, BCG's FACET, and similar consulting-firm
-tool products overlap on form factor: interactive diagnostic
-tools delivered to C-suite audiences with scenario modeling and
-operational benchmarking. They're credentialed, enterprise-
-distributed, and backed by consulting relationships.
-
-**What they do better:** Brand authority, live data integration,
-industry benchmarking against peers.
-
-**What they can't do:** These tools are licensed to large
-enterprises via consulting engagements. A ~$25M specialty food
-brand doesn't have the data infrastructure McKinsey assumes, the
-budget for a consulting engagement, or the IT team to onboard
-an enterprise diagnostic. This demo delivers the same form
-factor — interactive diagnostic for a CEO — without requiring
-any of that. It's a consulting-quality deliverable accessible
-at a scale the consulting firms don't serve.
-
-#### Cross-Domain Structural Analogs
-
-Two domains have solved problems structurally identical to what
-this demo does, just in different industries:
-
-1. **Legal case preparation** (Relativity, Everlaw) — scores
-   document completeness against claim requirements. The demo's
-   evidence readiness view is the same pattern: "what do you
-   have vs. what do you need" applied to deduction disputes
-   instead of litigation discovery.
-
-2. **Insurance claims triage** (Guidewire, Duck Creek) — routes
-   claims by expected recovery minus processing cost. The demo's
-   cost-to-dispute triage (amount × win probability − labor) is
-   structurally identical. The difference: insurance tools bury
-   this in a workflow engine; this demo makes it visible and
-   explorable.
-
-### Summary
-
-Across 15 tools in 5 categories — deduction management,
-data storytelling, scenario simulation, consulting
-deliverables, and cross-domain analogs — no single tool
-combines operational root cause narrative with executive-
-facing simulation. Each adjacent category has one piece:
-
-- Storytelling tools do narrative (Flourish, Tableau)
-- Simulation tools do what-if (Synario, Causal)
-- Deduction tools do processing (HighRadius, Glimpse)
-- Consulting tools do diagnostics (McKinsey Solutions)
-
-This demo does all four. The competitive moat isn't any one
-feature — it's the combination of diagnosis + narrative +
-simulation + executive accessibility in a domain where every
-existing tool chose exactly one of those.
-
-The "busy" UX problem is hiding this. A CEO who opens the
-demo today sees 16 sections and bounces. If the UI guided
-them through the story — see the problem, understand why,
-see what's fixable, decide what to do — they'd see something
-that doesn't exist anywhere else in the market.
+4. **Evidence-scoring UX is validated in adjacent categories.**
+   Compliance tools (Relyance, Sprinto) have proven that
+   requirement-vs-evidence scoring is an intuitive pattern. The
+   dispute builder uses the same mental model, so prospects won't
+   need to learn a new interaction paradigm.
 
 ---
 
-## Phase 4: Differentiation & Next Moves
-**Date:** 2026-05-15
+## Phase 4: Synthesis & Next Moves
+**Date:** 2026-05-16
 
 ### Cross-Reference Summary
 
-The audit's central finding: **the #1 internal problem is
-directly hiding the #1 competitive advantage.** Phase 2 found
-that 16 flat sections with no narrative hierarchy creates the
-"busy" feeling. Phase 3 found that this demo has five unique
-capabilities no commercial platform offers — root cause tracing,
-evidence quality assessment, recovery simulation, cost-to-dispute
-triage, and executive-facing visualization. The combination of
-diagnosis + narrative + simulation + executive accessibility is
-the competitive moat. But a CEO who opens the demo today sees 16
-sections and bounces before discovering any of it.
+The central finding from the last audit — the #1 internal problem
+is hiding the #1 competitive advantage — has been fixed. The
+chapter restructure successfully surfaces the five unique
+capabilities in narrative sequence. The competitive position is
+stronger than a month ago: Glimpse's $35M raise validates the
+market, HighRadius's AI additions confirm the direction, and
+nobody has built the prevention/diagnostic tool this demo is.
 
-This is rare: the highest-leverage internal improvement IS the
-strategic move. Adding a narrative chapter structure doesn't just
-make the tool less busy — it reveals the unique story that no
-competitor can tell. Every other move is either prep work that
-enables this or a quick win that clears the path.
+The remaining internal issues are detail-level, not structural.
+But two of them directly threaten the demo's credibility with a
+data-curious CEO:
 
-The architecture already supports the fix. Views are isolated,
-the shared selection model works, no view imports another view.
-The refactor is structural (add navigation, group views), not
-architectural (no rewrites, no new state management).
+1. **WIN_PROB discrepancy** — Chapters 4's simulation and cost
+   views give different answers for the same deductions. A CEO
+   who toggles between them sees contradictory numbers. This
+   undermines the "here is what each fix is worth" promise that
+   makes Chapter 4 the payoff of the whole narrative.
+
+2. **Non-deterministic dates** — `disputeReadinessFor` uses the
+   real clock while three views pin to 2026-05-31. The Sankey
+   and the explorer can disagree on whether a deduction is past
+   deadline. For a CEO clicking through, inconsistency = distrust.
+
+Everything else is polish: CSS consolidation for visual
+consistency, dead code removal for a clean repo, accessibility
+for portfolio use, and test coverage for maintainability.
+
+### Strategic Framing
+
+The demo is one gate away from its purpose: friend preview →
+prospect intro. The friend preview tests whether a cold viewer
+can navigate the chapters, discover the five-failure story, and
+arrive at "I need this" without a walkthrough. The remaining work
+should optimize for that moment, not for long-term maintainability.
+
+That means:
+- Fix data bugs that would make a CEO distrust the numbers
+- Remove visual noise that makes the demo feel unfinished
+- Don't start a CSS rewrite before the friend sees it — spacing
+  drift is invisible to non-designers
+- Don't add more tests — the feature set is frozen
 
 ### Ranked Next Moves
 
-| # | Move | Category | Strategic | Internal | Effort | Score | Description |
-|---|------|----------|-----------|----------|--------|-------|-------------|
-| 1 | Remove vestigial bottom tables | Foundational | 1 | 3 | 1 | 4.0 | Delete the 3 redundant by-type / by-retailer / by-distributor tables. Zero information loss — data already in Sankey + scorecard. 5-minute noise reduction. |
-| 2 | Narrative chapter structure | Leapfrog | 5 | 5 | 3 | 3.3 | Group views into 4 story chapters (The Problem → Why → Evidence Gaps → What to Do) with tab/chapter navigation. Only active chapter renders below the persistent Sankey + KPIs. Cross-links switch chapters. This is the move — it fixes the "busy" problem AND surfaces the unique capabilities in sequence. |
-| 3 | Rename sankey/data.ts → domain.ts | Foundational | 0 | 2 | 1 | 2.0 | The shared domain module (Selection, isOnSelectedPath, rootCauseFor, etc.) is named as Sankey-specific but imported by 7+ views. Quick rename + import update. |
-| 4 | Extract App.tsx inline components | Foundational | 0 | 3 | 2 | 1.5 | Pull Kpi, CohortBar, TimeRangeSelector, and aggregation functions out of App.tsx before adding navigation logic. Keeps the monolith from getting worse. |
-| 5 | Add test coverage for refactored navigation | Foundational | 0 | 3 | 3 | 1.0 | After the chapter structure lands, add component tests for navigation state, chapter switching, cross-link behavior. Safety net for future changes. |
+| # | Move | Category | Why Now | Effort | Risk if Skipped |
+|---|------|----------|---------|--------|-----------------|
+| 1 | Fix WIN_PROB discrepancy | Bug fix | CEO sees contradictory numbers in Ch4 | 5 min | High — kills credibility |
+| 2 | Pin DEMO_DATE everywhere | Bug fix | Sankey and views disagree on deadlines | 15 min | Medium — subtle but discoverable |
+| 3 | Extract shared logic to domain.ts | Cleanup | Prevents more data discrepancies; readableOutcome, evidenceCategoryFor, WIN_PROB | 30 min | Low now, high if any constant changes |
+| 4 | Delete dead code | Cleanup | Legacy CSS (~72 LOC) + screenshot scripts (~1,156 LOC). Noise in the repo. | 10 min | None for demo; repo feels unfinished |
+| 5 | Friend preview | Gate | The whole point. Every other move is prep for this. | External | Prospect intro stays blocked |
+| 6 | CSS custom properties for hardcoded hex values | Polish | Promotes 8+ repeated hex values to :root vars | 30 min | Visual drift continues |
+| 7 | CSS pattern consolidation | Polish | ~465 LOC reduction, consistent spacing | 2 hrs | Demo works fine; code stays messy |
+| 8 | Keyboard accessibility (Sankey + tables) | A11y | Needed for portfolio showcase, not for prospect demo | 1 hr | No impact on prospect intro |
+| 9 | Domain logic tests | Testing | Cover disputeReadinessFor, buildSankeyData, isOnSelectedPath, computeKpis | 1 hr | No safety net for future changes |
+| 10 | Missing useMemo + O(n²) fix | Perf | OriginClusteringView + ExplorerView + RetailerScorecardView | 15 min | Invisible at current data size |
 
 ### Recommended Sequence
 
-**Phase A — Clear the path (< 1 hour)**
-1. Remove bottom tables (Move #1)
-2. Rename sankey/data.ts → domain.ts (Move #3)
-3. Extract App.tsx inline components (Move #4)
+**Before friend preview (< 1 hour total):**
+1. Fix WIN_PROB (Move #1) — 5 min
+2. Pin DEMO_DATE (Move #2) — 15 min
+3. Extract shared logic (Move #3) — 30 min
+4. Delete dead code (Move #4) — 10 min
 
-These three are independent, low-risk, and reduce noise before
-the main refactor. Do them in one session.
+These four moves fix the two data bugs, eliminate the duplication
+that caused them, and clean the repo. After this, the demo is
+friend-preview-ready.
 
-**Phase B — Build the narrative (main effort)**
-4. Narrative chapter structure (Move #2)
+**Friend preview (Move #5):** Hand off the live URL. Capture
+feedback. Decide what needs fixing before prospect intro.
 
-This is the primary deliverable. Suggested chapter mapping:
-
-| Chapter | Name | Views | Story beat |
-|---------|------|-------|------------|
-| 1 | The Problem | Sankey + KPIs + cohort table | "Here is the shape of your losses" |
-| 2 | Why This Happens | Explorer + causation trace + origin clustering | "Each deduction traces back to a specific operational failure" |
-| 3 | The Evidence Gap | Dispute builder + post-audit risk + retailer scorecard | "You don't have what you need to win, and here's what that costs" |
-| 4 | What to Do About It | Recovery simulation + cost-to-dispute + timeline pressure | "These fixes, in this order, recover this much money" |
-
-The Sankey, KPIs, filter row, and cohort bar stay persistent
-(always visible). Chapter navigation sits below them. Only the
-active chapter's views render. Cross-links (Trace →, Filter →)
-switch chapters when they point to a view in a different chapter.
-
-No React Router needed — this is 4 tabs with local state, not
-URL-based routing. The chapter index is one more piece of state
-in App.tsx alongside selection, dateRange, and tracedDeductionId.
-
-**Phase C — Harden (after chapter structure stabilizes)**
-5. Add tests (Move #5)
+**After friend feedback (prioritize based on what they say):**
+6–10 are polish. Do them if the friend says the demo feels rough,
+or if the project becomes a portfolio showcase. Don't do them
+preemptively — the friend's reaction determines what matters.
 
 ### What NOT to Do
 
-1. **Don't chase competitor features.** Portal integration,
-   automated dispute filing, ERP sync — these are V2/product
-   scope, not demo scope. Chasing them means competing where
-   HighRadius and Glimpse are strongest. The demo's advantage is
-   diagnostic depth, not operational automation. Don't dilute it.
+1. **Don't start CSS consolidation before the friend preview.**
+   Spacing drift is invisible to non-designers. A CEO won't
+   notice 9px vs 10px padding. If the friend flags visual
+   inconsistency, consolidate then.
 
-2. **Don't add more views.** The problem is too many sections,
-   not too few. Every new view added to a flat scroll makes the
-   "busy" problem worse. If a new capability is needed, it should
-   either replace an existing view or fit within a chapter that
-   already has room.
+2. **Don't add more features.** The competitive advantage is the
+   combination of five capabilities, not the number of views. The
+   chapter structure now surfaces them clearly. Adding views makes
+   the "busy" problem come back.
 
-3. **Don't do a CSS cleanup before the narrative refactor.** The
-   chapter structure will change layout patterns. Cleaning up CSS
-   duplication now means redoing it after the refactor. Wait until
-   the new structure is stable.
+3. **Don't optimize performance.** The O(n²) and missing useMemo
+   are invisible at 3,333 deductions. Only matters if the dataset
+   grows 10x, which is V2 scope.
 
-4. **Don't over-engineer navigation.** Four chapters, one active
-   at a time, local state in App.tsx. No React Router, no URL
-   hash routing, no animation library. The simplest thing that
-   works. Complexity can be added later if the demo becomes a
-   product.
+4. **Don't build accessibility before the prospect intro.** The
+   prospect will use a mouse. Accessibility matters for portfolio
+   use and is the right thing to do, but it's not the gate.
 
-5. **Don't build a "guided tour" or onboarding overlay.** The
-   narrative structure should make the tool self-explanatory. If
-   the chapters are right, the CEO reads "The Problem" and clicks
-   forward. A tour is a band-aid for a confusing UI; fix the UI.
+5. **Don't write more tests before the friend preview.** The
+   feature set is frozen. Tests protect against regressions from
+   changes — if you're not changing anything, you don't need more
+   tests. Write them after friend feedback when you know what
+   you'll be changing.
+
+### PLAN.md Updates
+
+Phase A tasks should be checked off (completed but unchecked).
+A new Phase D (pre-preview cleanup) should be added between
+Phase C's tests and the friend preview, containing Moves #1-4.
