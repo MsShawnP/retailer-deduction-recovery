@@ -623,3 +623,15 @@ may generate additional polish items before that.
 **Next:** Deploy updated version to Cloudflare Pages, then Phase C — component tests for navigation state, friend preview, and feedback incorporation.
 
 ---
+
+## 2026-05-15 20:26
+
+**What changed:** Fixed Sankey chart bottom clipping with dynamic SVG viewBox height, plus resolved full series of visual regressions on wide viewports. All merged to master via PR #8.
+
+**Why:** d3-sankey barycenter reordering of layer-2 nodes pushes them 260px past the fixed 700px layout extent, clipping the bottom of the chart. A static height increase failed (d3 expands to fill it); dynamic height computed from actual node positions after reordering solves it. Companion fixes: removed overflow-x:hidden that broke full-bleed pattern, constrained text elements on 2560px+ monitors, removed SVG max-width cap.
+
+**State:** SankeyView computes viewBox height from max node Y after reordering (currently 979px). Full-bleed SVG fills viewport width; text elements capped at 1044px. PR #8 merged to master — Cloudflare Pages deploy triggered. Build passes. All 4 chapters render correctly. Phase B complete; Phase C (tests + friend preview) untouched.
+
+**Next:** Phase C — component tests for chapter navigation state, friend preview handoff, and feedback incorporation.
+
+---
