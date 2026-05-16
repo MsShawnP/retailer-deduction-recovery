@@ -647,3 +647,15 @@ may generate additional polish items before that.
 **Next:** Phase D task 1 — fix WIN_PROB discrepancy between RecoverySimulationView (0.05) and CostToDisputeView (0.0) for "none" evidence. Extract WIN_PROB into domain.ts.
 
 ---
+
+## 2026-05-16 15:51
+
+**What changed:** Phase D (pre-preview cleanup) complete. Extracted WIN_PROB, DEMO_DATE, readableOutcome, evidenceCategoryFor, and EvidenceCategory to domain.ts as single source of truth. Fixed WIN_PROB data bug (CostToDisputeView had 0.0 for "none", should be 0.05). Deleted 16 Playwright scripts (~1,200 LOC) and 72 LOC dead CSS. 26 files changed, +53/−1,408 lines.
+
+**Why:** Pre-preview gate. A data-curious CEO clicking between cost-to-dispute and recovery simulation would see contradictory numbers for the same deduction. Duplicated logic across 6 views was a maintenance hazard and a source of the discrepancy.
+
+**State:** Build passes (305.63KB JS, 44.13KB CSS). 14 tests pass. Zero console errors. All Phase D tasks checked off in PLAN.md. Definition of done: 9/11 items complete — remaining 2 are friend preview and feedback incorporation (Phase E).
+
+**Next:** Phase E — hand off live URL for friend preview and incorporate feedback. Deploy first if the current Cloudflare Pages build is stale.
+
+---
