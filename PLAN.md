@@ -75,11 +75,11 @@ worse."
       chapter switching compose correctly. Screenshot verification.
 - [x] Responsive check — verify chapter nav works at iPad portrait
       (768), MacBook (1366), wide (1680).
-- [ ] Deploy updated version to Cloudflare Pages.
+- [x] Deploy updated version to Cloudflare Pages.
 
 ### Phase C: Harden
 
-- [ ] Add component tests for navigation state — chapter switching,
+- [x] Add component tests for navigation state — chapter switching,
       cross-link chapter transitions, selection persistence across
       chapter changes.
 - [ ] Friend preview — hand off for feedback.
@@ -178,7 +178,7 @@ chapters with persistent Sankey/KPIs and cross-chapter navigation.
       cohort table (Ch1) switches to Ch2 and shows the explorer
       focused on that deduction; `npm run build` passes.
 
-- [ ] **B4: End-to-end verification + responsive + deploy**
+- [x] **B4: End-to-end verification + responsive + deploy**
     - Depends on: B3
     - Walk every filter path: dropdown → Sankey click → scorecard
       filter → origin filter → time range. Confirm KPIs, cohort
