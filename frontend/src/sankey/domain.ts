@@ -78,6 +78,34 @@ export function isOperational(d: Deduction): boolean {
 
 export const SLOTTING_TERMINAL_LABEL = "Not disputable — negotiated cost";
 
+export const DEMO_DATE = new Date("2026-05-31");
+
+export const WIN_PROB: Record<string, number> = {
+  digital_complete: 0.65,
+  digital_partial: 0.35,
+  handwritten_only: 0.12,
+  none: 0.05,
+};
+
+export type EvidenceCategory = "digital" | "paper" | "missing";
+
+export function evidenceCategoryFor(d: Deduction): EvidenceCategory {
+  if (d.dispute?.evidence_quality) {
+    const q = d.dispute.evidence_quality;
+    if (q === "digital_complete" || q === "digital_partial") return "digital";
+    if (q === "handwritten_only") return "paper";
+    return "missing";
+  }
+  if (!d.pack_record) return "missing";
+  if (d.pack_record.evidence_location === "lost") return "missing";
+  if (d.pack_record.evidence_format === "digital") return "digital";
+  return "paper";
+}
+
+export function readableOutcome(o: string): string {
+  return OUTCOME_LABELS[o] || o;
+}
+
 const OUTCOME_LABELS: Record<string, string> = {
   won_full: "Won full",
   won_partial: "Won partial",
@@ -165,7 +193,7 @@ export function disputeReadinessFor(d: Deduction): string {
 
   if (d.dispute_deadline) {
     const deadline = new Date(d.dispute_deadline);
-    if (deadline < new Date()) return "Can't dispute";
+    if (deadline < DEMO_DATE) return "Can't dispute";
   }
 
   const loc = d.pack_record?.evidence_location;

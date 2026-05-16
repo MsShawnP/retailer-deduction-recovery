@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars } from "../data";
-import { isOperational } from "../sankey/domain";
+import { isOperational, DEMO_DATE, evidenceCategoryFor, type EvidenceCategory } from "../sankey/domain";
 import "./TimelinePressureView.css";
 
 interface Props {
@@ -9,12 +9,11 @@ interface Props {
   onTrace: (id: string) => void;
 }
 
-const TODAY = new Date("2026-05-31");
+const TODAY = DEMO_DATE;
 const TODAY_LABEL = "2026-05-31";
 const DAY_MS = 86_400_000;
 
 type Bucket = "critical" | "expiring" | "active" | "expired" | "no_deadline";
-type EvidenceCategory = "digital" | "paper" | "missing";
 
 function isUnfiled(d: Deduction): boolean {
   return !d.dispute || !d.dispute.filed_date;
@@ -40,19 +39,6 @@ function bucketFor(days: number | null): Bucket {
   if (days <= 7) return "critical";
   if (days <= 30) return "expiring";
   return "active";
-}
-
-function evidenceCategoryFor(d: Deduction): EvidenceCategory {
-  if (d.dispute?.evidence_quality) {
-    const q = d.dispute.evidence_quality;
-    if (q === "digital_complete" || q === "digital_partial") return "digital";
-    if (q === "handwritten_only") return "paper";
-    return "missing";
-  }
-  if (!d.pack_record) return "missing";
-  if (d.pack_record.evidence_location === "lost") return "missing";
-  if (d.pack_record.evidence_format === "digital") return "digital";
-  return "paper";
 }
 
 const BUCKET_LABEL: Record<Bucket, string> = {

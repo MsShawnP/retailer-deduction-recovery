@@ -635,3 +635,39 @@ may generate additional polish items before that.
 **Next:** Phase C — component tests for chapter navigation state, friend preview handoff, and feedback incorporation.
 
 ---
+
+## 2026-05-16 15:39
+
+**What changed:** Full project audit (Phase 1-4) completed. AUDIT.md rewritten with current baseline, internal review (1 bug: WIN_PROB discrepancy, 4 important issues), updated landscape scan (Glimpse $35M raise, HighRadius AI additions, 5 unique capabilities still unmatched), and ranked next moves. PLAN.md updated: Phase A checked off, Phase D (pre-preview cleanup) added with 4 tasks, Phase E/F defined. Definition of done 7/11 checked.
+
+**Why:** Second audit, one month after the first. The chapter restructure the first audit recommended has landed. This audit assesses the result and identifies the remaining gate to friend preview: two data bugs (WIN_PROB discrepancy, non-deterministic dates) and duplicated business logic across views.
+
+**State:** AUDIT.md has all 4 phases. PLAN.md updated with Phases D/E/F. Build passes, 14 tests pass, 0 vulnerabilities. No code changes this session — analysis only. Competitive position stronger: 5 unique capabilities still unmatched, market validates the space.
+
+**Next:** Phase D task 1 — fix WIN_PROB discrepancy between RecoverySimulationView (0.05) and CostToDisputeView (0.0) for "none" evidence. Extract WIN_PROB into domain.ts.
+
+---
+
+## 2026-05-16 15:51
+
+**What changed:** Phase D (pre-preview cleanup) complete. Extracted WIN_PROB, DEMO_DATE, readableOutcome, evidenceCategoryFor, and EvidenceCategory to domain.ts as single source of truth. Fixed WIN_PROB data bug (CostToDisputeView had 0.0 for "none", should be 0.05). Deleted 16 Playwright scripts (~1,200 LOC) and 72 LOC dead CSS. 26 files changed, +53/−1,408 lines.
+
+**Why:** Pre-preview gate. A data-curious CEO clicking between cost-to-dispute and recovery simulation would see contradictory numbers for the same deduction. Duplicated logic across 6 views was a maintenance hazard and a source of the discrepancy.
+
+**State:** Build passes (305.63KB JS, 44.13KB CSS). 14 tests pass. Zero console errors. All Phase D tasks checked off in PLAN.md. Definition of done: 9/11 items complete — remaining 2 are friend preview and feedback incorporation (Phase E).
+
+**Next:** Phase E — hand off live URL for friend preview and incorporate feedback. Deploy first if the current Cloudflare Pages build is stale.
+
+---
+
+## 2026-05-16 15:55 — /wrap
+
+**Started from:** Audit (Phase 1–4) had just been logged. Phase D (pre-preview cleanup) was defined but unstarted.
+
+**Did:** Executed all 4 Phase D tasks: extracted WIN_PROB/DEMO_DATE/readableOutcome/evidenceCategoryFor/EvidenceCategory to domain.ts, fixed the WIN_PROB 0.0→0.05 data bug, deleted 16 dead Playwright scripts and 72 LOC unused CSS. Committed, logged, pushed, opened PR #15.
+
+**State:** PR #15 open against master (3 commits, −1,253 net lines). Build passes, 14 tests pass, zero console errors. PLAN.md Phases A–D complete. Definition of done 9/11 — remaining 2 are friend preview and feedback (Phase E). Arc is blocked on friend feedback, expected next week.
+
+**Next:** Merge PR #15. When friend feedback arrives, start Phase E — incorporate feedback, then conditionally do Phase F polish items based on what the friend flags.
+
+---
