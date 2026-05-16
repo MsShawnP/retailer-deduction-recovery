@@ -635,3 +635,15 @@ may generate additional polish items before that.
 **Next:** Phase C — component tests for chapter navigation state, friend preview handoff, and feedback incorporation.
 
 ---
+
+## 2026-05-15 21:51
+
+**What changed:** Phase C task 1 done — Vitest + React Testing Library, 14 component tests passing. Plus 1600px-wide unified layout, Sankey single-scroll height, equal-width cohort table columns. Five PRs merged (#9–#14).
+
+**Why:** Phase C component tests harden navigation state behavior. Visual polish landed in parallel — chart was bloating to 1500px tall on wide monitors and the persistent UI was 1100px while the chart was 1600px, looking misaligned. End-of-session frustration on table columns suggests Cloudflare CDN caching is biting between iterations.
+
+**State:** PLAN.md B4 and Phase C task 1 checked off. App.tsx layout: 1600px content area (max-width 1700px, 50px side padding). Sankey: 1600px cap, dynamic viewBox height (~979px), no full-bleed breakout. CohortTable: table-layout fixed, all 8 cols at 12.5%. Test infra: `npm test` runs 14 tests in ~4s; `src/test-setup.ts` adds jest-dom + cleanup. Deployed CSS bundle: index-BCIRdspK.css. Master is 8 commits ahead of where this session started; all merged to master via PRs.
+
+**Next:** Phase C task 2 — friend preview handoff. Send the live URL and capture feedback.
+
+---
