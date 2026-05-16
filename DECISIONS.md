@@ -97,6 +97,23 @@ Each entry:
 - **Scope:** deployment
 - **Do not:** use Netlify for this project
 
+### 2026-05-15 — Vitest + React Testing Library for component tests
+- **Why:** Natural fit for the Vite stack — Vitest shares Vite's
+  config and is fast (~4s for the current 14-test suite). React
+  Testing Library encourages user-behavior queries (`getByText`,
+  `getByRole`) over implementation-coupled selectors, which keeps
+  tests resilient as components evolve.
+- **Scope:** All component tests in `frontend/`. Setup in
+  `src/test-setup.ts` with explicit `afterEach(cleanup)` (auto-cleanup
+  is unreliable — see FAILURES.md 2026-05-15). Test files named
+  `*.test.tsx` co-located next to the component they cover. Run via
+  `npm test`. `tsconfig.app.json` excludes `*.test.*` from the
+  production build.
+- **Do not:** Add Jest or another test runner. Do not rely on
+  testing-library auto-cleanup — call `cleanup` explicitly in the
+  setup file. Do not co-mingle test files into the production
+  TypeScript compile.
+
 ---
 
 ## Data & Schema
@@ -194,6 +211,19 @@ Each entry:
   the order, not a giant red banner saying "you lost $X."
 - **Scope:** global — design tone
 - **Do not:** lead with accusatory cost callouts
+
+### 2026-05-15 — App content width standardized at 1600px
+- **Why:** The Sankey chart needs ~1600px to render readably at full
+  three-layer width with labels in the right margin. The original
+  1100px `.app` content width left the chart looking misaligned with
+  the surrounding UI on wide monitors. 1600px is wide enough for the
+  chart and reasonable for tables/cards; text-heavy elements can
+  still constrain themselves with internal max-widths where needed.
+- **Scope:** `frontend/src/App.css` — `.app { max-width: 1700px; padding: 32px 50px 96px; }` gives a 1600px content area. Sankey SVG capped at 1600px. All new chapter views inherit this width.
+- **Do not:** Re-introduce the 1100px content area. Do not add
+  full-bleed (`width: 100vw; margin-left: calc(-50vw + 50%)`)
+  breakouts that misalign sections with the chart; the unified
+  1600px container already handles wide-monitor layout.
 
 ---
 
