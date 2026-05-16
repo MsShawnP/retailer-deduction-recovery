@@ -23,11 +23,9 @@
 
 .sankey-svg {
   width: 100%;
-  max-width: 1600px;
   min-width: 900px;
   height: auto;
   display: block;
-  margin: 0 auto;
   background: var(--panel);
   border: 1px solid var(--rule);
 }
