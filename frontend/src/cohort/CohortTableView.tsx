@@ -105,6 +105,16 @@ export default function CohortTableView({ cohort, onSelectDeduction, activeDeduc
 
       <div className="cohort-table-wrap">
         <table className="cohort-table">
+          <colgroup>
+            <col className="col-id" />
+            <col className="col-date" />
+            <col className="col-retailer" />
+            <col className="col-type" />
+            <col className="col-amount" />
+            <col className="col-readiness" />
+            <col className="col-outcome" />
+            <col className="col-retrieval" />
+          </colgroup>
           <thead>
             <tr>
               <th onClick={() => toggleSort("deduction_id")}>
