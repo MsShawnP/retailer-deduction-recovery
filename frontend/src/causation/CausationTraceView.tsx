@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { Deduction } from "../types";
-import { OUTCOME_COLORS, rootCauseFor } from "../sankey/domain";
+import { OUTCOME_COLORS, rootCauseFor, readableOutcome } from "../sankey/domain";
 import { formatCount, formatDollars } from "../data";
 import "./CausationTraceView.css";
 
@@ -562,17 +562,3 @@ function buildPostAuditEvents(d: Deduction): TimelineEvent[] {
   return events;
 }
 
-function readableOutcome(o: string): string {
-  return (
-    ({
-      won_full: "Won full",
-      won_partial: "Won partial",
-      pending: "Pending",
-      lost_evidence: "Lost — evidence",
-      lost_deadline: "Lost — deadline",
-      lost_no_response: "Lost — no response",
-      lost_other: "Lost — other",
-      abandoned: "Abandoned",
-    } as Record<string, string>)[o] || o
-  );
-}

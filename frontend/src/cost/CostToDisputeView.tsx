@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars, formatPercent } from "../data";
-import { isOperational } from "../sankey/domain";
+import { isOperational, DEMO_DATE, WIN_PROB } from "../sankey/domain";
 import "./CostToDisputeView.css";
 
 interface Props {
@@ -9,17 +9,7 @@ interface Props {
   onTrace?: (id: string) => void;
 }
 
-const TODAY = new Date("2026-05-31");
-
-// Win probability by evidence quality, calibrated to the research
-// numbers in research/retailers/ — same model the recovery simulation
-// uses, so the two views agree on what evidence quality buys.
-const WIN_PROB: Record<string, number> = {
-  digital_complete: 0.65,
-  digital_partial: 0.35,
-  handwritten_only: 0.12,
-  none: 0.0,
-};
+const TODAY = DEMO_DATE;
 
 // Hours to assemble and file a dispute, by evidence quality. Digital
 // records pull straight from the system; handwritten records require
