@@ -659,3 +659,15 @@ may generate additional polish items before that.
 **Next:** Phase E — hand off live URL for friend preview and incorporate feedback. Deploy first if the current Cloudflare Pages build is stale.
 
 ---
+
+## 2026-05-16 15:55 — /wrap
+
+**Started from:** Audit (Phase 1–4) had just been logged. Phase D (pre-preview cleanup) was defined but unstarted.
+
+**Did:** Executed all 4 Phase D tasks: extracted WIN_PROB/DEMO_DATE/readableOutcome/evidenceCategoryFor/EvidenceCategory to domain.ts, fixed the WIN_PROB 0.0→0.05 data bug, deleted 16 dead Playwright scripts and 72 LOC unused CSS. Committed, logged, pushed, opened PR #15.
+
+**State:** PR #15 open against master (3 commits, −1,253 net lines). Build passes, 14 tests pass, zero console errors. PLAN.md Phases A–D complete. Definition of done 9/11 — remaining 2 are friend preview and feedback (Phase E). Arc is blocked on friend feedback, expected next week.
+
+**Next:** Merge PR #15. When friend feedback arrives, start Phase E — incorporate feedback, then conditionally do Phase F polish items based on what the friend flags.
+
+---
