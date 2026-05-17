@@ -52,3 +52,26 @@ ranges before recommending changes. Confirmed the data can stay as-is.
 **Status:** Resolved — no data changes needed.
 
 **Tags:** data calibration, industry benchmarks, deduction rates, audit
+
+---
+
+### 2026-05-17 — useMemo placed after early return violated Rules of Hooks
+
+**Attempted:** Wrapped `computeKpis(filteredDeductions)` in `useMemo`
+for performance, placing it at line 103 in App.tsx — after the
+`if (error)` and `if (!summary || !deductions)` early returns.
+
+**Why it didn't work:** React requires hooks to be called in the same
+order on every render. On the first render (loading state), the early
+return fires before the `useMemo` runs. On the second render (data
+loaded), the `useMemo` runs for the first time — React sees a new hook
+appearing that wasn't there before and throws "Rendered more hooks than
+during the previous render."
+
+**What we tried instead:** Moved the `useMemo` above the early returns
+with an internal null guard: `if (!filteredDeductions) return null`.
+The hook always runs in the same position regardless of loading state.
+
+**Status:** Resolved.
+
+**Tags:** react, hooks, useMemo, early return, rules of hooks

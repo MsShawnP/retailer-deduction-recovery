@@ -8,9 +8,13 @@ export interface DateRangeValue {
 
 export type DateRange = DateRangeValue | null;
 
-function addMonthsISO(dateStr: string, months: number): string {
+export function addMonthsISO(dateStr: string, months: number): string {
   const d = new Date(dateStr + "T00:00:00Z");
+  const origDay = d.getUTCDate();
+  d.setUTCDate(1);
   d.setUTCMonth(d.getUTCMonth() + months);
+  const lastDay = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+  d.setUTCDate(Math.min(origDay, lastDay));
   return d.toISOString().slice(0, 10);
 }
 

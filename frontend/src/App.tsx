@@ -95,15 +95,26 @@ export default function App() {
     if (id) setActiveChapter(2);
   }
 
+  const filteredKpis = useMemo(
+    () => {
+      if (!filteredDeductions) return null;
+      const anyF = !!(selection || dateRange);
+      return anyF ? computeKpis(filteredDeductions) : null;
+    },
+    [selection, dateRange, filteredDeductions]
+  );
+
   if (error) return <div className="error">Error loading data: {error}</div>;
   if (!summary || !deductions) return <div className="loading">Loading…</div>;
 
   const { totals } = summary;
   const anyFilter = !!(selection || dateRange);
-  const filteredKpis = anyFilter && filteredDeductions ? computeKpis(filteredDeductions) : null;
   const kpiCount = filteredKpis?.count ?? totals.deductions_count;
   const kpiDollar = filteredKpis?.dollar ?? totals.deductions_dollar;
-  const kpiAnnualized = filteredKpis ? (kpiDollar * 12 / summary.window.months) : totals.annualized_dollar;
+  const filterMonths = dateRange
+    ? Math.max(1, Math.round((new Date(dateRange.end).getTime() - new Date(dateRange.start).getTime()) / (30.44 * 86_400_000)))
+    : summary.window.months;
+  const kpiAnnualized = filteredKpis ? (kpiDollar * 12 / filterMonths) : totals.annualized_dollar;
   const kpiRecovered = filteredKpis?.recovered ?? totals.disputes_recovered;
   const kpiRecoveryRate = kpiDollar ? kpiRecovered / kpiDollar : 0;
   const kpiNoDisputeCount = filteredKpis?.noDisputeCount ?? totals.deductions_no_dispute_count;

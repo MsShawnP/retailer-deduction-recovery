@@ -122,9 +122,10 @@ Prioritize based on friend feedback. Don't do preemptively.
       Sankey interactive elements and sortable table headers.
 - [ ] Domain logic tests — cover disputeReadinessFor,
       buildSankeyData, isOnSelectedPath, computeKpis.
-- [ ] Performance — hoist O(n²) totalDollars in
-      OriginClusteringView, add useMemo to peer computations in
-      ExplorerView and RetailerScorecardView.
+- [x] Performance — hoist O(n²) totalDollars in
+      OriginClusteringView, add useMemo to computeKpis in App.tsx,
+      eliminate duplicate clustersFor() call, use pre-computed
+      highlightedNodeSet for O(1) node highlight.
 
 ---
 

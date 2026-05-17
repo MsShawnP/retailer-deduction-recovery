@@ -1,11 +1,13 @@
 import { useMemo } from "react";
 import { sankey, sankeyLinkHorizontal, sankeyJustify } from "d3-sankey";
 import type { Deduction } from "../types";
+import { formatDollars } from "../data";
 import {
   buildSankeyData,
   LAYER_TITLES,
   OUTCOME_COLORS,
   highlightedLinkSet,
+  highlightedNodeSet,
   isOnSelectedPath,
   type Selection,
 } from "./domain";
@@ -40,11 +42,6 @@ const OUTCOME_GROUP: Record<string, string> = {
   "Won partial":        "wins",
 };
 
-function dollarsCompact(n: number): string {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n.toFixed(0)}`;
-}
 
 function nodeColor(node: { layer: number; label: string }): string {
   if (node.layer === 2) {
@@ -171,11 +168,17 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
     return { nodes: result.nodes, links: result.links, total: totalIn, height };
   }, [operationalDeductions]);
 
-  // For the current selection, compute which links should be highlighted.
+  // For the current selection, compute which links and nodes should be highlighted.
   const highlightLinks = useMemo(() => {
     if (!selection) return null;
     const filtered = deductions.filter((d) => isOnSelectedPath(d, selection));
     return highlightedLinkSet(filtered);
+  }, [deductions, selection]);
+
+  const highlightNodes = useMemo(() => {
+    if (!selection) return null;
+    const filtered = deductions.filter((d) => isOnSelectedPath(d, selection));
+    return highlightedNodeSet(filtered);
   }, [deductions, selection]);
 
   const linkPath = sankeyLinkHorizontal();
@@ -216,7 +219,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
 
       {slottingStats.count > 0 && (
         <div className="sankey-slotting-callout">
-          {slottingStats.count} placement fees · {dollarsCompact(slottingStats.total)} · negotiated cost of access — not disputable
+          {slottingStats.count} placement fees · {formatDollars(slottingStats.total)} · negotiated cost of access — not disputable
         </div>
       )}
 
@@ -274,7 +277,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
                 }}
               >
                 <title>
-                  {link.source.label} → {link.target.label}: {dollarsCompact(link.value)}
+                  {link.source.label} → {link.target.label}: {formatDollars(link.value)}
                 </title>
               </path>
             );
@@ -286,11 +289,8 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
           {layout.nodes.map((node: any) => {
             const isSelected =
               selection?.kind === "node" && selection.nodeId === node.id;
-            const isOnPath = highlightLinks
-              ? highlightLinks.has(`${node.id}>>placeholder`) ||
-                [...highlightLinks].some(
-                  (k) => k.startsWith(`${node.id}>>`) || k.endsWith(`>>${node.id}`)
-                )
+            const isOnPath = highlightNodes
+              ? highlightNodes.has(node.id)
               : null;
             const opacity =
               isSelected ? 1 :
@@ -314,7 +314,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
                   className="sankey-node-rect"
                 >
                   <title>
-                    {node.label}: {dollarsCompact(node.value || 0)}
+                    {node.label}: {formatDollars(node.value || 0)}
                   </title>
                 </rect>
 
@@ -327,7 +327,7 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
                   {node.label}
                   <tspan className="sankey-node-value">
                     {" "}
-                    {dollarsCompact(node.value || 0)}
+                    {formatDollars(node.value || 0)}
                   </tspan>
                 </text>
               </g>

@@ -117,19 +117,6 @@ const OUTCOME_LABELS: Record<string, string> = {
   abandoned: "Abandoned",
 };
 
-const EVIDENCE_QUALITY_LABELS: Record<string, string> = {
-  digital_complete: "Digital, complete",
-  digital_partial: "Digital, partial",
-  handwritten_only: "Handwritten only",
-  none: "No evidence",
-};
-
-const LOCATION_LABELS: Record<string, string> = {
-  system: "Digital system",
-  warehouse_clipboard: "Warehouse clipboard",
-  office_filing_cabinet: "Filing cabinet",
-  lost: "Lost",
-};
 
 export function rootCauseFor(d: Deduction): string {
   if (d.is_post_audit) return "Post-audit clawback";
@@ -163,23 +150,6 @@ export function rootCauseFor(d: Deduction): string {
   return "Other";
 }
 
-export function evidenceQualityFor(d: Deduction): string {
-  if (!d.dispute) return "Never filed";
-  return EVIDENCE_QUALITY_LABELS[d.dispute.evidence_quality] || d.dispute.evidence_quality;
-}
-
-export function accessibilityFor(d: Deduction): string {
-  if (!d.dispute) return "n/a — never filed";
-  if (!d.pack_record?.evidence_location) return "No verification";
-  return LOCATION_LABELS[d.pack_record.evidence_location] || d.pack_record.evidence_location;
-}
-
-export function timelinessFor(d: Deduction): string {
-  if (!d.dispute) return "Never filed";
-  if (d.dispute.was_within_deadline === true) return "On time";
-  if (d.dispute.was_within_deadline === false) return "Past deadline";
-  return "No published deadline";
-}
 
 function outcomeFor(d: Deduction): string {
   if (!d.dispute) return "Never filed";
