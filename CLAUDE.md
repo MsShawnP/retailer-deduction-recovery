@@ -133,7 +133,7 @@ the ones with decent evidence get rejected on timing.
 
 ## Cinderhaven context
 
-- ~$25M specialty food brand, 90 SKUs, three product lines
+- ~$25M specialty food brand, 50 SKUs, three product lines
 - Retailers: Walmart, Costco, Whole Foods, regional chains,
   UNFI/KeHE distribution, DTC
 - Company has focused energy on growth and outgrown its capacity to
