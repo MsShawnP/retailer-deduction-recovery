@@ -126,7 +126,8 @@ function simulate(cohort: Deduction[], t: SimToggles): SimResult {
     // only replaces outcomes the toggles would have moved.
     const wasFiled = !!d.dispute && !!d.dispute.filed_date;
     const filed = t.systematic_filing || wasFiled;
-    const wasOnTime = d.dispute?.was_within_deadline !== false;
+    const wasOnTime = d.dispute?.was_within_deadline !== false &&
+      d.dispute?.outcome !== "lost_deadline";
     const onTime = t.deadline_tracking || wasOnTime;
     const wasEvidence = d.dispute?.evidence_quality;
     const evidenceUpgraded =

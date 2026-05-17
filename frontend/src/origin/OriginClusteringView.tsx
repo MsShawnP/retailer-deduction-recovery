@@ -133,9 +133,17 @@ export default function OriginClusteringView({
     [cohort]
   );
 
+  const clustersByDimension = useMemo(() => {
+    const map = new Map<string, Cluster[]>();
+    for (const dim of ORIGIN_DIMENSIONS) {
+      map.set(dim.id, clustersFor(operationalCohort, dim.id));
+    }
+    return map;
+  }, [operationalCohort]);
+
   const summaries: DimensionSummary[] = useMemo(() => {
     return ORIGIN_DIMENSIONS.map((dim) => {
-      const clusters = clustersFor(operationalCohort, dim.id);
+      const clusters = clustersByDimension.get(dim.id) ?? [];
       const total = clusters.reduce((s, c) => s + c.dollars, 0);
       const top = clusters[0];
       return {
@@ -147,12 +155,10 @@ export default function OriginClusteringView({
         totalDollars: total,
       };
     }).sort((a, b) => b.topShare - a.topShare);
-  }, [operationalCohort]);
+  }, [clustersByDimension]);
 
-  const activeClusters = useMemo(
-    () => clustersFor(operationalCohort, activeDimension),
-    [operationalCohort, activeDimension]
-  );
+  const activeClusters = clustersByDimension.get(activeDimension) ?? [];
+  const activeClusterTotal = activeClusters.reduce((s, x) => s + x.dollars, 0);
 
   const activeDimLabel =
     ORIGIN_DIMENSIONS.find((d) => d.id === activeDimension)?.label ??
@@ -310,11 +316,7 @@ export default function OriginClusteringView({
               const isActive =
                 activeCluster?.dimension === c.dimension &&
                 activeCluster.value === c.value;
-              const totalDollars = activeClusters.reduce(
-                (s, x) => s + x.dollars,
-                0
-              );
-              const share = totalDollars ? c.dollars / totalDollars : 0;
+              const share = activeClusterTotal ? c.dollars / activeClusterTotal : 0;
               return (
                 <tr key={c.value} className={isActive ? "active" : ""}>
                   <td className="origin-cluster-name">

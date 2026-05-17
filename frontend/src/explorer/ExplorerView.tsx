@@ -58,9 +58,9 @@ export default function ExplorerView({
     );
   }
 
-  const current = sorted[index];
   const total = sorted.length;
   const safeIndex = Math.min(index, total - 1);
+  const current = sorted[safeIndex];
 
   const goPrev = () => setIndex((i) => (i - 1 + total) % total);
   const goNext = () => setIndex((i) => (i + 1) % total);
@@ -412,7 +412,7 @@ function timelinessHeadline(d: Deduction): string {
 
   if (d.dispute.was_within_deadline === false && d.dispute.filed_date) {
     const filed = new Date(d.dispute.filed_date);
-    const days = Math.floor((filed.getTime() - deadline.getTime()) / 86_400_000);
+    const days = Math.max(1, Math.floor((filed.getTime() - deadline.getTime()) / 86_400_000));
     return `Filed ${days} days past deadline`;
   }
 
