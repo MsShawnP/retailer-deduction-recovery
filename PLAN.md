@@ -120,7 +120,7 @@ Prioritize based on friend feedback. Don't do preemptively.
       button, and tab patterns into App.css. ~465 LOC reduction.
 - [ ] Keyboard accessibility — add tabIndex, role, onKeyDown to
       Sankey interactive elements and sortable table headers.
-- [ ] Domain logic tests — cover disputeReadinessFor,
+- [x] Domain logic tests — cover disputeReadinessFor,
       buildSankeyData, isOnSelectedPath, computeKpis.
 - [x] Performance — hoist O(n²) totalDollars in
       OriginClusteringView, add useMemo to computeKpis in App.tsx,

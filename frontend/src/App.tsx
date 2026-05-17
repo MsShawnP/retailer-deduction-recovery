@@ -108,7 +108,6 @@ export default function App() {
   if (!summary || !deductions) return <div className="loading">Loading…</div>;
 
   const { totals } = summary;
-  const anyFilter = !!(selection || dateRange);
   const kpiCount = filteredKpis?.count ?? totals.deductions_count;
   const kpiDollar = filteredKpis?.dollar ?? totals.deductions_dollar;
   const filterMonths = dateRange
