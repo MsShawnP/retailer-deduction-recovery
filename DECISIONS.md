@@ -197,6 +197,18 @@ Each entry:
 
 ---
 
+### 2026-05-17 — Dataset at 16.4% deduction-to-revenue ratio is intentional
+- **Why:** The expanded dataset ($10.8M / 13,496 deductions / 36 months)
+  was deliberately calibrated to accommodate DTC and other realistic
+  data. Industry research confirms 5-15%+ is the plausible range for
+  an unmanaged emerging CPG brand through UNFI/KeHE/Walmart. The 45%
+  promo share is below the industry-typical 50%+.
+- **Scope:** Data pipeline calibration, AUDIT.md interpretation
+- **Do not:** Scale deductions down to 3-5% — that figure applies to
+  operational deductions only, not total deductions including trade/promo
+
+---
+
 ## Output Formats
 
 [No entries yet]

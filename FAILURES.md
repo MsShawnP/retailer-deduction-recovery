@@ -31,4 +31,24 @@ quarto" or "scope, scrollytelling, decoration"]
 
 ## Entries
 
-[New entries get added here, most recent at the top]
+### 2026-05-17 — Misquoted industry deduction benchmark caused false alarm
+
+**Attempted:** During data-change audit, flagged the 16.4%
+deduction-to-revenue ratio as "BROKEN" and the 45% promo billback
+share as narratively problematic, citing "industry norm is 1-3%."
+
+**Why it didn't work:** The 1-3% figure applies only to
+operational/shortage deductions alone, not total deductions. Web
+research found: total deductions for CPG run 5-15% (managed) to
+15-25%+ (emerging brands through UNFI/KeHE). Promo/trade deductions
+are typically 50%+ of all deductions — so 45% actually shows
+operational failures punching above their weight. Both numbers are
+defensible for Cinderhaven's profile.
+
+**What we tried instead:** Ran structured web research (Eightx,
+CPGVision, Woodridge, Confido sources) to verify actual industry
+ranges before recommending changes. Confirmed the data can stay as-is.
+
+**Status:** Resolved — no data changes needed.
+
+**Tags:** data calibration, industry benchmarks, deduction rates, audit
