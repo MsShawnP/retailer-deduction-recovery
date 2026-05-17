@@ -109,7 +109,7 @@ export default function App() {
   const kpiNoDisputeCount = filteredKpis?.noDisputeCount ?? totals.deductions_no_dispute_count;
   const kpiNoDisputeDollar = filteredKpis?.noDisputeDollar ?? totals.deductions_no_dispute_dollar;
   const kpiLaborHours = filteredKpis?.laborHours ?? totals.labor_hours;
-  const kpiFte = kpiLaborHours / 2080;
+  const kpiFte = (kpiLaborHours * 12 / summary.window.months) / 2080;
   const kpiDisputedCount = filteredKpis?.disputedCount ?? totals.disputes_filed;
 
   return (
