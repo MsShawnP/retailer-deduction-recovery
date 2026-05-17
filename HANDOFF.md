@@ -671,3 +671,15 @@ may generate additional polish items before that.
 **Next:** Merge PR #15. When friend feedback arrives, start Phase E — incorporate feedback, then conditionally do Phase F polish items based on what the friend flags.
 
 ---
+
+## 2026-05-17 16:10 — /wrap
+
+**Started from:** Data source substantially rebuilt (cinderhaven-data expanded from 3K to 13.5K deductions, $1.5M to $10.8M, 23 to 36 months). Needed to verify app math still holds.
+
+**Did:** Full data-change audit. Fixed FTE annualization bug (showed 12.5 instead of correct 4.2 FTE/year). Updated README numbers. Investigated deduction-to-revenue ratio (16.4%) and promo share (45%) — web research confirmed both are within industry norms for an unmanaged $25M brand.
+
+**State:** App renders correctly with new 13,496-deduction dataset. All views, null guards, KPIs verified. 14 tests pass, TypeScript clean. AUDIT.md rewritten. One commit on worktree branch (06eaa0e). Cloudflare Pages deploy may be stale.
+
+**Next:** Phase E — deploy to Cloudflare Pages if stale, then hand off live URL for friend preview.
+
+---
