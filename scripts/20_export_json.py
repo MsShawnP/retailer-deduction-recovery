@@ -60,6 +60,8 @@ class _Connection:
 
     def __init__(self, dsn: str):
         self._conn = psycopg2.connect(dsn, cursor_factory=psycopg2.extras.RealDictCursor)
+        self._conn.cursor().execute("SET search_path TO public_staging, public_marts, raw, public")
+        self._conn.commit()
         self._conn.autocommit = True
 
     def cursor(self):
