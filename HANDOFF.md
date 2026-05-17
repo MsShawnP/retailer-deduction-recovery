@@ -695,3 +695,15 @@ may generate additional polish items before that.
 **Next:** Hand off to friend for Phase E preview. Highest-value remaining coding work: domain.ts unit tests (P0 testing gap) and verifying brotli compression of 19MB JSON in production.
 
 ---
+
+## 2026-05-17 17:47 — /wrap
+
+**Started from:** Domain.ts unit tests in progress (file read, not yet written). Brotli verification failed due to DNS.
+
+**Did:** Wrote 68 domain.ts unit tests covering all critical pure functions. Fixed build (removed dead `anyFilter` variable). Discovered site was never deployed — created Cloudflare Pages project and deployed to production. Verified brotli compression (`Content-Encoding: br` confirmed).
+
+**State:** All technical work complete. 82 tests passing (3 files). Site live at `https://retailer-deduction-recovery.pages.dev/`. Phase E (friend preview) is the only remaining step.
+
+**Next:** Send URL to friend for preview feedback. When feedback arrives, assess Phase F items (CSS cleanup, keyboard accessibility).
+
+---
