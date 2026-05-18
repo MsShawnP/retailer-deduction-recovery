@@ -60,7 +60,7 @@ class _Connection:
 
     def __init__(self, dsn: str):
         self._conn = psycopg2.connect(dsn, cursor_factory=psycopg2.extras.RealDictCursor)
-        self._conn.cursor().execute("SET search_path TO public_staging, public_marts, raw, public")
+        self._conn.cursor().execute("SET search_path TO public_intermediate, public_staging, public_marts, raw, public")
         self._conn.commit()
         self._conn.autocommit = True
 
@@ -85,7 +85,7 @@ def build_summary(con) -> dict:
     cur = con.cursor()
 
     window = cur.execute(
-        "SELECT MIN(deduction_date) AS start, MAX(deduction_date) AS end FROM stg_deductions"
+        "SELECT MIN(deduction_date) AS start, MAX(deduction_date) AS end FROM int_all_deductions"
     ).fetchone()
     window_start = window["start"] if isinstance(window["start"], date) else date.fromisoformat(window["start"])
     window_end = window["end"] if isinstance(window["end"], date) else date.fromisoformat(window["end"])
@@ -94,8 +94,8 @@ def build_summary(con) -> dict:
     totals_row = cur.execute("""
         SELECT
             COUNT(*) AS deductions_count,
-            ROUND(SUM(amount), 2) AS deductions_dollar
-        FROM stg_deductions
+            ROUND(SUM(deduction_amount), 2) AS deductions_dollar
+        FROM int_all_deductions
     """).fetchone()
 
     disputes_row = cur.execute("""
@@ -103,15 +103,16 @@ def build_summary(con) -> dict:
             COUNT(*) AS disputes_filed,
             ROUND(SUM(recovered_amount), 2) AS disputes_recovered,
             ROUND(SUM(labor_hours), 1) AS labor_hours
-        FROM stg_disputes
+        FROM int_all_disputes
     """).fetchone()
 
     orders_row = cur.execute("""
         SELECT
             COUNT(*) AS orders_count,
             ROUND(SUM(total_value), 2) AS orders_dollar
-        FROM stg_orders
-    """).fetchone()
+        FROM int_all_orders
+        WHERE po_date BETWEEN %s AND %s
+    """, (window_start.isoformat(), window_end.isoformat())).fetchone()
 
     recovery_rate = (disputes_row["disputes_recovered"] or 0) / (totals_row["deductions_dollar"] or 1)
     annualized = (totals_row["deductions_dollar"] or 0) * 12 / window_months
@@ -119,8 +120,8 @@ def build_summary(con) -> dict:
 
     by_type = []
     for row in cur.execute("""
-        SELECT deduction_type, COUNT(*) AS count, ROUND(SUM(amount), 2) AS dollar
-        FROM stg_deductions
+        SELECT deduction_type, COUNT(*) AS count, ROUND(SUM(deduction_amount), 2) AS dollar
+        FROM int_all_deductions
         GROUP BY deduction_type
         ORDER BY dollar DESC
     """).fetchall():
@@ -131,16 +132,16 @@ def build_summary(con) -> dict:
     by_retailer = []
     for row in cur.execute("""
         SELECT
-            d.retailer_id,
+            d.partner_id,
             r.name,
             r.channel_type,
             COUNT(*) AS deductions,
-            ROUND(SUM(d.amount), 2) AS dollar,
+            ROUND(SUM(d.deduction_amount), 2) AS dollar,
             ROUND(SUM(disp.recovered_amount), 2) AS recovered
-        FROM stg_deductions d
-        JOIN stg_retailers r ON r.retailer_id = d.retailer_id
-        LEFT JOIN stg_disputes disp ON disp.deduction_id = d.deduction_id
-        GROUP BY d.retailer_id, r.name, r.channel_type
+        FROM int_all_deductions d
+        JOIN int_all_partners r ON r.partner_id = d.partner_id
+        LEFT JOIN int_all_disputes disp ON disp.deduction_id = d.deduction_id
+        GROUP BY d.partner_id, r.name, r.channel_type
         ORDER BY dollar DESC
     """).fetchall():
         recovered = row["recovered"] or 0
@@ -151,7 +152,7 @@ def build_summary(con) -> dict:
     by_outcome = []
     for row in cur.execute("""
         SELECT outcome, COUNT(*) AS count, ROUND(SUM(recovered_amount), 2) AS dollar
-        FROM stg_disputes
+        FROM int_all_disputes
         GROUP BY outcome
         ORDER BY count DESC
     """).fetchall():
@@ -160,16 +161,16 @@ def build_summary(con) -> dict:
     by_evidence_quality = []
     for row in cur.execute("""
         SELECT evidence_quality, COUNT(*) AS count
-        FROM stg_disputes
+        FROM int_all_disputes
         GROUP BY evidence_quality
         ORDER BY count DESC
     """).fetchall():
         by_evidence_quality.append(row)
 
     deductions_no_dispute = cur.execute("""
-        SELECT COUNT(*) AS n, ROUND(SUM(d.amount), 2) AS dollar
-        FROM stg_deductions d
-        LEFT JOIN stg_disputes disp ON disp.deduction_id = d.deduction_id
+        SELECT COUNT(*) AS n, ROUND(SUM(d.deduction_amount), 2) AS dollar
+        FROM int_all_deductions d
+        LEFT JOIN int_all_disputes disp ON disp.deduction_id = d.deduction_id
         WHERE disp.dispute_id IS NULL
     """).fetchone()
 
@@ -205,16 +206,16 @@ def build_deductions(con) -> list[dict]:
     cur = con.cursor()
 
     # Pre-fetch the lookups that will be repeatedly joined
-    retailers = {r["retailer_id"]: r for r in cur.execute("SELECT * FROM stg_retailers").fetchall()}
-    codes = {c["code_id"]: c for c in cur.execute("SELECT * FROM stg_deduction_codes").fetchall()}
-    orders = {o["order_id"]: o for o in cur.execute("SELECT * FROM stg_orders").fetchall()}
-    pack_records = {p["order_id"]: p for p in cur.execute("SELECT * FROM stg_pack_records").fetchall()}
-    shipments = {s["shipment_id"]: s for s in cur.execute("SELECT * FROM stg_shipments").fetchall()}
-    disputes = {d["deduction_id"]: d for d in cur.execute("SELECT * FROM stg_disputes").fetchall()}
+    partners = {r["partner_id"]: r for r in cur.execute("SELECT * FROM int_all_partners").fetchall()}
+    codes = {c["code_id"]: c for c in cur.execute("SELECT * FROM stg_retailer_deduction_codes").fetchall()}
+    orders = {o["order_id"]: o for o in cur.execute("SELECT * FROM int_all_orders").fetchall()}
+    pack_records = {p["order_id"]: p for p in cur.execute("SELECT * FROM stg_retailer_pack_records").fetchall()}
+    shipments = {s["order_id"]: s for s in cur.execute("SELECT * FROM int_all_shipments").fetchall()}
+    disputes = {d["deduction_id"]: d for d in cur.execute("SELECT * FROM int_all_disputes").fetchall()}
 
     # dispute_evidence grouped by dispute_id
     evidence_by_dispute: dict[str, list[dict]] = defaultdict(list)
-    for ev in cur.execute("SELECT * FROM stg_dispute_evidence").fetchall():
+    for ev in cur.execute("SELECT * FROM stg_retailer_dispute_evidence").fetchall():
         ev_clean = {
             "type": ev["evidence_type"],
             "submitted": bool(ev["was_submitted"]),
@@ -225,33 +226,32 @@ def build_deductions(con) -> list[dict]:
         evidence_by_dispute[ev["dispute_id"]].append(ev_clean)
 
     # post_audit_claims by deduction_id
-    audit_by_deduction = {a["deduction_id"]: a for a in cur.execute("SELECT * FROM stg_post_audit_claims").fetchall()}
+    audit_by_deduction = {a["deduction_id"]: a for a in cur.execute("SELECT * FROM stg_retailer_post_audit_claims").fetchall()}
 
     out = []
-    for d in cur.execute("SELECT * FROM stg_deductions").fetchall():
-        retailer = retailers.get(d["retailer_id"], {})
-        code = codes.get(d["code_id"]) if d["code_id"] else None
+    for d in cur.execute("SELECT * FROM int_all_deductions").fetchall():
+        partner = partners.get(d["partner_id"], {})
+        code = codes.get(d["code_id"]) if d.get("code_id") else None
         order = orders.get(d["order_id"]) if d["order_id"] else None
         pack = pack_records.get(d["order_id"]) if d["order_id"] else None
-        shipment = shipments.get(d["shipment_id"]) if d["shipment_id"] else None
+        shipment_id = order.get("order_id") if order else None
+        shipment = shipments.get(shipment_id) if shipment_id else None
         dispute = disputes.get(d["deduction_id"])
         audit = audit_by_deduction.get(d["deduction_id"])
 
         record = {
             "deduction_id": d["deduction_id"],
             "deduction_type": d["deduction_type"],
-            "code_as_remitted": d["code_as_remitted"],
-            "remittance_description": d["remittance_description"],
-            "amount": d["amount"],
+            "amount": d["deduction_amount"],
             "deduction_date": d["deduction_date"],
-            "dispute_deadline": d["dispute_deadline"],
-            "is_vague": bool(d["is_vague"]),
-            "is_post_audit": bool(d["is_post_audit"]),
+            "dispute_deadline": d.get("dispute_deadline"),
+            "is_post_audit": bool(d.get("is_post_audit")),
             "remittance_id": d["remittance_id"],
+            "channel_type": d["channel_type"],
             "retailer": {
-                "id": retailer.get("retailer_id"),
-                "name": retailer.get("name"),
-                "channel_type": retailer.get("channel_type"),
+                "id": partner.get("partner_id"),
+                "name": partner.get("name"),
+                "channel_type": partner.get("channel_type"),
             },
             "code": {
                 "id": code["code_id"],
@@ -265,8 +265,7 @@ def build_deductions(con) -> list[dict]:
                 "po_date": order["po_date"],
                 "total_units": order["total_units"],
                 "total_value": order["total_value"],
-                "requested_ship_date": order["requested_ship_date"],
-                "requested_delivery_window_end": order["requested_delivery_window_end"],
+                "requested_ship_date": order.get("requested_ship_date"),
             } if order else None,
             "pack_record": {
                 "label_type_used": pack["label_type_used"],
@@ -285,25 +284,17 @@ def build_deductions(con) -> list[dict]:
                 "ship_date": shipment["ship_date"],
                 "delivery_date": shipment["delivery_date"],
                 "carrier": shipment["carrier"],
-                "bol_signed": bool(shipment["bol_signed"]),
-                "bol_signed_short": bool(shipment["bol_signed_short"]),
-                "bol_signed_damaged": bool(shipment["bol_signed_damaged"]),
-                "pod_received": bool(shipment["pod_received"]),
-                "asn_sent": bool(shipment["asn_sent"]),
-                "asn_sent_late": bool(shipment["asn_sent_late"]),
+                "bol_number": shipment.get("bol_number"),
+                "asn_sent": bool(shipment.get("asn_sent")),
+                "asn_sent_late": bool(shipment.get("asn_sent_late")),
                 "units_shipped": shipment["units_shipped"],
-                "pallets_shipped": shipment["pallets_shipped"],
+                "pallets_shipped": shipment.get("pallets_shipped"),
             } if shipment else None,
             "dispute": {
                 "dispute_id": dispute["dispute_id"],
                 "filed_date": dispute["filed_date"],
-                "filing_method": dispute["filing_method"],
-                "evidence_quality": dispute["evidence_quality"],
-                "submitted_evidence_count": dispute["submitted_evidence_count"],
-                "was_within_deadline": (
-                    bool(dispute["was_within_deadline"])
-                    if dispute["was_within_deadline"] is not None else None
-                ),
+                "filing_method": dispute.get("filing_method"),
+                "evidence_quality": dispute.get("evidence_quality"),
                 "outcome": dispute["outcome"],
                 "recovered_amount": dispute["recovered_amount"],
                 "closed_date": dispute["closed_date"],
@@ -338,7 +329,7 @@ def build_retailers(con) -> dict:
         }
 
     codes_by_retailer: dict[str, list[dict]] = defaultdict(list)
-    for c in cur.execute("SELECT * FROM stg_deduction_codes ORDER BY retailer_id, code").fetchall():
+    for c in cur.execute("SELECT * FROM stg_retailer_deduction_codes ORDER BY retailer_id, code").fetchall():
         codes_by_retailer[c["retailer_id"]].append({
             "code_id": c["code_id"],
             "code": c["code"],
@@ -348,7 +339,7 @@ def build_retailers(con) -> dict:
         })
 
     edi_by_retailer: dict[str, list[dict]] = defaultdict(list)
-    for e in cur.execute("SELECT * FROM stg_edi_requirements ORDER BY retailer_id, category").fetchall():
+    for e in cur.execute("SELECT * FROM stg_retailer_edi_requirements ORDER BY retailer_id, category").fetchall():
         edi_by_retailer[e["retailer_id"]].append({
             "category": e["category"],
             "requirement": e["requirement"],
