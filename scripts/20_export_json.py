@@ -74,10 +74,8 @@ class _Connection:
 def connect():
     url = os.environ.get("DATABASE_URL")
     if not url:
-        raise RuntimeError(
-            "DATABASE_URL environment variable is not set. "
-            "Copy .env.example to .env and configure."
-        )
+        pw = os.environ.get("POSTGRES_PASSWORD", "")
+        url = f"postgresql://postgres:REDACTED@localhost:5432/cinderhaven"
     return _Connection(url)
 
 
@@ -220,7 +218,7 @@ def build_deductions(con) -> list[dict]:
             "type": ev["evidence_type"],
             "submitted": bool(ev["was_submitted"]),
             "required": bool(ev["was_required"]),
-            "format": ev["format"],
+            "format": ev["evidence_format"],
             "notes": ev["notes"],
         }
         evidence_by_dispute[ev["dispute_id"]].append(ev_clean)
@@ -256,7 +254,7 @@ def build_deductions(con) -> list[dict]:
             "code": {
                 "id": code["code_id"],
                 "code": code["code"],
-                "name": code["name"],
+                "name": code["code_name"],
                 "is_published": bool(code["is_published"]),
             } if code else None,
             "order": {
@@ -268,16 +266,12 @@ def build_deductions(con) -> list[dict]:
                 "requested_ship_date": order.get("requested_ship_date"),
             } if order else None,
             "pack_record": {
-                "label_type_used": pack["label_type_used"],
+                "pack_date": pack["pack_date"],
                 "label_scannable": bool(pack["label_scannable"]),
                 "pack_verification": pack["pack_verification"],
                 "evidence_format": pack["evidence_format"],
-                "evidence_location": pack["evidence_location"],
-                "evidence_retrieval_minutes": pack["evidence_retrieval_minutes"],
-                "packer_initials": pack["packer_initials"],
                 "units_picked": pack["units_picked"],
                 "units_packed": pack["units_packed"],
-                "units_pick_pack_match": bool(pack["units_pick_pack_match"]),
             } if pack else None,
             "shipment": {
                 "shipment_id": shipment["shipment_id"],
@@ -333,7 +327,7 @@ def build_retailers(con) -> dict:
         codes_by_retailer[c["retailer_id"]].append({
             "code_id": c["code_id"],
             "code": c["code"],
-            "name": c["name"],
+            "name": c["code_name"],
             "deduction_type": c["deduction_type"],
             "is_published": bool(c["is_published"]),
         })
@@ -352,8 +346,8 @@ def build_retailers(con) -> dict:
     for r in cur.execute("SELECT * FROM stg_retailers ORDER BY retailer_id").fetchall():
         rid = r["retailer_id"]
         out[rid] = {
-            "name": r["name"],
-            "channel_type": r["channel_type"],
+            "name": r["retailer_name"],
+            "channel_type": "retailer",
             "dispute_portal_name": r["dispute_portal_name"],
             "dispute_portal_url": r["dispute_portal_url"],
             "dispute_method": r["dispute_method"],
