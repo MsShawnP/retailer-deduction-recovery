@@ -80,20 +80,21 @@ export interface OrderRef {
   total_units: number;
   total_value: number;
   requested_ship_date: string;
-  requested_delivery_window_end: string | null;
+  requested_delivery_window_end?: string | null;
 }
 
 export interface PackRecord {
-  label_type_used: string;
+  pack_date?: string;
+  label_type_used?: string;
   label_scannable: boolean;
   pack_verification: string;
   evidence_format: string;
-  evidence_location: string | null;
-  evidence_retrieval_minutes: number | null;
-  packer_initials: string;
+  evidence_location?: string | null;
+  evidence_retrieval_minutes?: number | null;
+  packer_initials?: string;
   units_picked: number;
   units_packed: number;
-  units_pick_pack_match: boolean;
+  units_pick_pack_match?: boolean;
 }
 
 export interface Shipment {
@@ -101,10 +102,11 @@ export interface Shipment {
   ship_date: string;
   delivery_date: string | null;
   carrier: string;
-  bol_signed: boolean;
-  bol_signed_short: boolean;
-  bol_signed_damaged: boolean;
-  pod_received: boolean;
+  bol_number?: string;
+  bol_signed?: boolean;
+  bol_signed_short?: boolean;
+  bol_signed_damaged?: boolean;
+  pod_received?: boolean;
   asn_sent: boolean;
   asn_sent_late: boolean;
   units_shipped: number;
@@ -124,8 +126,8 @@ export interface Dispute {
   filed_date: string | null;
   filing_method: string | null;
   evidence_quality: string;
-  submitted_evidence_count: number;
-  was_within_deadline: boolean | null;
+  submitted_evidence_count?: number;
+  was_within_deadline?: boolean | null;
   outcome: string;
   recovered_amount: number;
   closed_date: string | null;
@@ -145,13 +147,15 @@ export interface PostAudit {
 export interface Deduction {
   deduction_id: string;
   deduction_type: string;
-  code_as_remitted: string;
-  remittance_description: string;
+  code_as_remitted?: string;
+  remittance_description?: string;
   amount: number;
   deduction_date: string;
   dispute_deadline: string | null;
-  is_vague: boolean;
+  is_vague?: boolean;
   is_post_audit: boolean;
+  is_double_dip?: boolean;
+  channel_type?: string;
   remittance_id: string | null;
   retailer: RetailerRef;
   code: CodeRef | null;

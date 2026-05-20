@@ -38,19 +38,25 @@ interface Profitability {
 }
 
 function inferEvidenceQuality(d: Deduction): string {
-  if (d.dispute?.evidence_quality) return d.dispute.evidence_quality;
-  if (!d.pack_record) return "none";
-  if (d.pack_record.evidence_location === "lost") return "none";
-  if (d.pack_record.evidence_format === "digital") {
-    return d.pack_record.evidence_location === "system"
-      ? "digital_complete"
-      : "digital_partial";
+  if (d.dispute?.evidence_quality) {
+    const q = d.dispute.evidence_quality;
+    if (q === "strong") return "digital_complete";
+    if (q === "moderate") return "digital_partial";
+    if (q === "weak") return "handwritten_only";
+    return q;
   }
-  return "handwritten_only";
+  if (!d.pack_record) return "none";
+  if (d.pack_record.evidence_format === "digital" || d.pack_record.evidence_format === "photo")
+    return "digital_complete";
+  if (d.pack_record.evidence_format === "handwritten")
+    return "handwritten_only";
+  return "none";
 }
 
 function isPastDeadline(d: Deduction): boolean {
-  if (d.dispute?.was_within_deadline === false) return true;
+  if (d.dispute?.filed_date && d.dispute_deadline) {
+    return new Date(d.dispute.filed_date) > new Date(d.dispute_deadline);
+  }
   if (d.dispute) return false;
   if (!d.dispute_deadline) return false;
   return new Date(d.dispute_deadline) < TODAY;

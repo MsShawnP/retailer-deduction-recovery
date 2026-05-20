@@ -36,6 +36,7 @@ export const TYPE_LABELS: Record<string, string> = {
   damaged: "Damaged",
   late_delivery: "Late delivery",
   promo_billback: "Promo billback",
+  pricing_error: "Pricing error",
   vague: "Vague",
   spoilage: "Spoilage",
   slotting: "Slotting",
@@ -51,6 +52,7 @@ export const TYPE_OPTIONS: string[] = [
   "Promo billback",
   "Damaged",
   "Pallet fine",
+  "Pricing error",
   "Spoilage",
   "Vague",
   "Slotting",
@@ -68,6 +70,7 @@ export const OPERATIONAL_TYPES: ReadonlySet<string> = new Set([
   "damaged",
   "late_delivery",
   "promo_billback",
+  "pricing_error",
   "vague",
   "spoilage",
 ]);
@@ -92,14 +95,14 @@ export type EvidenceCategory = "digital" | "paper" | "missing";
 export function evidenceCategoryFor(d: Deduction): EvidenceCategory {
   if (d.dispute?.evidence_quality) {
     const q = d.dispute.evidence_quality;
-    if (q === "digital_complete" || q === "digital_partial") return "digital";
-    if (q === "handwritten_only") return "paper";
+    if (q === "digital_complete" || q === "digital_partial" || q === "strong") return "digital";
+    if (q === "handwritten_only" || q === "weak" || q === "moderate") return "paper";
     return "missing";
   }
   if (!d.pack_record) return "missing";
-  if (d.pack_record.evidence_location === "lost") return "missing";
-  if (d.pack_record.evidence_format === "digital") return "digital";
-  return "paper";
+  if (d.pack_record.evidence_format === "digital" || d.pack_record.evidence_format === "photo") return "digital";
+  if (d.pack_record.evidence_format === "handwritten") return "paper";
+  return "missing";
 }
 
 export function readableOutcome(o: string): string {
@@ -126,22 +129,22 @@ export function rootCauseFor(d: Deduction): string {
 
   if (d.deduction_type === "short_ship") {
     if (d.pack_record?.label_scannable === false) return "Non-scannable label";
-    if (d.shipment?.bol_signed_short) return "BOL signed short";
+    if (d.shipment?.bol_signed_short === true) return "BOL signed short";
     if (d.pack_record && d.pack_record.units_pick_pack_match === false) return "Pack/pick mismatch";
     return "Other shortage";
   }
   if (d.deduction_type === "label_fine") {
-    if (d.pack_record?.label_type_used === "generic") return "Generic label";
+    if (d.pack_record?.label_scannable === false) return "Generic label";
     return "Other label issue";
   }
   if (d.deduction_type === "pallet_fine") return "Pallet noncompliance";
   if (d.deduction_type === "damaged") return "Damage at receiving";
   if (d.deduction_type === "late_delivery") return "Delivery missed window";
   if (d.deduction_type === "promo_billback") return "Promo program";
+  if (d.deduction_type === "pricing_error") return "Pricing discrepancy";
   if (d.deduction_type === "vague") return "Opaque remittance";
   if (d.deduction_type === "spoilage") {
-    // Sub-cause is encoded in the remittance_description keyword.
-    const desc = (d.remittance_description ?? "").toLowerCase();
+    const desc = ((d.remittance_description ?? d.code?.name) ?? "").toLowerCase();
     if (desc.includes("temperature")) return "Heat exposure in transit";
     if (desc.includes("expired") || desc.includes("short-dated"))
       return "Expired / short-dated at receiving";
@@ -169,14 +172,12 @@ export function disputeReadinessFor(d: Deduction): string {
     if (deadline < DEMO_DATE) return "Can't dispute";
   }
 
-  const loc = d.pack_record?.evidence_location;
   const verification = d.pack_record?.pack_verification;
 
   if (!d.pack_record) return "Can't dispute";
-  if (loc === "lost") return "Can't dispute";
   if (verification === "none") return "Can't dispute";
 
-  if (verification === "digital_log" && loc === "system")
+  if (verification === "digital_log" || verification === "scan_verified")
     return "Ready to dispute";
 
   return "Needs work";
@@ -257,9 +258,14 @@ export const ORIGIN_DIMENSIONS: ClusterDimension[] = [
     getter: (d) => d.shipment?.carrier ?? "(no shipment)",
   },
   {
-    id: "label_type",
-    label: "Label decision",
-    getter: (d) => d.pack_record?.label_type_used ?? "(no pack record)",
+    id: "label_scannable",
+    label: "Label scannable",
+    getter: (d) =>
+      d.pack_record == null
+        ? "(no pack record)"
+        : d.pack_record.label_scannable
+        ? "Scannable"
+        : "Not scannable",
   },
   {
     id: "pack_verification",
@@ -270,11 +276,6 @@ export const ORIGIN_DIMENSIONS: ClusterDimension[] = [
     id: "evidence_format",
     label: "Evidence format",
     getter: (d) => d.pack_record?.evidence_format ?? "(no pack record)",
-  },
-  {
-    id: "packer",
-    label: "Packer",
-    getter: (d) => d.pack_record?.packer_initials || "(unassigned)",
   },
 ];
 

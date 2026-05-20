@@ -185,12 +185,6 @@ function buildStandardEvents(d: Deduction): TimelineEvent[] {
           <strong>{d.retailer.name}</strong> issued PO{" "}
           <strong>{d.order.po_number}</strong> — {formatCount(d.order.total_units)}{" "}
           units, {formatDollars(d.order.total_value)}.
-          {d.order.requested_delivery_window_end && (
-            <span className="muted">
-              {" "}
-              Delivery window closes {d.order.requested_delivery_window_end}.
-            </span>
-          )}
         </>
       ),
       severity: "neutral",
@@ -198,39 +192,33 @@ function buildStandardEvents(d: Deduction): TimelineEvent[] {
   }
 
   if (d.pack_record) {
-    const labelGeneric = d.pack_record.label_type_used === "generic";
     const notScannable = d.pack_record.label_scannable === false;
     const pickPackOff = d.pack_record.units_pick_pack_match === false;
     const paperOnly = d.pack_record.evidence_format === "handwritten";
-    const lostEvidence = d.pack_record.evidence_location === "lost";
     const packSeverity: Severity =
-      notScannable || pickPackOff || lostEvidence
+      notScannable || pickPackOff
         ? "fail"
-        : labelGeneric || paperOnly
+        : paperOnly
         ? "warn"
         : "ok";
     const flags: string[] = [];
-    if (labelGeneric) flags.push("generic label");
-    if (notScannable) flags.push("non-scannable");
+    if (notScannable) flags.push("non-scannable label");
     if (pickPackOff) flags.push("pack/pick mismatch");
     if (paperOnly) flags.push("paper evidence");
-    if (lostEvidence) flags.push("evidence lost");
 
     events.push({
-      dateLabel: d.order?.requested_ship_date ?? "—",
+      dateLabel: d.pack_record.pack_date ?? d.order?.requested_ship_date ?? "—",
       step: "Pack & label",
       detail: (
         <>
           {formatCount(d.pack_record.units_picked)} picked →{" "}
-          {formatCount(d.pack_record.units_packed)} packed by{" "}
-          {d.pack_record.packer_initials || "—"}. Label:{" "}
-          <strong>{d.pack_record.label_type_used}</strong>
+          {formatCount(d.pack_record.units_packed)} packed.
           {d.pack_record.label_scannable ? (
-            " (scannable)."
+            " Label scannable."
           ) : (
             <>
               {" "}
-              <span className="bad">(not scannable).</span>
+              <span className="bad">Label not scannable.</span>
             </>
           )}{" "}
           Verification:{" "}
@@ -277,49 +265,18 @@ function buildStandardEvents(d: Deduction): TimelineEvent[] {
     });
 
     if (d.shipment.delivery_date) {
-      const short = d.shipment.bol_signed_short;
-      const damaged = d.shipment.bol_signed_damaged;
-      const pod = d.shipment.pod_received;
-      const lateVsWindow =
-        d.order?.requested_delivery_window_end &&
-        d.shipment.delivery_date > d.order.requested_delivery_window_end;
-      const sevRecv: Severity =
-        short || damaged || lateVsWindow ? "fail" : !pod ? "warn" : "ok";
-      const recvFlags: string[] = [];
-      if (short) recvFlags.push("BOL signed short");
-      if (damaged) recvFlags.push("BOL signed damaged");
-      if (!pod) recvFlags.push("no POD");
-      if (lateVsWindow) recvFlags.push("past delivery window");
-
       events.push({
         dateLabel: d.shipment.delivery_date,
         step: "Delivered & received",
         detail: (
           <>
-            {short && (
-              <>
-                <span className="bad">BOL signed marking shortage.</span>{" "}
-              </>
-            )}
-            {damaged && (
-              <>
-                <span className="bad">BOL signed marking damage.</span>{" "}
-              </>
-            )}
-            {!short && !damaged && <>BOL signed clean. </>}
-            {pod ? "POD captured." : <span className="bad">No POD on file.</span>}
-            {lateVsWindow && (
-              <>
-                {" "}
-                <span className="bad">
-                  Delivered past the requested window.
-                </span>
-              </>
+            Delivered {d.shipment.delivery_date}.
+            {d.shipment.bol_number && (
+              <> BOL {d.shipment.bol_number}.</>
             )}
           </>
         ),
-        severity: sevRecv,
-        flags: recvFlags,
+        severity: "neutral",
       });
     }
   }
@@ -342,9 +299,6 @@ function buildStandardEvents(d: Deduction): TimelineEvent[] {
         ) : (
           "."
         )}
-        {d.remittance_description && (
-          <span className="muted"> "{d.remittance_description}"</span>
-        )}
       </>
     ),
     severity: "fail",
@@ -354,21 +308,14 @@ function buildStandardEvents(d: Deduction): TimelineEvent[] {
   // Dispute attempt
   if (d.dispute) {
     if (d.dispute.filed_date) {
-      const onTime = d.dispute.was_within_deadline;
-      const handwritten =
-        d.dispute.evidence_quality === "handwritten_only";
+      const evidenceCount = d.dispute.evidence?.length ?? 0;
       const noEvidence = d.dispute.evidence_quality === "none";
+      const weak = d.dispute.evidence_quality === "weak" ||
+        d.dispute.evidence_quality === "handwritten_only";
       const sevFile: Severity =
-        onTime === false || noEvidence
-          ? "fail"
-          : handwritten
-          ? "warn"
-          : onTime === null
-          ? "neutral"
-          : "ok";
+        noEvidence ? "fail" : weak ? "warn" : "ok";
       const fileFlags: string[] = [];
-      if (onTime === false) fileFlags.push("past deadline");
-      if (handwritten) fileFlags.push("paper-only evidence");
+      if (weak) fileFlags.push("weak evidence");
       if (noEvidence) fileFlags.push("no evidence");
 
       events.push({
@@ -378,16 +325,10 @@ function buildStandardEvents(d: Deduction): TimelineEvent[] {
           <>
             Filed via{" "}
             {d.dispute.filing_method?.replace(/_/g, " ") ?? "—"} with{" "}
-            <strong>{d.dispute.submitted_evidence_count}</strong> item
-            {d.dispute.submitted_evidence_count === 1 ? "" : "s"} (
+            <strong>{evidenceCount}</strong> item
+            {evidenceCount === 1 ? "" : "s"} (
             {d.dispute.evidence_quality.replace(/_/g, " ")}).{" "}
             ~{d.dispute.labor_hours.toFixed(1)} labor hours.
-            {onTime === false && (
-              <>
-                {" "}
-                <span className="bad">Past deadline.</span>
-              </>
-            )}
           </>
         ),
         severity: sevFile,
@@ -523,11 +464,11 @@ function buildPostAuditEvents(d: Deduction): TimelineEvent[] {
         <>
           {d.dispute.filed_date ? "Filed" : "Opened but not filed"} —{" "}
           {d.dispute.evidence_quality.replace(/_/g, " ")},{" "}
-          {d.dispute.submitted_evidence_count} item
-          {d.dispute.submitted_evidence_count === 1 ? "" : "s"}.
+          {d.dispute.evidence?.length ?? 0} item
+          {(d.dispute.evidence?.length ?? 0) === 1 ? "" : "s"}.
         </>
       ),
-      severity: d.dispute.was_within_deadline === false ? "fail" : "warn",
+      severity: "warn",
     });
 
     events.push({

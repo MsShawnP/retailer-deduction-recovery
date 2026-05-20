@@ -64,58 +64,44 @@ function inferRequirement(
   // Otherwise infer what likely exists from the pack and shipment chain.
   switch (reqType) {
     case "signed_bol":
-      if (d.shipment?.bol_signed) {
-        if (d.pack_record?.evidence_format === "digital") {
+      if (d.shipment?.bol_number) {
+        if (d.pack_record?.evidence_format === "digital" || d.pack_record?.evidence_format === "photo") {
           return {
             type: reqType,
             status: "inferable",
-            notes: "BOL was signed at receiving — digital record likely retrievable",
+            notes: `BOL ${d.shipment.bol_number} on file — digital record likely retrievable`,
           };
         }
         return {
           type: reqType,
           status: "have_paper",
-          notes: "BOL signed at receiving — paper file in office",
+          notes: `BOL ${d.shipment.bol_number} — paper file in office`,
         };
       }
       return {
         type: reqType,
         status: "missing",
-        notes: "No record of a signed BOL",
+        notes: "No BOL number on file",
       };
     case "pod":
-      if (d.shipment?.pod_received) {
-        return {
-          type: reqType,
-          status: "inferable",
-          notes: "POD received from carrier — usually retrievable",
-        };
-      }
       return {
         type: reqType,
         status: "missing",
-        notes: "No POD on file",
+        notes: "POD status not tracked in current data",
       };
     case "pack_log":
       if (d.pack_record) {
-        if (d.pack_record.evidence_location === "lost") {
-          return {
-            type: reqType,
-            status: "missing",
-            notes: "Pack log was lost — unrecoverable",
-          };
-        }
-        if (d.pack_record.evidence_format === "digital") {
+        if (d.pack_record.evidence_format === "digital" || d.pack_record.evidence_format === "photo") {
           return {
             type: reqType,
             status: "have_digital",
-            notes: `Digital pack log in ${(d.pack_record.evidence_location ?? "system").replace(/_/g, " ")}`,
+            notes: "Digital pack log on file",
           };
         }
         return {
           type: reqType,
           status: "have_paper",
-          notes: `Handwritten pack notes — ${(d.pack_record.evidence_location ?? "filed").replace(/_/g, " ")}`,
+          notes: "Handwritten pack notes on file",
         };
       }
       return {
@@ -124,21 +110,18 @@ function inferRequirement(
         notes: "No pack record on file",
       };
     case "label_scan":
-      if (
-        d.pack_record?.label_scannable &&
-        d.pack_record.label_type_used !== "generic"
-      ) {
+      if (d.pack_record?.label_scannable) {
         return {
           type: reqType,
           status: "have_digital",
-          notes: "Compliant retailer-specific label — scannable barcode on file",
+          notes: "Scannable label — barcode on file",
         };
       }
-      if (d.pack_record?.label_type_used === "generic") {
+      if (d.pack_record && !d.pack_record.label_scannable) {
         return {
           type: reqType,
           status: "missing",
-          notes: "Generic label was used — no compliant scan exists to show",
+          notes: "Label not scannable — no compliant scan exists to show",
         };
       }
       return {
@@ -168,10 +151,14 @@ function inferRequirement(
         notes: "No ASN was sent",
       };
     case "photo":
-      if (
-        d.pack_record?.evidence_format === "digital" &&
-        d.pack_record.evidence_location === "system"
-      ) {
+      if (d.pack_record?.evidence_format === "photo") {
+        return {
+          type: reqType,
+          status: "have_digital",
+          notes: "Photo evidence on file",
+        };
+      }
+      if (d.pack_record?.evidence_format === "digital") {
         return {
           type: reqType,
           status: "inferable",
