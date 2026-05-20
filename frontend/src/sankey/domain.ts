@@ -339,13 +339,13 @@ export function selectionLabel(sel: Selection | null, retailerName?: string): st
 }
 
 export const OUTCOME_COLORS: Record<string, string> = {
-  "Won full":           "#0A7B3E",
-  "Won partial":        "#0A7B3E",
-  Pending:              "#8B95A1",
-  Abandoned:            "#E3120B",
-  "Lost — evidence":    "#E3120B",
-  "Lost — deadline":    "#E3120B",
-  "Lost — no response": "#E3120B",
-  "Lost — other":       "#E3120B",
-  "Never filed":        "#E3120B",
+  "Won full":           "#0e6e5a", // Hong Kong-25
+  "Won partial":        "#0e6e5a", // Hong Kong-25
+  Pending:              "#b3b3b3", // London-70
+  Abandoned:            "#b82d4a", // Tokyo-40
+  "Lost — evidence":    "#b82d4a", // Tokyo-40
+  "Lost — deadline":    "#b82d4a", // Tokyo-40
+  "Lost — no response": "#b82d4a", // Tokyo-40
+  "Lost — other":       "#b82d4a", // Tokyo-40
+  "Never filed":        "#b82d4a", // Tokyo-40
 };

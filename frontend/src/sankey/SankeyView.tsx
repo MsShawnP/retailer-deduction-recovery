@@ -25,9 +25,9 @@ const MIN_HEIGHT = 700;
 const MARGIN = { top: 44, right: 260, bottom: 20, left: 32 };
 
 const LAYER_COLORS = [
-  "#6BBFC8", // type
-  "#26829A", // dispute readiness
-  "#053D52", // outcome — overridden per-node by OUTCOME_COLORS
+  "#6dcdb5", // Hong Kong-70: type
+  "#158f75", // Hong Kong-35: dispute readiness
+  "#063d32", // Hong Kong-5: outcome — overridden per-node by OUTCOME_COLORS
 ];
 
 const OUTCOME_GROUP: Record<string, string> = {

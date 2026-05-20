@@ -42,7 +42,6 @@
 }
 
 .sim-actions button {
-  font-family: var(--serif);
   font-size: 16px;
   background: var(--panel);
   border: 1px solid var(--rule);
@@ -84,7 +83,6 @@
   border-left-width: 3px;
   border-left-color: var(--rule);
   cursor: pointer;
-  font-family: var(--serif);
 }
 
 .sim-toggle:hover {
@@ -93,7 +91,7 @@
 
 .sim-toggle.on {
   border-left-color: var(--accent-green);
-  background: #fafdf9;
+  background: var(--surface-success);
 }
 
 .sim-toggle input[type="checkbox"] {
@@ -118,7 +116,6 @@
 
 .sim-toggle-impact {
   text-align: right;
-  font-family: var(--serif);
   border-left: 1px solid var(--rule);
   padding-left: 16px;
   font-variant-numeric: tabular-nums;
@@ -154,7 +151,6 @@
 .sim-compare {
   background: var(--panel);
   border: 1px solid var(--rule);
-  font-family: var(--serif);
 }
 
 .sim-compare-row {
@@ -172,7 +168,7 @@
 }
 
 .sim-compare-head {
-  background: #f1f2f4;
+  background: var(--surface);
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -212,7 +208,7 @@
 }
 
 .sim-compare-savings {
-  background: #fafafa;
+  background: var(--surface);
   border-top: 2px solid var(--ink);
 }
 
