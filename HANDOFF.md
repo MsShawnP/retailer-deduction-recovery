@@ -695,3 +695,34 @@ may generate additional polish items before that.
 **Next:** Hand off to friend for Phase E preview. Highest-value remaining coding work: domain.ts unit tests (P0 testing gap) and verifying brotli compression of 19MB JSON in production.
 
 ---
+
+## 2026-05-20 — /wrap
+
+**Started from:** Code review had flagged P0 schema misalignment
+(upstream cinderhaven-data changed 15 fields, evidence quality
+values, and added pricing_error type). Fixes were in progress.
+
+**Did:**
+1. Completed P0 schema alignment — fixed "moderate" evidence
+   quality mapping in CostToDisputeView (`inferEvidenceQuality`
+   now maps moderate → digital_partial, 224 disputes affected).
+   Added pricing_error prose to ExplorerView's `rootCauseProse`.
+   Browser audit confirmed zero unmapped evidence values and
+   correct Sankey flow conservation.
+2. Added 45 domain logic unit tests (Phase F task 4) — covers
+   `disputeReadinessFor`, `buildSankeyData`, `isOnSelectedPath`,
+   `computeKpis`, `evidenceCategoryFor`, `rootCauseFor`,
+   `selectionLabel`, `isOperational`. Suite now 59 tests / 3 files.
+
+**State:** Two commits pushed to origin (`004ae75` schema fix,
+`1ca035c` domain tests). 59 tests pass, TypeScript strict clean,
+Vite build succeeds (305KB JS, 55KB CSS). Cloudflare Pages should
+have auto-deployed from push. PLAN.md Phase F task 4 checked off.
+
+**Next:** Phase E — hand off live URL for friend preview. All
+coding work is done. Remaining PLAN.md items: friend preview (E),
+3 optional Phase F polish tasks (CSS custom properties, CSS
+consolidation, keyboard accessibility) — do only if friend
+feedback calls for them.
+
+---
