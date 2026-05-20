@@ -32,14 +32,17 @@ const LAYER_COLORS = [
 
 const OUTCOME_GROUP: Record<string, string> = {
   "Never filed":        "never_filed",
+  Lost:                 "losses",
   "Lost — evidence":    "losses",
   "Lost — no response": "losses",
   "Lost — other":       "losses",
   "Lost — deadline":    "losses",
-  "Abandoned":          "abandoned",
-  "Pending":            "pending",
+  Abandoned:            "abandoned",
+  Pending:              "pending",
+  Won:                  "wins",
   "Won full":           "wins",
   "Won partial":        "wins",
+  "Partial win":        "wins",
 };
 
 

@@ -107,9 +107,12 @@ export function readableOutcome(o: string): string {
 }
 
 const OUTCOME_LABELS: Record<string, string> = {
+  won: "Won",
   won_full: "Won full",
   won_partial: "Won partial",
+  partial: "Partial win",
   pending: "Pending",
+  lost: "Lost",
   lost_evidence: "Lost — evidence",
   lost_deadline: "Lost — deadline",
   lost_no_response: "Lost — no response",
@@ -339,10 +342,13 @@ export function selectionLabel(sel: Selection | null, retailerName?: string): st
 }
 
 export const OUTCOME_COLORS: Record<string, string> = {
+  Won:                  "#0e6e5a", // Hong Kong-25
   "Won full":           "#0e6e5a", // Hong Kong-25
   "Won partial":        "#0e6e5a", // Hong Kong-25
+  "Partial win":        "#0e6e5a", // Hong Kong-25
   Pending:              "#b3b3b3", // London-70
   Abandoned:            "#b82d4a", // Tokyo-40
+  Lost:                 "#b82d4a", // Tokyo-40
   "Lost — evidence":    "#b82d4a", // Tokyo-40
   "Lost — deadline":    "#b82d4a", // Tokyo-40
   "Lost — no response": "#b82d4a", // Tokyo-40
