@@ -37,7 +37,6 @@
   border: 1px solid var(--rule);
   padding: 16px 20px;
   margin-bottom: 24px;
-  font-family: var(--serif);
 }
 
 .origin-section-head {
@@ -68,7 +67,6 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 15px;
-  font-family: var(--serif);
 }
 
 .origin-summary-table th,
@@ -77,7 +75,7 @@
 .origin-cluster-table td {
   text-align: left;
   padding: 9px 14px;
-  border-bottom: 1px solid #eef0f2;
+  border-bottom: 1px solid var(--rule-light);
   vertical-align: middle;
 }
 
@@ -88,7 +86,7 @@
   letter-spacing: 0.5px;
   color: var(--ink-soft);
   font-weight: 700;
-  background: #f1f2f4;
+  background: var(--surface);
   border-bottom: 1px solid var(--rule);
 }
 
@@ -104,11 +102,11 @@
 }
 
 .origin-summary-table tr.active {
-  background: #fafafa;
+  background: var(--surface);
 }
 
 .origin-cluster-table tr.active {
-  background: #fff5f5;
+  background: var(--surface-danger);
   outline: 2px solid var(--accent-red);
   outline-offset: -2px;
 }
@@ -129,7 +127,7 @@
   display: inline-block;
   width: 100px;
   height: 8px;
-  background: #f1f2f4;
+  background: var(--surface);
   border: 1px solid var(--rule);
   position: relative;
 }
@@ -150,7 +148,6 @@
 .origin-drill-btn,
 .origin-filter-btn,
 .origin-trace-btn {
-  font-family: var(--serif);
   font-size: 14px;
   background: var(--panel);
   border: 1px solid var(--rule);
@@ -194,7 +191,6 @@
 }
 
 .origin-tab {
-  font-family: var(--serif);
   font-size: 14px;
   background: var(--panel);
   border: none;
@@ -209,7 +205,7 @@
 }
 
 .origin-tab:hover:not(.active) {
-  background: #f5f6f7;
+  background: var(--surface);
 }
 
 .origin-tab.active {

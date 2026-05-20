@@ -42,7 +42,6 @@
 }
 
 .explorer-nav button {
-  font-family: var(--serif);
   font-size: 16px;
   background: var(--panel);
   border: 1px solid var(--rule);
@@ -128,7 +127,7 @@
   padding: 6px 0;
   gap: 16px;
   font-size: 16px;
-  border-bottom: 1px solid #eef0f2;
+  border-bottom: 1px solid var(--rule-light);
 }
 
 .explorer-kv:last-child {

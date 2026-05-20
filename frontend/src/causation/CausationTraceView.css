@@ -51,7 +51,6 @@
 }
 
 .trace-nav button {
-  font-family: var(--serif);
   font-size: 16px;
   background: var(--panel);
   border: 1px solid var(--rule);
@@ -87,7 +86,6 @@
   border: 1px solid var(--rule);
   border-left: 3px solid var(--accent-red);
   font-size: 15px;
-  font-family: var(--serif);
   color: var(--ink);
 }
 
@@ -230,7 +228,6 @@
   color: var(--ink);
   font-size: 16px;
   line-height: 1.55;
-  font-family: var(--serif);
 }
 
 .trace-detail .bad {
@@ -253,13 +250,12 @@
 .trace-flag {
   display: inline-block;
   padding: 2px 8px;
-  background: #f1f2f4;
+  background: var(--surface);
   color: var(--ink-soft);
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.4px;
   border: 1px solid var(--rule);
-  font-family: var(--serif);
 }
 
 @media (max-width: 760px) {

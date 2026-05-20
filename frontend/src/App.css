@@ -1,35 +1,56 @@
-/* Sober, data-forward — Economist style. */
+/* Lailara Design System v2 — city-named palette, editorial serif/sans duet. */
 
 :root {
-  /* Economist palette — crisp and authoritative, not muted. */
-  --ink: #0D1B2A;          /* dark navy, near-black for text */
-  --ink-soft: #4A5568;     /* secondary text */
-  --ink-faint: #8B95A1;    /* tertiary, captions */
-  --rule: #C8CDD3;         /* cool gray separator */
-  --bg: #E8E8E8;           /* Economist chart-area gray */
-  --panel: #FFFFFF;        /* card / table bg */
-  --accent: #E3120B;       /* Economist red — primary accent */
-  --accent-red: #E3120B;
-  --accent-blue: #0077B6;
-  --accent-teal: #00A5CF;
-  --accent-gold: #FFB800;
-  --accent-green: #157F3D;
-  --neg: #E3120B;
-  --pos: #157F3D;
+  /* London greyscale */
+  --ink: #0d0d0d;            /* London-5: chart titles, primary headings */
+  --ink-soft: #595959;       /* London-35: secondary text, axis labels */
+  --ink-faint: #b3b3b3;     /* London-70: disabled, captions */
+  --rule: #d9d9d9;           /* London-85: borders, gridlines */
+  --bg: #f5f3ee;             /* Canvas: warm off-white */
+  --panel: #ffffff;          /* Card / table bg */
+  --surface: #f2f2f2;       /* London-95: header bg, subtle surfaces */
+  --rule-light: #e0e0e0;    /* London-90: subtle internal separators */
 
-  --serif: Georgia, Charter, "Charter BT", "Bitstream Charter",
-           "Times New Roman", Times, serif;
+  /* Brand red (rationed — text and 1px rules only) */
+  --accent: #cc100a;         /* Red-42: section flags, brand accent */
+  --accent-red: #cc100a;     /* Red-42 */
+
+  /* Chicago (accent blue) */
+  --accent-blue: #1f2e7a;   /* Chicago-20: primary buttons, data anchor */
+
+  /* Hong Kong (teal) */
+  --accent-teal: #158f75;   /* Hong Kong-35: positive, supporting data */
+  --accent-green: #0e6e5a;  /* Hong Kong-25: success, wins */
+
+  /* Singapore (orange) */
+  --accent-gold: #ee8a2a;   /* Singapore-55: warnings */
+
+  /* Tokyo (berry/rose) — used for negative in divergent context */
+  --accent-rose: #b82d4a;   /* Tokyo-40: losses, negative outcomes */
+
+  --neg: #cc100a;            /* Red-42 */
+  --pos: #0e6e5a;            /* Hong Kong-25 */
+
+  /* Semantic surface fills (family step 95) */
+  --surface-danger: #fce8e7;  /* Red-95 */
+  --surface-warning: #fdeee0; /* Singapore-95 */
+  --surface-success: #e4f5f0; /* Hong Kong-95 */
+  --surface-info: #e8eaf4;    /* Chicago-95 */
+
+  /* Typography */
+  --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --sans: 'Source Sans 3', 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: var(--serif);
-  font-size: 18px;
+  font-family: var(--sans);
+  font-size: 17px;
   background: var(--bg);
   color: var(--ink);
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-x: hidden;
 }
 
@@ -46,19 +67,19 @@ header {
 }
 
 header h1 {
-  font-size: 36px;
+  font-size: 26px;
   margin: 0 0 6px;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.01em;
   font-family: var(--serif);
 }
 
 .subtitle {
-  color: var(--ink-faint);
+  color: var(--ink-soft);
   margin: 0;
-  font-size: 16px;
-  font-style: italic;
-  font-family: var(--serif);
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 h2 {
@@ -68,10 +89,10 @@ h2 {
   border-bottom: 1px solid var(--rule);
   padding-bottom: 8px;
   font-family: var(--serif);
+  line-height: 1.3;
 }
 
 .section-description {
-  font-family: var(--serif);
   font-size: 15px;
   color: var(--ink-soft);
   line-height: 1.55;
@@ -97,8 +118,7 @@ h2 {
 }
 
 .kpi-label {
-  font-family: var(--serif);
-  font-size: 16px;
+  font-size: 14px;
   color: var(--ink-soft);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -111,6 +131,7 @@ h2 {
   margin-top: 6px;
   font-family: var(--serif);
   line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .kpi-sub {
@@ -118,14 +139,12 @@ h2 {
   color: var(--ink-soft);
   margin-top: 6px;
   font-style: italic;
-  font-family: var(--serif);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 16px;
-  font-family: var(--serif);
+  font-size: 15px;
   background: var(--panel);
   border: 1px solid var(--rule);
 }
@@ -137,12 +156,11 @@ th, td {
 }
 
 th {
-  font-family: var(--serif);
-  font-size: 16px;
+  font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--ink-soft);
-  background: #F1F2F4;
+  background: var(--surface);
   font-weight: 700;
 }
 
@@ -164,7 +182,6 @@ tr:last-child td { border-bottom: 0; }
   border: 1px solid var(--rule);
   border-left: 3px solid var(--ink-faint);
   font-size: 15px;
-  font-family: var(--serif);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -201,7 +218,6 @@ tr:last-child td { border-bottom: 0; }
   cursor: pointer;
   font-size: 14px;
   color: var(--ink-soft);
-  font-family: var(--serif);
 }
 
 .cohort-bar-clear:hover {
@@ -216,12 +232,12 @@ tr:last-child td { border-bottom: 0; }
   padding: 3px 10px;
   background: var(--accent-red);
   color: #fff;
-  font-size: 14px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-family: var(--serif);
-  font-weight: 700;
+  font-weight: 500;
   vertical-align: middle;
+  border-radius: 2px;
 }
 
 .filter-row {
@@ -246,8 +262,7 @@ tr:last-child td { border-bottom: 0; }
   padding: 10px 16px;
   background: var(--panel);
   border: 1px solid var(--rule);
-  font-family: var(--serif);
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .time-range {
@@ -257,7 +272,6 @@ tr:last-child td { border-bottom: 0; }
   padding: 10px 16px;
   background: var(--panel);
   border: 1px solid var(--rule);
-  font-family: var(--serif);
   font-size: 15px;
   flex-wrap: wrap;
 }
@@ -276,7 +290,6 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .time-range-buttons button {
-  font-family: var(--serif);
   font-size: 14px;
   background: var(--panel);
   border: none;
@@ -291,7 +304,7 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .time-range-buttons button:hover:not(.active) {
-  background: #f5f6f7;
+  background: var(--surface);
 }
 
 .time-range-buttons button.active {
@@ -307,7 +320,7 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .time-range-custom input[type="date"] {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 14px;
   padding: 4px 8px;
   border: 1px solid var(--rule);
@@ -335,8 +348,8 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .type-selector select {
-  font-family: var(--serif);
-  font-size: 16px;
+  font-family: var(--sans);
+  font-size: 15px;
   color: var(--ink);
   background: var(--panel);
   border: 1px solid var(--rule);
@@ -359,9 +372,8 @@ tr:last-child td { border-bottom: 0; }
 
 .chapter-tab {
   flex: 1;
-  font-family: var(--serif);
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   padding: 12px 16px;
   background: transparent;
   border: none;
@@ -415,8 +427,7 @@ tr:last-child td { border-bottom: 0; }
   text-align: center;
   color: var(--ink-soft);
   font-style: italic;
-  font-size: 18px;
-  font-family: var(--serif);
+  font-size: 17px;
 }
 
 .error {

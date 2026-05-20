@@ -40,7 +40,6 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--serif);
   font-size: 14px;
 }
 
@@ -53,7 +52,6 @@
 }
 
 .scorecard-sort-btn {
-  font-family: var(--serif);
   font-size: 14px;
   background: var(--panel);
   border: 1px solid var(--rule);
@@ -86,7 +84,6 @@
   border-left-width: 4px;
   border-left-color: var(--rule);
   padding: 18px 20px;
-  font-family: var(--serif);
 }
 
 .scorecard-card.channel-retailer {
@@ -100,7 +97,7 @@
 .scorecard-card.active {
   outline: 2px solid var(--ink);
   outline-offset: -2px;
-  background: #fafafa;
+  background: var(--surface);
 }
 
 .scorecard-card-head {
@@ -128,7 +125,6 @@
 }
 
 .scorecard-filter-btn {
-  font-family: var(--serif);
   font-size: 14px;
   background: var(--panel);
   border: 1px solid var(--accent-red);
@@ -182,7 +178,7 @@
 
 .scorecard-loss-bar {
   height: 6px;
-  background: #f1f2f4;
+  background: var(--surface);
   position: relative;
 }
 
@@ -200,7 +196,7 @@
 }
 
 .scorecard-metric {
-  background: #fafafa;
+  background: var(--surface);
   border: 1px solid var(--rule);
   padding: 10px 12px;
 }
@@ -238,7 +234,7 @@
   margin: 0;
   line-height: 1.5;
   padding-top: 4px;
-  border-top: 1px solid #eef0f2;
+  border-top: 1px solid var(--rule-light);
   padding-top: 12px;
 }
 

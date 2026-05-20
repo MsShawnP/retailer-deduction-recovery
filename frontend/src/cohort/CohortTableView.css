@@ -11,7 +11,6 @@
   table-layout: fixed;
   border-collapse: collapse;
   font-size: 14px;
-  font-family: var(--serif);
   background: var(--panel);
   border: 1px solid var(--rule);
 }
@@ -19,12 +18,11 @@
 .cohort-table col { width: 12.5%; }
 
 .cohort-table th {
-  font-family: var(--serif);
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--ink-soft);
-  background: #F1F2F4;
+  background: var(--surface);
   font-weight: 700;
   padding: 8px 12px;
   border-bottom: 1px solid var(--rule);
@@ -48,11 +46,11 @@
 }
 
 .cohort-table tbody tr:hover {
-  background: #F5F6F8;
+  background: var(--surface);
 }
 
 .cohort-table tbody tr.active-row {
-  background: #E8F4F8;
+  background: var(--surface-info);
   font-weight: 600;
 }
 
@@ -80,7 +78,6 @@
 }
 
 .cohort-table-pagination button {
-  font-family: var(--serif);
   font-size: 14px;
   padding: 4px 12px;
   border: 1px solid var(--rule);
@@ -95,5 +92,5 @@
 }
 
 .cohort-table-pagination button:hover:not(:disabled) {
-  background: #F1F2F4;
+  background: var(--surface);
 }

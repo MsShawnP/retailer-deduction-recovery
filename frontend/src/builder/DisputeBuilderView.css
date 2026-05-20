@@ -42,7 +42,6 @@
 }
 
 .builder-nav button {
-  font-family: var(--serif);
   font-size: 16px;
   background: var(--panel);
   border: 1px solid var(--rule);
@@ -71,7 +70,6 @@
 }
 
 .builder-filter-tab {
-  font-family: var(--serif);
   font-size: 15px;
   background: transparent;
   border: none;
@@ -87,7 +85,7 @@
 }
 
 .builder-filter-tab:hover:not(.active) {
-  background: #f5f6f7;
+  background: var(--surface);
 }
 
 .builder-filter-tab.active {
@@ -117,7 +115,6 @@
   background: var(--panel);
   border: 1px solid var(--rule);
   border-left: 3px solid var(--accent-red);
-  font-family: var(--serif);
   font-size: 16px;
   flex-wrap: wrap;
 }
@@ -136,7 +133,6 @@
 }
 
 .builder-readiness {
-  font-family: var(--serif);
   font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
@@ -170,7 +166,6 @@
   background: var(--panel);
   border: 1px solid var(--rule);
   padding: 16px 20px;
-  font-family: var(--serif);
 }
 
 .builder-section h3 {
@@ -199,7 +194,6 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 15px;
-  font-family: var(--serif);
 }
 
 .builder-reqs th {
@@ -215,7 +209,7 @@
 
 .builder-reqs td {
   padding: 10px 10px 10px 0;
-  border-bottom: 1px solid #eef0f2;
+  border-bottom: 1px solid var(--rule-light);
   vertical-align: top;
 }
 
@@ -277,7 +271,7 @@
   grid-template-columns: 28px 1fr;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid #eef0f2;
+  border-bottom: 1px solid var(--rule-light);
   align-items: start;
 }
 
@@ -288,7 +282,6 @@
 .mock-checkbox {
   font-size: 22px;
   line-height: 1;
-  font-family: var(--serif);
 }
 
 .mock-item.status-have_digital .mock-checkbox {
@@ -322,7 +315,7 @@
   font-size: 15px;
   color: var(--ink);
   font-style: italic;
-  background: #fafafa;
+  background: var(--surface);
   border-left: 3px solid var(--ink);
   padding: 10px 14px;
   margin: 0 0 14px;
@@ -334,7 +327,6 @@
 }
 
 .builder-action-btn {
-  font-family: var(--serif);
   font-size: 15px;
   background: var(--panel);
   border: 1px solid var(--accent-red);
