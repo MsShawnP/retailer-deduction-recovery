@@ -217,22 +217,30 @@ Each entry:
 - **Do not:** disable strict or add `// @ts-ignore` for nullable
   field access. If a type error appears, fix the code, not the config.
 
-### 2026-05-17 — Use Economist-style palette, not Lailara Design System
+### ~~2026-05-17 — Use Economist-style palette, not Lailara Design System~~ (superseded 2026-05-20)
 
-- **Why:** This project's identity is "sober data journalism tool for a
+- ~~**Why:** This project's identity is "sober data journalism tool for a
   CEO who likes playing with data." The Economist aesthetic (cool grays,
   Georgia serif, red accents, minimal gridlines) signals credibility and
   objectivity. The Lailara Design System (warm off-white, Playfair Display,
   Source Sans 3, sequential teal) was designed for polished portfolio
   pieces. This project prioritises feeling like an analytical tool over
-  feeling like a branded portfolio showcase. The wider 1700px max-width
-  accommodates the multi-panel data density required by the 10 connected
-  views. The design divergence was incremental (not originally documented)
-  and is now formalised here.
-- **Scope:** All frontend styling — colors, typography, layout, accents
-- **Do not:** Apply Lailara Design System tokens to this project without
-  reconsidering the data-tool identity. If the project later needs
-  portfolio consistency, a future session can reconcile the two.
+  feeling like a branded portfolio showcase.~~
+- ~~**Scope:** All frontend styling~~
+- Superseded by 2026-05-20 — Apply full Lailara Design System (below)
+
+### 2026-05-20 — Apply full Lailara Design System, replacing Economist palette
+
+- **Why:** Portfolio consistency matters more than palette differentiation.
+  The Lailara Design System's warm canvas, city-named color families, and
+  Playfair/Source Sans duet still read as sober and data-forward — the
+  Economist *voice* stays, only the visual tokens change. Having one
+  coherent design system across all Lailara portfolio pieces strengthens
+  the brand. The 1700px max-width is retained (design system's Known Gaps
+  acknowledges dashboards may need wider layouts).
+- **Scope:** All frontend styling — :root tokens, font imports, component CSS
+- **Do not:** Revert to the Economist cool-gray palette. Future visual
+  tweaks should stay within the Lailara Design System's token vocabulary.
 
 ---
 
