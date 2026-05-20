@@ -105,7 +105,8 @@ function compute(
       }
       s.recovered += d.dispute.recovered_amount ?? 0;
     }
-    if (d.dispute?.was_within_deadline === false) {
+    if (d.dispute?.filed_date && d.dispute_deadline &&
+        new Date(d.dispute.filed_date) > new Date(d.dispute_deadline)) {
       s.expiredCount++;
       s.expiredDollars += d.amount;
     }

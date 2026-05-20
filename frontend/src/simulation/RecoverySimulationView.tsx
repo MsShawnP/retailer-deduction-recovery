@@ -126,8 +126,12 @@ function simulate(cohort: Deduction[], t: SimToggles): SimResult {
     // only replaces outcomes the toggles would have moved.
     const wasFiled = !!d.dispute && !!d.dispute.filed_date;
     const filed = t.systematic_filing || wasFiled;
-    const wasOnTime = d.dispute?.was_within_deadline !== false &&
-      d.dispute?.outcome !== "lost_deadline";
+    const wasOnTime = (() => {
+      if (d.dispute?.outcome === "lost_deadline") return false;
+      if (d.dispute?.filed_date && d.dispute_deadline)
+        return new Date(d.dispute.filed_date) <= new Date(d.dispute_deadline);
+      return true;
+    })();
     const onTime = t.deadline_tracking || wasOnTime;
     const wasEvidence = d.dispute?.evidence_quality;
     const evidenceUpgraded =
@@ -208,7 +212,8 @@ function countAffected(cohort: Deduction[], key: ToggleKey): number {
     } else if (key === "systematic_filing") {
       if (!d.dispute || !d.dispute.filed_date) n++;
     } else if (key === "deadline_tracking") {
-      if (d.dispute && d.dispute.was_within_deadline === false) n++;
+      if (d.dispute?.filed_date && d.dispute_deadline &&
+          new Date(d.dispute.filed_date) > new Date(d.dispute_deadline)) n++;
     } else if (key === "edi_asn") {
       if (
         d.deduction_type === "late_delivery" &&

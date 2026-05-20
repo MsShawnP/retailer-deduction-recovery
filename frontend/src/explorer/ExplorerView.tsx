@@ -160,10 +160,10 @@ function DeductionDetail({
           <strong>{formatDollars(deduction.amount)}</strong>
         </KV>
         <KV label="Date">{deduction.deduction_date}</KV>
-        {(deduction.is_post_audit || deduction.is_vague) && (
+        {(deduction.is_post_audit || deduction.deduction_type === "vague") && (
           <div className="explorer-tags">
             {deduction.is_post_audit && <span className="tag">post-audit</span>}
-            {deduction.is_vague && <span className="tag">vague</span>}
+            {deduction.deduction_type === "vague" && <span className="tag">vague</span>}
           </div>
         )}
       </ExplorerCard>
@@ -202,8 +202,8 @@ function DeductionDetail({
               {deduction.pack_record?.pack_verification?.replace(/_/g, " ") ?? "—"}
             </KV>
             <KV label="Submitted">
-              {deduction.dispute.submitted_evidence_count} item
-              {deduction.dispute.submitted_evidence_count === 1 ? "" : "s"}
+              {deduction.dispute.evidence?.length ?? 0} item
+              {(deduction.dispute.evidence?.length ?? 0) === 1 ? "" : "s"}
             </KV>
             <KV label="Missing">
               {missingEvidence(deduction.dispute.evidence) || (
@@ -228,18 +228,17 @@ function DeductionDetail({
         {deduction.pack_record ? (
           <>
             <p className="explorer-headline">
-              {readableLocation(deduction.pack_record.evidence_location)}
+              {deduction.pack_record.evidence_format === "digital" || deduction.pack_record.evidence_format === "photo"
+                ? "Digital records"
+                : deduction.pack_record.evidence_format === "handwritten"
+                ? "Handwritten records"
+                : "Unknown format"}
             </p>
             <KV label="Format">
               {deduction.pack_record.evidence_format.replace(/_/g, " ")}
             </KV>
-            <KV label="Retrieval cost">
-              {deduction.pack_record.evidence_retrieval_minutes != null
-                ? `~${deduction.pack_record.evidence_retrieval_minutes} minutes`
-                : <span className="muted">—</span>}
-            </KV>
-            <KV label="Packer">
-              {deduction.pack_record.packer_initials || "—"}
+            <KV label="Verification">
+              {deduction.pack_record.pack_verification.replace(/_/g, " ")}
             </KV>
           </>
         ) : (
@@ -351,6 +350,8 @@ function rootCauseProse(d: Deduction): string {
       return "Delivery date fell outside the retailer's requested window. OTIF-style fines apply at retailers with published programs (Walmart 3% of COGS); other retailers charge flat fees.";
     case "Promo program":
       return "MCB / scan-down billback flowing back from a retailer promotion. These are contractually owed but routinely arrive without the matching promo agreement on file, creating disputes by default.";
+    case "Pricing discrepancy":
+      return "Invoice price doesn't match the retailer's expected cost — often a lag between a negotiated price change and the updated price file in the retailer's system. Defending requires the signed pricing agreement and effective dates.";
     case "Opaque remittance":
       return "Vague remittance line — no PO, no specific reason. Investigating decodes some; many remain unmapped to a specific shipment or invoice.";
     case "Heat exposure in transit":
@@ -375,20 +376,11 @@ function readableEvidenceQuality(q: string): string {
     digital_complete: "Digital, complete",
     digital_partial: "Digital, partial",
     handwritten_only: "Handwritten only",
+    strong: "Strong",
+    weak: "Weak",
     none: "No evidence",
-  } as Record<string, string>)[q] || q;
+  } as Record<string, string>)[q] || q.replace(/_/g, " ");
 }
-
-function readableLocation(l: string | null): string {
-  if (!l) return "No verification record";
-  return ({
-    system: "Digital system",
-    warehouse_clipboard: "Warehouse clipboard",
-    office_filing_cabinet: "Filing cabinet (office)",
-    lost: "Lost",
-  } as Record<string, string>)[l] || l;
-}
-
 
 function missingEvidence(items: Evidence[]): string {
   return items
@@ -410,10 +402,12 @@ function timelinessHeadline(d: Deduction): string {
     return `${days} days to deadline — never filed`;
   }
 
-  if (d.dispute.was_within_deadline === false && d.dispute.filed_date) {
+  if (d.dispute.filed_date) {
     const filed = new Date(d.dispute.filed_date);
-    const days = Math.max(1, Math.floor((filed.getTime() - deadline.getTime()) / 86_400_000));
-    return `Filed ${days} days past deadline`;
+    if (filed > deadline) {
+      const days = Math.max(1, Math.floor((filed.getTime() - deadline.getTime()) / 86_400_000));
+      return `Filed ${days} days past deadline`;
+    }
   }
 
   return "Filed within deadline window";
@@ -421,7 +415,10 @@ function timelinessHeadline(d: Deduction): string {
 
 function timelinessColor(d: Deduction): string {
   if (!d.dispute_deadline) return "var(--ink-soft)";
-  if (!d.dispute) return "var(--accent-red)";
-  if (d.dispute.was_within_deadline === false) return "var(--accent-red)";
+  if (!d.dispute) {
+    return new Date(d.dispute_deadline) < TODAY ? "var(--accent-red)" : "var(--ink-soft)";
+  }
+  if (d.dispute.filed_date && new Date(d.dispute.filed_date) > new Date(d.dispute_deadline))
+    return "var(--accent-red)";
   return "var(--accent-green)";
 }

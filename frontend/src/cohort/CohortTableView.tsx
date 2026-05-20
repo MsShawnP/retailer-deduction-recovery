@@ -28,9 +28,7 @@ interface SortState {
 const PAGE_SIZE = 25;
 
 function retrievalHours(d: Deduction): number | null {
-  const mins = d.pack_record?.evidence_retrieval_minutes;
-  if (mins == null) return null;
-  return mins / 60;
+  return d.dispute?.labor_hours ?? null;
 }
 
 function outcomeLabel(d: Deduction): string {
