@@ -75,3 +75,32 @@ The hook always runs in the same position regardless of loading state.
 **Status:** Resolved.
 
 **Tags:** react, hooks, useMemo, early return, rules of hooks
+
+---
+
+### 2026-05-22 — Stale pipeline docs caused multi-repo detour to find data SSOT
+
+**Attempted:** Reconcile JSON files against the database. CLAUDE.md
+said the data source was "SQLite database from cinderhaven-data repo."
+Followed that to the local SQLite file (3,563 deductions), then to
+cinderhaven-data (archived, SQLite-based), then to
+refactor-older-cinderhaven-projects (Docker Postgres with empty
+volume), before the user corrected: the real SSOT is Fly.io Postgres
+in cinderhaven-data-platform.
+
+**Why it didn't work:** The data pipeline migrated from SQLite →
+Fly.io Postgres across multiple sessions and repos, but CLAUDE.md
+was never updated to reflect the change. Each intermediate repo
+looked plausible as the source — cinderhaven-data had generation
+scripts, refactor-older-cinderhaven-projects had a Docker Postgres
+and dump scripts — so the search kept going deeper instead of asking.
+
+**What we tried instead:** Connected to Fly.io Postgres via flyctl
+proxy with credentials from cinderhaven-data-platform/.env.
+Reconciliation confirmed exact match. Updated CLAUDE.md and
+DECISIONS.md to document the real pipeline.
+
+**Status:** Resolved — docs now reflect actual SSOT.
+
+**Tags:** data pipeline, documentation drift, SSOT, postgres, flyctl,
+cinderhaven-data-platform
