@@ -28,37 +28,34 @@ shows what each one is costing them and what it takes to fix it.
 
 ## Stack and tools
 
-- Data source: SQLite database from cinderhaven-data repo (includes
-  all deduction tables as of May 2026)
-- Data pipeline: Python (export to static JSON only — generation
-  lives in cinderhaven-data)
+- Data source: Fly.io Postgres (cinderhaven-data-platform dbt project,
+  app `cinderhaven-db`)
+- Data pipeline: Python export script reads Postgres via flyctl proxy,
+  writes static JSON
 - Frontend: React + HTML
 - Deployment: Cloudflare Pages
 - No live backend — React app consumes pre-built JSON files
 
 ## Data architecture
 
-The cinderhaven-data repo (https://github.com/MsShawnP/cinderhaven-data)
-is the single source of truth for all data generation, including
-deduction tables. As of May 2026, data generation scripts that
-previously lived in this repo's `scripts/` directory have been merged
-upstream into cinderhaven-data (scripts 07–15 in its build pipeline).
-The scripts in this repo's `scripts/` directory are superseded —
-kept for reference but no longer the canonical versions.
+The cinderhaven-data-platform repo is the single source of truth
+(SSOT). It runs a dbt project against Fly.io Postgres (app
+`cinderhaven-db`) with channel-isolated pipelines (retailer,
+distributor, DTC) and cross-channel intermediate views.
 
-This repo now only consumes the built database. The database includes:
+This repo consumes the Postgres database via `scripts/20_export_json.py`,
+which reads from the `int_all_*` intermediate views and `stg_retailer_*`
+staging tables, then writes three JSON files to `frontend/public/json/`.
 
-- Base tables: product_master, stores, distribution_log, sku_costs,
-  promotions (with promo_cost and funding_mechanism), price_history,
-  scan_data, chargebacks
-- Deduction tables: retailers, retailer_rules, deduction_codes,
-  edi_requirements, orders, order_lines, pack_records, shipments,
-  deductions (with is_double_dip flag), remittances, disputes,
-  dispute_evidence, post_audit_claims
+The SQLite file at `data/cinderhaven_deductions.db` is a stale
+reference copy from an earlier pipeline — it is NOT the SSOT and
+does not reflect the current dataset.
 
-To regenerate the database, run `python scripts/build_db.py` in the
-cinderhaven-data repo. A Python export script in this repo transforms
-the SQLite data into JSON structures the React app consumes.
+To re-export JSON from Postgres:
+1. `flyctl proxy 5432:5432 -a cinderhaven-db`
+2. `set POSTGRES_PASSWORD=<password from cinderhaven-data-platform/.env>`
+3. `python scripts/20_export_json.py`
+4. `python scripts/21_validate_dataset.py`
 
 ## Features (all ship in V1)
 
