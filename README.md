@@ -33,9 +33,17 @@ requirements.
 
 ## Features
 
+The tool is organized into four narrative chapters that guide the
+user through the five compounding failures: **The Problem** (Sankey
+flow and KPIs), **Why This Happens** (explorer, causation trace,
+origin clustering), **The Evidence Gap** (dispute builder, post-audit
+risk, retailer scorecard), and **What to Do About It** (recovery
+simulation, cost-to-dispute triage, timeline pressure).
+
 All ten views share a single selection state. Click a Sankey band,
 pick a deduction type from the dropdown, or filter by retailer --
-every view updates from the same cohort.
+every view updates from the same cohort. Cross-links between views
+switch chapters automatically.
 
 | View | What it shows |
 |---|---|
@@ -61,7 +69,8 @@ every view updates from the same cohort.
   [cinderhaven-data](https://github.com/MsShawnP/cinderhaven-data)
   shared database with 13 deduction-specific tables
 - **Hosting** -- Cloudflare Pages (static site, no backend)
-- **Testing** -- Playwright screenshot scripts for visual verification
+- **Testing** -- Vitest + React Testing Library (59 unit tests
+  covering domain logic, navigation state, and component rendering)
 
 ## Repository structure
 
