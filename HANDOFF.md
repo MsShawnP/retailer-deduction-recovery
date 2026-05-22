@@ -726,3 +726,28 @@ consolidation, keyboard accessibility) — do only if friend
 feedback calls for them.
 
 ---
+
+## 2026-05-22 — /wrap
+
+**Started from:** All coding work complete (Phases A–D, 59 tests,
+review-hardened). Blocked on friend preview (Phase E).
+
+**Did:** Deploy + housekeeping + data reconciliation. Deployed to
+Cloudflare Pages (current). Updated README (chapter nav, Vitest).
+Fixed 2 moderate npm vulnerabilities. Updated project health tracker.
+Reconciled JSON files against Fly.io Postgres SSOT — exact match on
+deductions (15,898), disputes (6,141), all type breakdowns. Committed
+JSON so git matches deployed state. Documented Fly.io Postgres as
+SSOT in CLAUDE.md and DECISIONS.md; marked local SQLite as stale
+reference.
+
+**State:** App live at retailer-deduction-recovery.pages.dev. JSON
+reconciled against Postgres. 0 npm vulnerabilities. Documentation
+reflects actual data pipeline (Fly.io Postgres, not SQLite). 4
+commits pushed to origin. Still blocked on friend preview.
+
+**Next:** Phase E — hand off live URL to friend for preview. No
+coding work unless feedback generates it. Phase F polish gated on
+feedback.
+
+---
