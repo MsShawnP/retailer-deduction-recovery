@@ -197,6 +197,19 @@ Each entry:
 
 ---
 
+### 2026-05-22 — Fly.io Postgres is the SSOT; local SQLite is a stale reference copy
+- **Why:** The data pipeline changed. The cinderhaven-data-platform
+  repo (dbt project on Fly.io Postgres, app `cinderhaven-db`) is now
+  the single source of truth. The export script (`scripts/20_export_json.py`)
+  reads directly from Postgres via `flyctl proxy`. The SQLite file at
+  `data/cinderhaven_deductions.db` (3,563 deductions) is from the old
+  pipeline and does not reflect the current dataset (15,898 deductions).
+  It is kept for reference only.
+- **Scope:** data pipeline
+- **Do not:** treat `data/cinderhaven_deductions.db` as authoritative.
+  To re-export JSON, start `flyctl proxy 5432:5432 -a cinderhaven-db`,
+  set `POSTGRES_PASSWORD`, and run `python scripts/20_export_json.py`.
+
 ### 2026-05-17 — Dataset at 16.4% deduction-to-revenue ratio is intentional
 - **Why:** The expanded dataset ($10.8M / 13,496 deductions / 36 months)
   was deliberately calibrated to accommodate DTC and other realistic
