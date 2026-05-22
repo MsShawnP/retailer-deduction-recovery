@@ -8,184 +8,163 @@
     "notes": null,
     "rules": {
       "short_ship": {
-        "dispute_window_days": 45,
+        "dispute_window_days": 90,
         "auto_deduct": false,
         "evidence_required": [
           "invoice + ASN"
         ],
-        "typical_recovery_rate": 0.3914,
+        "typical_recovery_rate": 0.7441,
         "notes": null
       },
       "promo_billback": {
-        "dispute_window_days": 45,
+        "dispute_window_days": 60,
         "auto_deduct": false,
         "evidence_required": [
-          "invoice + ASN"
+          "BOL + POD"
         ],
-        "typical_recovery_rate": 0.6156,
+        "typical_recovery_rate": 0.6587,
         "notes": null
       },
       "slotting": {
-        "dispute_window_days": 60,
-        "auto_deduct": true,
+        "dispute_window_days": 30,
+        "auto_deduct": false,
         "evidence_required": [
-          "all"
+          "price confirmation"
         ],
-        "typical_recovery_rate": 0.6998,
+        "typical_recovery_rate": 0.3763,
         "notes": null
       },
       "late_delivery": {
-        "dispute_window_days": 60,
+        "dispute_window_days": 30,
+        "auto_deduct": false,
+        "evidence_required": [
+          "BOL + POD"
+        ],
+        "typical_recovery_rate": 0.5717,
+        "notes": null
+      },
+      "label_fine": {
+        "dispute_window_days": 90,
         "auto_deduct": false,
         "evidence_required": [
           "pack photo"
         ],
-        "typical_recovery_rate": 0.6135,
-        "notes": null
-      },
-      "label_fine": {
-        "dispute_window_days": 45,
-        "auto_deduct": false,
-        "evidence_required": [
-          "all"
-        ],
-        "typical_recovery_rate": 0.236,
+        "typical_recovery_rate": 0.5369,
         "notes": null
       },
       "pallet_fine": {
-        "dispute_window_days": 45,
+        "dispute_window_days": 30,
         "auto_deduct": false,
         "evidence_required": [
-          "all"
+          "invoice + ASN"
         ],
-        "typical_recovery_rate": 0.3151,
+        "typical_recovery_rate": 0.7015,
         "notes": null
       },
       "spoilage": {
         "dispute_window_days": 45,
         "auto_deduct": false,
         "evidence_required": [
-          "price confirmation"
+          "all"
         ],
-        "typical_recovery_rate": 0.4063,
+        "typical_recovery_rate": 0.5654,
         "notes": null
       },
       "damaged": {
-        "dispute_window_days": 30,
-        "auto_deduct": false,
-        "evidence_required": [
-          "price confirmation"
-        ],
-        "typical_recovery_rate": 0.715,
-        "notes": null
-      },
-      "pricing_error": {
-        "dispute_window_days": 60,
-        "auto_deduct": false,
+        "dispute_window_days": 90,
+        "auto_deduct": true,
         "evidence_required": [
           "pack photo"
         ],
-        "typical_recovery_rate": 0.395,
+        "typical_recovery_rate": 0.7045,
+        "notes": null
+      },
+      "pricing_error": {
+        "dispute_window_days": 30,
+        "auto_deduct": true,
+        "evidence_required": [
+          "BOL + POD"
+        ],
+        "typical_recovery_rate": 0.6603,
         "notes": null
       }
     },
     "codes": [
       {
-        "code_id": "DC-0037",
-        "code": "TCO-DAM-037",
+        "code_id": "DC-0034",
+        "code": "TCO-DAM-034",
         "name": "Warehouse Damage",
         "deduction_type": "damaged",
         "is_published": true
       },
       {
-        "code_id": "DC-0029",
-        "code": "TCO-LAB-029",
-        "name": "Label Non-Compliance",
-        "deduction_type": "label_fine",
+        "code_id": "DC-0035",
+        "code": "TCO-DAM-035",
+        "name": "Transit Damage",
+        "deduction_type": "damaged",
         "is_published": true
       },
       {
         "code_id": "DC-0030",
         "code": "TCO-LAB-030",
+        "name": "Label Non-Compliance",
+        "deduction_type": "label_fine",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0031",
+        "code": "TCO-LAB-031",
         "name": "Label Defect",
         "deduction_type": "label_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0026",
-        "code": "TCO-LAT-026",
-        "name": "Appointment Miss",
-        "deduction_type": "late_delivery",
-        "is_published": true
-      },
-      {
         "code_id": "DC-0027",
         "code": "TCO-LAT-027",
-        "name": "MABD Violation",
+        "name": "Appointment Miss",
         "deduction_type": "late_delivery",
         "is_published": true
       },
       {
         "code_id": "DC-0028",
         "code": "TCO-LAT-028",
-        "name": "Late Delivery",
+        "name": "MABD Violation",
         "deduction_type": "late_delivery",
         "is_published": true
       },
       {
-        "code_id": "DC-0031",
-        "code": "TCO-PAL-031",
-        "name": "Pallet Overhang",
-        "deduction_type": "pallet_fine",
+        "code_id": "DC-0029",
+        "code": "TCO-LAT-029",
+        "name": "Late Delivery",
+        "deduction_type": "late_delivery",
         "is_published": false
       },
       {
         "code_id": "DC-0032",
         "code": "TCO-PAL-032",
-        "name": "Pallet Violation",
-        "deduction_type": "pallet_fine",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0033",
-        "code": "TCO-PAL-033",
         "name": "Ti-Hi Error",
         "deduction_type": "pallet_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0038",
-        "code": "TCO-PRI-038",
-        "name": "Pricing Variance",
-        "deduction_type": "pricing_error",
-        "is_published": false
-      },
-      {
-        "code_id": "DC-0039",
-        "code": "TCO-PRI-039",
+        "code_id": "DC-0036",
+        "code": "TCO-PRI-036",
         "name": "Invoice Mismatch",
         "deduction_type": "pricing_error",
         "is_published": true
       },
       {
-        "code_id": "DC-0021",
-        "code": "TCO-PRO-021",
-        "name": "Ad Allowance",
+        "code_id": "DC-0023",
+        "code": "TCO-PRO-023",
+        "name": "Scan Rebate",
         "deduction_type": "promo_billback",
-        "is_published": true
+        "is_published": false
       },
       {
-        "code_id": "DC-0022",
-        "code": "TCO-PRO-022",
+        "code_id": "DC-0024",
+        "code": "TCO-PRO-024",
         "name": "Promo Billback",
         "deduction_type": "promo_billback",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0019",
-        "code": "TCO-SHO-019",
-        "name": "Quantity Variance",
-        "deduction_type": "short_ship",
         "is_published": false
       },
       {
@@ -196,43 +175,36 @@
         "is_published": true
       },
       {
-        "code_id": "DC-0023",
-        "code": "TCO-SLO-023",
-        "name": "Slotting Fee",
-        "deduction_type": "slotting",
+        "code_id": "DC-0021",
+        "code": "TCO-SHO-021",
+        "name": "Short Ship",
+        "deduction_type": "short_ship",
         "is_published": true
       },
       {
-        "code_id": "DC-0024",
-        "code": "TCO-SLO-024",
-        "name": "New Item Fee",
-        "deduction_type": "slotting",
+        "code_id": "DC-0022",
+        "code": "TCO-SHO-022",
+        "name": "Quantity Variance",
+        "deduction_type": "short_ship",
         "is_published": true
       },
       {
         "code_id": "DC-0025",
         "code": "TCO-SLO-025",
+        "name": "Slotting Fee",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "DC-0026",
+        "code": "TCO-SLO-026",
         "name": "Shelf Placement",
         "deduction_type": "slotting",
-        "is_published": true
+        "is_published": false
       },
       {
-        "code_id": "DC-0034",
-        "code": "TCO-SPO-034",
-        "name": "Spoilage",
-        "deduction_type": "spoilage",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0035",
-        "code": "TCO-SPO-035",
-        "name": "Short Date",
-        "deduction_type": "spoilage",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0036",
-        "code": "TCO-SPO-036",
+        "code_id": "DC-0033",
+        "code": "TCO-SPO-033",
         "name": "Expired Product",
         "deduction_type": "spoilage",
         "is_published": true
@@ -241,14 +213,21 @@
     "edi_requirements": [
       {
         "category": "ASN",
-        "requirement": "ASN must include SSCC-18",
-        "penalty_if_violated": "$250 chargeback",
+        "requirement": "Must send ASN within 24hrs of ship",
+        "penalty_if_violated": null,
         "is_verified": true,
         "source_url": null
       },
       {
+        "category": "ASN",
+        "requirement": "PO number required on ASN",
+        "penalty_if_violated": "shipment refused",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
         "category": "Documentation",
-        "requirement": "Packing list required",
+        "requirement": "Certificate of insurance",
         "penalty_if_violated": null,
         "is_verified": true,
         "source_url": null
@@ -257,14 +236,28 @@
         "category": "Documentation",
         "requirement": "BOL must accompany shipment",
         "penalty_if_violated": "shipment refused",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "Documentation",
+        "requirement": "Packing list required",
+        "penalty_if_violated": "vendor scorecard impact",
         "is_verified": true,
         "source_url": null
       },
       {
         "category": "Label",
-        "requirement": "Retailer-specific label template",
-        "penalty_if_violated": "vendor scorecard impact",
+        "requirement": "GS1-128 label required",
+        "penalty_if_violated": null,
         "is_verified": true,
+        "source_url": null
+      },
+      {
+        "category": "Label",
+        "requirement": "SSCC barcode on each pallet",
+        "penalty_if_violated": "$250 chargeback",
+        "is_verified": false,
         "source_url": null
       },
       {
@@ -276,9 +269,9 @@
       },
       {
         "category": "Routing",
-        "requirement": "Must use approved carriers",
-        "penalty_if_violated": "vendor scorecard impact",
-        "is_verified": true,
+        "requirement": "MABD compliance",
+        "penalty_if_violated": "$500 per violation",
+        "is_verified": false,
         "source_url": null
       }
     ]
@@ -292,30 +285,30 @@
     "notes": null,
     "rules": {
       "short_ship": {
-        "dispute_window_days": 90,
-        "auto_deduct": false,
-        "evidence_required": [
-          "all"
-        ],
-        "typical_recovery_rate": 0.2974,
-        "notes": null
-      },
-      "promo_billback": {
-        "dispute_window_days": 60,
+        "dispute_window_days": 45,
         "auto_deduct": true,
         "evidence_required": [
           "price confirmation"
         ],
-        "typical_recovery_rate": 0.643,
+        "typical_recovery_rate": 0.3307,
+        "notes": null
+      },
+      "promo_billback": {
+        "dispute_window_days": 45,
+        "auto_deduct": true,
+        "evidence_required": [
+          "price confirmation"
+        ],
+        "typical_recovery_rate": 0.4108,
         "notes": null
       },
       "slotting": {
-        "dispute_window_days": 90,
-        "auto_deduct": true,
+        "dispute_window_days": 60,
+        "auto_deduct": false,
         "evidence_required": [
-          "invoice + ASN"
+          "pack photo"
         ],
-        "typical_recovery_rate": 0.627,
+        "typical_recovery_rate": 0.1962,
         "notes": null
       },
       "late_delivery": {
@@ -324,210 +317,210 @@
         "evidence_required": [
           "all"
         ],
-        "typical_recovery_rate": 0.443,
+        "typical_recovery_rate": 0.4475,
         "notes": null
       },
       "label_fine": {
-        "dispute_window_days": 30,
+        "dispute_window_days": 45,
         "auto_deduct": false,
         "evidence_required": [
           "BOL + POD"
         ],
-        "typical_recovery_rate": 0.6534,
+        "typical_recovery_rate": 0.2313,
         "notes": null
       },
       "pallet_fine": {
-        "dispute_window_days": 30,
+        "dispute_window_days": 90,
         "auto_deduct": false,
         "evidence_required": [
-          "invoice + ASN"
+          "pack photo"
         ],
-        "typical_recovery_rate": 0.3974,
+        "typical_recovery_rate": 0.5221,
         "notes": null
       },
       "spoilage": {
-        "dispute_window_days": 30,
-        "auto_deduct": false,
-        "evidence_required": [
-          "all"
-        ],
-        "typical_recovery_rate": 0.1555,
-        "notes": null
-      },
-      "damaged": {
         "dispute_window_days": 90,
         "auto_deduct": false,
         "evidence_required": [
           "all"
         ],
-        "typical_recovery_rate": 0.5207,
+        "typical_recovery_rate": 0.6393,
+        "notes": null
+      },
+      "damaged": {
+        "dispute_window_days": 45,
+        "auto_deduct": false,
+        "evidence_required": [
+          "invoice + ASN"
+        ],
+        "typical_recovery_rate": 0.5119,
         "notes": null
       },
       "pricing_error": {
         "dispute_window_days": 90,
         "auto_deduct": false,
         "evidence_required": [
-          "all"
+          "pack photo"
         ],
-        "typical_recovery_rate": 0.1594,
+        "typical_recovery_rate": 0.7287,
         "notes": null
       }
     },
     "codes": [
       {
-        "code_id": "DC-0094",
-        "code": "GER-DAM-094",
-        "name": "Damaged Goods",
-        "deduction_type": "damaged",
-        "is_published": false
-      },
-      {
-        "code_id": "DC-0095",
-        "code": "GER-DAM-095",
+        "code_id": "DC-0086",
+        "code": "GER-DAM-086",
         "name": "Warehouse Damage",
         "deduction_type": "damaged",
-        "is_published": false
-      },
-      {
-        "code_id": "DC-0088",
-        "code": "GER-LAB-088",
-        "name": "UPC Error",
-        "deduction_type": "label_fine",
         "is_published": true
       },
       {
         "code_id": "DC-0087",
-        "code": "GER-LAT-087",
-        "name": "Appointment Miss",
+        "code": "GER-DAM-087",
+        "name": "Damaged Goods",
+        "deduction_type": "damaged",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0080",
+        "code": "GER-LAB-080",
+        "name": "Label Defect",
+        "deduction_type": "label_fine",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0078",
+        "code": "GER-LAT-078",
+        "name": "Late Delivery",
         "deduction_type": "late_delivery",
         "is_published": true
       },
       {
-        "code_id": "DC-0089",
-        "code": "GER-PAL-089",
-        "name": "Pallet Overhang",
-        "deduction_type": "pallet_fine",
+        "code_id": "DC-0079",
+        "code": "GER-LAT-079",
+        "name": "MABD Violation",
+        "deduction_type": "late_delivery",
         "is_published": true
       },
       {
-        "code_id": "DC-0090",
-        "code": "GER-PAL-090",
+        "code_id": "DC-0081",
+        "code": "GER-PAL-081",
         "name": "Pallet Violation",
         "deduction_type": "pallet_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0091",
-        "code": "GER-PAL-091",
+        "code_id": "DC-0082",
+        "code": "GER-PAL-082",
         "name": "Ti-Hi Error",
         "deduction_type": "pallet_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0096",
-        "code": "GER-PRI-096",
+        "code_id": "DC-0088",
+        "code": "GER-PRI-088",
+        "name": "Pricing Variance",
+        "deduction_type": "pricing_error",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0089",
+        "code": "GER-PRI-089",
         "name": "Cost Discrepancy",
         "deduction_type": "pricing_error",
         "is_published": true
       },
       {
-        "code_id": "DC-0097",
-        "code": "GER-PRI-097",
-        "name": "Invoice Mismatch",
-        "deduction_type": "pricing_error",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0098",
-        "code": "GER-PRI-098",
-        "name": "Pricing Variance",
-        "deduction_type": "pricing_error",
-        "is_published": false
-      },
-      {
-        "code_id": "DC-0084",
-        "code": "GER-PRO-084",
-        "name": "Ad Allowance",
+        "code_id": "DC-0074",
+        "code": "GER-PRO-074",
+        "name": "Scan Rebate",
         "deduction_type": "promo_billback",
         "is_published": true
       },
       {
-        "code_id": "DC-0082",
-        "code": "GER-SHO-082",
+        "code_id": "DC-0075",
+        "code": "GER-PRO-075",
+        "name": "Promo Billback",
+        "deduction_type": "promo_billback",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0072",
+        "code": "GER-SHO-072",
         "name": "Under-delivery",
         "deduction_type": "short_ship",
         "is_published": true
       },
       {
-        "code_id": "DC-0083",
-        "code": "GER-SHO-083",
+        "code_id": "DC-0073",
+        "code": "GER-SHO-073",
         "name": "Short Ship",
         "deduction_type": "short_ship",
         "is_published": true
       },
       {
-        "code_id": "DC-0085",
-        "code": "GER-SLO-085",
+        "code_id": "DC-0076",
+        "code": "GER-SLO-076",
+        "name": "Slotting Fee",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "DC-0077",
+        "code": "GER-SLO-077",
         "name": "Shelf Placement",
         "deduction_type": "slotting",
         "is_published": true
       },
       {
-        "code_id": "DC-0086",
-        "code": "GER-SLO-086",
-        "name": "Slotting Fee",
-        "deduction_type": "slotting",
+        "code_id": "DC-0083",
+        "code": "GER-SPO-083",
+        "name": "Spoilage",
+        "deduction_type": "spoilage",
         "is_published": true
       },
       {
-        "code_id": "DC-0092",
-        "code": "GER-SPO-092",
+        "code_id": "DC-0084",
+        "code": "GER-SPO-084",
         "name": "Expired Product",
         "deduction_type": "spoilage",
-        "is_published": false
+        "is_published": true
       },
       {
-        "code_id": "DC-0093",
-        "code": "GER-SPO-093",
-        "name": "Spoilage",
+        "code_id": "DC-0085",
+        "code": "GER-SPO-085",
+        "name": "Short Date",
         "deduction_type": "spoilage",
-        "is_published": false
+        "is_published": true
       }
     ],
     "edi_requirements": [
       {
         "category": "ASN",
-        "requirement": "Must send ASN within 24hrs of ship",
-        "penalty_if_violated": null,
+        "requirement": "ASN must include SSCC-18",
+        "penalty_if_violated": "$500 per violation",
         "is_verified": false,
         "source_url": null
       },
       {
         "category": "ASN",
-        "requirement": "ASN must include SSCC-18",
-        "penalty_if_violated": "shipment refused",
-        "is_verified": false,
+        "requirement": "PO number required on ASN",
+        "penalty_if_violated": "$500 per violation",
+        "is_verified": true,
         "source_url": null
       },
       {
-        "category": "Documentation",
-        "requirement": "Packing list required",
-        "penalty_if_violated": "$250 chargeback",
-        "is_verified": false,
+        "category": "ASN",
+        "requirement": "Must send ASN within 24hrs of ship",
+        "penalty_if_violated": "$500 per violation",
+        "is_verified": true,
         "source_url": null
       },
       {
-        "category": "Documentation",
-        "requirement": "BOL must accompany shipment",
-        "penalty_if_violated": null,
-        "is_verified": false,
-        "source_url": null
-      },
-      {
-        "category": "Documentation",
-        "requirement": "Certificate of insurance",
+        "category": "Label",
+        "requirement": "Retailer-specific label template",
         "penalty_if_violated": "vendor scorecard impact",
-        "is_verified": false,
+        "is_verified": true,
         "source_url": null
       },
       {
@@ -538,31 +531,24 @@
         "source_url": null
       },
       {
-        "category": "Label",
-        "requirement": "Retailer-specific label template",
+        "category": "Routing",
+        "requirement": "Must use approved carriers",
         "penalty_if_violated": "shipment refused",
         "is_verified": true,
         "source_url": null
       },
       {
-        "category": "Label",
-        "requirement": "SSCC barcode on each pallet",
-        "penalty_if_violated": "$500 per violation",
-        "is_verified": false,
-        "source_url": null
-      },
-      {
         "category": "Routing",
         "requirement": "MABD compliance",
-        "penalty_if_violated": "$250 chargeback",
+        "penalty_if_violated": "$500 per violation",
         "is_verified": true,
         "source_url": null
       },
       {
         "category": "Routing",
-        "requirement": "Must use approved carriers",
-        "penalty_if_violated": "vendor scorecard impact",
-        "is_verified": false,
+        "requirement": "Appointment scheduling required",
+        "penalty_if_violated": "shipment refused",
+        "is_verified": true,
         "source_url": null
       }
     ]
@@ -576,190 +562,176 @@
     "notes": null,
     "rules": {
       "short_ship": {
-        "dispute_window_days": 90,
-        "auto_deduct": true,
+        "dispute_window_days": 60,
+        "auto_deduct": false,
         "evidence_required": [
-          "pack photo"
+          "all"
         ],
-        "typical_recovery_rate": 0.4677,
+        "typical_recovery_rate": 0.5297,
         "notes": null
       },
       "promo_billback": {
-        "dispute_window_days": 60,
-        "auto_deduct": true,
-        "evidence_required": [
-          "price confirmation"
-        ],
-        "typical_recovery_rate": 0.6379,
-        "notes": null
-      },
-      "slotting": {
         "dispute_window_days": 45,
-        "auto_deduct": true,
-        "evidence_required": [
-          "invoice + ASN"
-        ],
-        "typical_recovery_rate": 0.2078,
-        "notes": null
-      },
-      "late_delivery": {
-        "dispute_window_days": 45,
-        "auto_deduct": true,
-        "evidence_required": [
-          "pack photo"
-        ],
-        "typical_recovery_rate": 0.4659,
-        "notes": null
-      },
-      "label_fine": {
-        "dispute_window_days": 60,
         "auto_deduct": false,
         "evidence_required": [
           "price confirmation"
         ],
-        "typical_recovery_rate": 0.1974,
+        "typical_recovery_rate": 0.3182,
+        "notes": null
+      },
+      "slotting": {
+        "dispute_window_days": 60,
+        "auto_deduct": true,
+        "evidence_required": [
+          "all"
+        ],
+        "typical_recovery_rate": 0.4883,
+        "notes": null
+      },
+      "late_delivery": {
+        "dispute_window_days": 45,
+        "auto_deduct": false,
+        "evidence_required": [
+          "price confirmation"
+        ],
+        "typical_recovery_rate": 0.4801,
+        "notes": null
+      },
+      "label_fine": {
+        "dispute_window_days": 45,
+        "auto_deduct": false,
+        "evidence_required": [
+          "BOL + POD"
+        ],
+        "typical_recovery_rate": 0.3248,
         "notes": null
       },
       "pallet_fine": {
         "dispute_window_days": 90,
         "auto_deduct": false,
         "evidence_required": [
-          "invoice + ASN"
+          "pack photo"
         ],
-        "typical_recovery_rate": 0.7441,
+        "typical_recovery_rate": 0.2335,
         "notes": null
       },
       "spoilage": {
-        "dispute_window_days": 60,
-        "auto_deduct": false,
+        "dispute_window_days": 45,
+        "auto_deduct": true,
         "evidence_required": [
-          "BOL + POD"
+          "price confirmation"
         ],
-        "typical_recovery_rate": 0.6587,
+        "typical_recovery_rate": 0.2425,
         "notes": null
       },
       "damaged": {
-        "dispute_window_days": 30,
+        "dispute_window_days": 90,
+        "auto_deduct": true,
+        "evidence_required": [
+          "price confirmation"
+        ],
+        "typical_recovery_rate": 0.7444,
+        "notes": null
+      },
+      "pricing_error": {
+        "dispute_window_days": 90,
         "auto_deduct": false,
         "evidence_required": [
           "price confirmation"
         ],
-        "typical_recovery_rate": 0.3763,
-        "notes": null
-      },
-      "pricing_error": {
-        "dispute_window_days": 30,
-        "auto_deduct": false,
-        "evidence_required": [
-          "BOL + POD"
-        ],
-        "typical_recovery_rate": 0.5717,
+        "typical_recovery_rate": 0.7041,
         "notes": null
       }
     },
     "codes": [
       {
-        "code_id": "DC-0109",
-        "code": "NAL-DAM-109",
-        "name": "Damaged Goods",
-        "deduction_type": "damaged",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0110",
-        "code": "NAL-DAM-110",
-        "name": "Transit Damage",
-        "deduction_type": "damaged",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0111",
-        "code": "NAL-DAM-111",
+        "code_id": "DC-0100",
+        "code": "NAL-DAM-100",
         "name": "Warehouse Damage",
         "deduction_type": "damaged",
-        "is_published": false
+        "is_published": true
       },
       {
-        "code_id": "DC-0105",
-        "code": "NAL-LAB-105",
+        "code_id": "DC-0096",
+        "code": "NAL-LAB-096",
+        "name": "Label Non-Compliance",
+        "deduction_type": "label_fine",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0097",
+        "code": "NAL-LAB-097",
         "name": "UPC Error",
         "deduction_type": "label_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0103",
-        "code": "NAL-LAT-103",
-        "name": "Appointment Miss",
-        "deduction_type": "late_delivery",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0104",
-        "code": "NAL-LAT-104",
+        "code_id": "DC-0095",
+        "code": "NAL-LAT-095",
         "name": "MABD Violation",
         "deduction_type": "late_delivery",
         "is_published": true
       },
       {
-        "code_id": "DC-0106",
-        "code": "NAL-PAL-106",
+        "code_id": "DC-0098",
+        "code": "NAL-PAL-098",
         "name": "Pallet Overhang",
         "deduction_type": "pallet_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "DC-0101",
+        "code": "NAL-PRI-101",
+        "name": "Invoice Mismatch",
+        "deduction_type": "pricing_error",
         "is_published": true
       },
       {
-        "code_id": "DC-0107",
-        "code": "NAL-PAL-107",
-        "name": "Pallet Violation",
-        "deduction_type": "pallet_fine",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0112",
-        "code": "NAL-PRI-112",
+        "code_id": "DC-0102",
+        "code": "NAL-PRI-102",
         "name": "Pricing Variance",
         "deduction_type": "pricing_error",
         "is_published": true
       },
       {
-        "code_id": "DC-0113",
-        "code": "NAL-PRI-113",
-        "name": "Cost Discrepancy",
-        "deduction_type": "pricing_error",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0101",
-        "code": "NAL-PRO-101",
-        "name": "Ad Allowance",
+        "code_id": "DC-0092",
+        "code": "NAL-PRO-092",
+        "name": "Scan Rebate",
         "deduction_type": "promo_billback",
         "is_published": true
       },
       {
-        "code_id": "DC-0099",
-        "code": "NAL-SHO-099",
+        "code_id": "DC-0093",
+        "code": "NAL-PRO-093",
+        "name": "Promo Billback",
+        "deduction_type": "promo_billback",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0090",
+        "code": "NAL-SHO-090",
         "name": "Short Ship",
         "deduction_type": "short_ship",
         "is_published": true
       },
       {
-        "code_id": "DC-0100",
-        "code": "NAL-SHO-100",
+        "code_id": "DC-0091",
+        "code": "NAL-SHO-091",
         "name": "Under-delivery",
         "deduction_type": "short_ship",
-        "is_published": true
+        "is_published": false
       },
       {
-        "code_id": "DC-0102",
-        "code": "NAL-SLO-102",
+        "code_id": "DC-0094",
+        "code": "NAL-SLO-094",
         "name": "Shelf Placement",
         "deduction_type": "slotting",
-        "is_published": true
+        "is_published": false
       },
       {
-        "code_id": "DC-0108",
-        "code": "NAL-SPO-108",
-        "name": "Short Date",
+        "code_id": "DC-0099",
+        "code": "NAL-SPO-099",
+        "name": "Spoilage",
         "deduction_type": "spoilage",
         "is_published": true
       }
@@ -767,35 +739,21 @@
     "edi_requirements": [
       {
         "category": "ASN",
-        "requirement": "ASN must include SSCC-18",
-        "penalty_if_violated": "$500 per violation",
-        "is_verified": true,
-        "source_url": null
-      },
-      {
-        "category": "ASN",
         "requirement": "Must send ASN within 24hrs of ship",
-        "penalty_if_violated": "$250 chargeback",
-        "is_verified": true,
+        "penalty_if_violated": "vendor scorecard impact",
+        "is_verified": false,
         "source_url": null
       },
       {
         "category": "ASN",
         "requirement": "PO number required on ASN",
-        "penalty_if_violated": "vendor scorecard impact",
+        "penalty_if_violated": "$500 per violation",
         "is_verified": true,
         "source_url": null
       },
       {
         "category": "Documentation",
         "requirement": "Packing list required",
-        "penalty_if_violated": "vendor scorecard impact",
-        "is_verified": true,
-        "source_url": null
-      },
-      {
-        "category": "Documentation",
-        "requirement": "Certificate of insurance",
         "penalty_if_violated": null,
         "is_verified": true,
         "source_url": null
@@ -803,21 +761,21 @@
       {
         "category": "Label",
         "requirement": "GS1-128 label required",
-        "penalty_if_violated": "shipment refused",
-        "is_verified": false,
+        "penalty_if_violated": "$250 chargeback",
+        "is_verified": true,
         "source_url": null
       },
       {
-        "category": "Label",
-        "requirement": "Retailer-specific label template",
-        "penalty_if_violated": "$500 per violation",
-        "is_verified": false,
+        "category": "Routing",
+        "requirement": "MABD compliance",
+        "penalty_if_violated": "$250 chargeback",
+        "is_verified": true,
         "source_url": null
       },
       {
-        "category": "Label",
-        "requirement": "SSCC barcode on each pallet",
-        "penalty_if_violated": null,
+        "category": "Routing",
+        "requirement": "Appointment scheduling required",
+        "penalty_if_violated": "$250 chargeback",
         "is_verified": false,
         "source_url": null
       },
@@ -826,20 +784,6 @@
         "requirement": "Must use approved carriers",
         "penalty_if_violated": "shipment refused",
         "is_verified": true,
-        "source_url": null
-      },
-      {
-        "category": "Routing",
-        "requirement": "MABD compliance",
-        "penalty_if_violated": "$500 per violation",
-        "is_verified": false,
-        "source_url": null
-      },
-      {
-        "category": "Routing",
-        "requirement": "Appointment scheduling required",
-        "penalty_if_violated": "$250 chargeback",
-        "is_verified": false,
         "source_url": null
       }
     ]
@@ -858,279 +802,237 @@
         "evidence_required": [
           "invoice + ASN"
         ],
-        "typical_recovery_rate": 0.6026,
+        "typical_recovery_rate": 0.3272,
         "notes": null
       },
       "promo_billback": {
-        "dispute_window_days": 45,
-        "auto_deduct": false,
+        "dispute_window_days": 30,
+        "auto_deduct": true,
         "evidence_required": [
-          "pack photo"
+          "invoice + ASN"
         ],
-        "typical_recovery_rate": 0.2936,
+        "typical_recovery_rate": 0.2425,
         "notes": null
       },
       "slotting": {
-        "dispute_window_days": 60,
+        "dispute_window_days": 90,
         "auto_deduct": false,
         "evidence_required": [
-          "pack photo"
+          "BOL + POD"
         ],
-        "typical_recovery_rate": 0.4702,
+        "typical_recovery_rate": 0.2139,
         "notes": null
       },
       "late_delivery": {
         "dispute_window_days": 60,
-        "auto_deduct": true,
+        "auto_deduct": false,
         "evidence_required": [
-          "price confirmation"
+          "BOL + POD"
         ],
-        "typical_recovery_rate": 0.4577,
+        "typical_recovery_rate": 0.6068,
         "notes": null
       },
       "label_fine": {
-        "dispute_window_days": 90,
+        "dispute_window_days": 45,
         "auto_deduct": true,
         "evidence_required": [
-          "price confirmation"
+          "all"
         ],
-        "typical_recovery_rate": 0.7388,
+        "typical_recovery_rate": 0.4086,
         "notes": null
       },
       "pallet_fine": {
-        "dispute_window_days": 60,
-        "auto_deduct": false,
+        "dispute_window_days": 90,
+        "auto_deduct": true,
         "evidence_required": [
-          "price confirmation"
+          "all"
         ],
-        "typical_recovery_rate": 0.3724,
+        "typical_recovery_rate": 0.2038,
         "notes": null
       },
       "spoilage": {
         "dispute_window_days": 30,
         "auto_deduct": false,
         "evidence_required": [
-          "invoice + ASN"
+          "price confirmation"
         ],
-        "typical_recovery_rate": 0.2828,
+        "typical_recovery_rate": 0.6207,
         "notes": null
       },
       "damaged": {
         "dispute_window_days": 30,
         "auto_deduct": true,
         "evidence_required": [
-          "all"
+          "BOL + POD"
         ],
-        "typical_recovery_rate": 0.7109,
+        "typical_recovery_rate": 0.3827,
         "notes": null
       },
       "pricing_error": {
-        "dispute_window_days": 90,
-        "auto_deduct": true,
+        "dispute_window_days": 45,
+        "auto_deduct": false,
         "evidence_required": [
-          "invoice + ASN"
+          "price confirmation"
         ],
-        "typical_recovery_rate": 0.2677,
+        "typical_recovery_rate": 0.2517,
         "notes": null
       }
     },
     "codes": [
       {
-        "code_id": "DC-0077",
-        "code": "UTS-DAM-077",
+        "code_id": "DC-0067",
+        "code": "UTS-DAM-067",
+        "name": "Damaged Goods",
+        "deduction_type": "damaged",
+        "is_published": false
+      },
+      {
+        "code_id": "DC-0068",
+        "code": "UTS-DAM-068",
         "name": "Transit Damage",
         "deduction_type": "damaged",
         "is_published": true
       },
       {
-        "code_id": "DC-0078",
-        "code": "UTS-DAM-078",
+        "code_id": "DC-0069",
+        "code": "UTS-DAM-069",
         "name": "Warehouse Damage",
         "deduction_type": "damaged",
         "is_published": true
       },
       {
-        "code_id": "DC-0079",
-        "code": "UTS-DAM-079",
-        "name": "Damaged Goods",
-        "deduction_type": "damaged",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0069",
-        "code": "UTS-LAB-069",
+        "code_id": "DC-0060",
+        "code": "UTS-LAB-060",
         "name": "UPC Error",
         "deduction_type": "label_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0070",
-        "code": "UTS-LAB-070",
+        "code_id": "DC-0061",
+        "code": "UTS-LAB-061",
         "name": "Label Defect",
         "deduction_type": "label_fine",
-        "is_published": false
+        "is_published": true
       },
       {
-        "code_id": "DC-0071",
-        "code": "UTS-LAB-071",
+        "code_id": "DC-0062",
+        "code": "UTS-LAB-062",
         "name": "Label Non-Compliance",
         "deduction_type": "label_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0067",
-        "code": "UTS-LAT-067",
-        "name": "Late Delivery",
+        "code_id": "DC-0059",
+        "code": "UTS-LAT-059",
+        "name": "Appointment Miss",
         "deduction_type": "late_delivery",
         "is_published": true
       },
       {
-        "code_id": "DC-0068",
-        "code": "UTS-LAT-068",
-        "name": "MABD Violation",
-        "deduction_type": "late_delivery",
+        "code_id": "DC-0063",
+        "code": "UTS-PAL-063",
+        "name": "Pallet Overhang",
+        "deduction_type": "pallet_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0072",
-        "code": "UTS-PAL-072",
+        "code_id": "DC-0064",
+        "code": "UTS-PAL-064",
         "name": "Ti-Hi Error",
         "deduction_type": "pallet_fine",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0073",
-        "code": "UTS-PAL-073",
-        "name": "Pallet Violation",
-        "deduction_type": "pallet_fine",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0080",
-        "code": "UTS-PRI-080",
-        "name": "Cost Discrepancy",
-        "deduction_type": "pricing_error",
         "is_published": false
       },
       {
-        "code_id": "DC-0081",
-        "code": "UTS-PRI-081",
+        "code_id": "DC-0070",
+        "code": "UTS-PRI-070",
         "name": "Pricing Variance",
         "deduction_type": "pricing_error",
         "is_published": true
       },
       {
-        "code_id": "DC-0063",
-        "code": "UTS-PRO-063",
-        "name": "Ad Allowance",
+        "code_id": "DC-0071",
+        "code": "UTS-PRI-071",
+        "name": "Invoice Mismatch",
+        "deduction_type": "pricing_error",
+        "is_published": false
+      },
+      {
+        "code_id": "DC-0057",
+        "code": "UTS-PRO-057",
+        "name": "Promo Billback",
         "deduction_type": "promo_billback",
         "is_published": true
       },
       {
-        "code_id": "DC-0061",
-        "code": "UTS-SHO-061",
-        "name": "Short Ship",
+        "code_id": "DC-0056",
+        "code": "UTS-SHO-056",
+        "name": "Under-delivery",
         "deduction_type": "short_ship",
-        "is_published": true
+        "is_published": false
       },
       {
-        "code_id": "DC-0062",
-        "code": "UTS-SHO-062",
-        "name": "Quantity Variance",
-        "deduction_type": "short_ship",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0064",
-        "code": "UTS-SLO-064",
-        "name": "Slotting Fee",
-        "deduction_type": "slotting",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0065",
-        "code": "UTS-SLO-065",
+        "code_id": "DC-0058",
+        "code": "UTS-SLO-058",
         "name": "Shelf Placement",
         "deduction_type": "slotting",
         "is_published": true
       },
       {
-        "code_id": "DC-0066",
-        "code": "UTS-SLO-066",
-        "name": "New Item Fee",
-        "deduction_type": "slotting",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0074",
-        "code": "UTS-SPO-074",
-        "name": "Spoilage",
-        "deduction_type": "spoilage",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0075",
-        "code": "UTS-SPO-075",
-        "name": "Expired Product",
-        "deduction_type": "spoilage",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0076",
-        "code": "UTS-SPO-076",
+        "code_id": "DC-0065",
+        "code": "UTS-SPO-065",
         "name": "Short Date",
         "deduction_type": "spoilage",
         "is_published": true
+      },
+      {
+        "code_id": "DC-0066",
+        "code": "UTS-SPO-066",
+        "name": "Expired Product",
+        "deduction_type": "spoilage",
+        "is_published": false
       }
     ],
     "edi_requirements": [
       {
         "category": "ASN",
         "requirement": "ASN must include SSCC-18",
-        "penalty_if_violated": "vendor scorecard impact",
-        "is_verified": true,
-        "source_url": null
-      },
-      {
-        "category": "Documentation",
-        "requirement": "Packing list required",
-        "penalty_if_violated": "$500 per violation",
+        "penalty_if_violated": "$250 chargeback",
         "is_verified": false,
         "source_url": null
       },
       {
         "category": "Documentation",
-        "requirement": "Certificate of insurance",
-        "penalty_if_violated": "vendor scorecard impact",
-        "is_verified": true,
-        "source_url": null
-      },
-      {
-        "category": "Label",
-        "requirement": "Retailer-specific label template",
-        "penalty_if_violated": "$500 per violation",
-        "is_verified": true,
-        "source_url": null
-      },
-      {
-        "category": "Label",
-        "requirement": "SSCC barcode on each pallet",
+        "requirement": "BOL must accompany shipment",
         "penalty_if_violated": "shipment refused",
         "is_verified": true,
         "source_url": null
       },
       {
         "category": "Label",
-        "requirement": "GS1-128 label required",
-        "penalty_if_violated": "$250 chargeback",
-        "is_verified": false,
+        "requirement": "Retailer-specific label template",
+        "penalty_if_violated": null,
+        "is_verified": true,
+        "source_url": null
+      },
+      {
+        "category": "Label",
+        "requirement": "SSCC barcode on each pallet",
+        "penalty_if_violated": "$500 per violation",
+        "is_verified": true,
         "source_url": null
       },
       {
         "category": "Routing",
         "requirement": "Appointment scheduling required",
-        "penalty_if_violated": "vendor scorecard impact",
-        "is_verified": false,
+        "penalty_if_violated": "$500 per violation",
+        "is_verified": true,
+        "source_url": null
+      },
+      {
+        "category": "Routing",
+        "requirement": "MABD compliance",
+        "penalty_if_violated": "$500 per violation",
+        "is_verified": true,
         "source_url": null
       }
     ]
@@ -1145,98 +1047,91 @@
     "rules": {
       "short_ship": {
         "dispute_window_days": 90,
-        "auto_deduct": false,
+        "auto_deduct": true,
         "evidence_required": [
-          "all"
+          "BOL + POD"
         ],
-        "typical_recovery_rate": 0.5596,
+        "typical_recovery_rate": 0.5284,
         "notes": null
       },
       "promo_billback": {
         "dispute_window_days": 45,
-        "auto_deduct": false,
+        "auto_deduct": true,
         "evidence_required": [
-          "invoice + ASN"
+          "pack photo"
         ],
-        "typical_recovery_rate": 0.3587,
+        "typical_recovery_rate": 0.4534,
         "notes": null
       },
       "slotting": {
-        "dispute_window_days": 90,
-        "auto_deduct": false,
-        "evidence_required": [
-          "invoice + ASN"
-        ],
-        "typical_recovery_rate": 0.5867,
-        "notes": null
-      },
-      "late_delivery": {
         "dispute_window_days": 30,
         "auto_deduct": false,
         "evidence_required": [
-          "price confirmation"
+          "all"
         ],
-        "typical_recovery_rate": 0.7371,
+        "typical_recovery_rate": 0.5501,
+        "notes": null
+      },
+      "late_delivery": {
+        "dispute_window_days": 90,
+        "auto_deduct": false,
+        "evidence_required": [
+          "all"
+        ],
+        "typical_recovery_rate": 0.1594,
         "notes": null
       },
       "label_fine": {
         "dispute_window_days": 90,
-        "auto_deduct": false,
+        "auto_deduct": true,
         "evidence_required": [
-          "invoice + ASN"
+          "pack photo"
         ],
-        "typical_recovery_rate": 0.644,
+        "typical_recovery_rate": 0.4677,
         "notes": null
       },
       "pallet_fine": {
-        "dispute_window_days": 90,
-        "auto_deduct": false,
+        "dispute_window_days": 60,
+        "auto_deduct": true,
         "evidence_required": [
-          "BOL + POD"
+          "price confirmation"
         ],
-        "typical_recovery_rate": 0.3154,
+        "typical_recovery_rate": 0.6379,
         "notes": null
       },
       "spoilage": {
-        "dispute_window_days": 30,
-        "auto_deduct": false,
+        "dispute_window_days": 45,
+        "auto_deduct": true,
         "evidence_required": [
-          "BOL + POD"
+          "invoice + ASN"
         ],
-        "typical_recovery_rate": 0.4015,
+        "typical_recovery_rate": 0.2078,
         "notes": null
       },
       "damaged": {
         "dispute_window_days": 45,
         "auto_deduct": true,
         "evidence_required": [
-          "BOL + POD"
+          "pack photo"
         ],
-        "typical_recovery_rate": 0.2105,
+        "typical_recovery_rate": 0.4659,
         "notes": null
       },
       "pricing_error": {
-        "dispute_window_days": 90,
+        "dispute_window_days": 60,
         "auto_deduct": false,
         "evidence_required": [
-          "BOL + POD"
+          "price confirmation"
         ],
-        "typical_recovery_rate": 0.572,
+        "typical_recovery_rate": 0.1974,
         "notes": null
       }
     },
     "codes": [
       {
-        "code_id": "DC-0016",
-        "code": "ART-DAM-016",
-        "name": "Damaged Goods",
-        "deduction_type": "damaged",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0017",
-        "code": "ART-DAM-017",
-        "name": "Transit Damage",
+        "code_id": "DC-0018",
+        "code": "ART-DAM-018",
+        "name": "Warehouse Damage",
         "deduction_type": "damaged",
         "is_published": true
       },
@@ -1245,28 +1140,21 @@
         "code": "ART-LAB-010",
         "name": "Label Non-Compliance",
         "deduction_type": "label_fine",
-        "is_published": true
+        "is_published": false
       },
       {
         "code_id": "DC-0011",
         "code": "ART-LAB-011",
-        "name": "Label Defect",
+        "name": "UPC Error",
         "deduction_type": "label_fine",
         "is_published": true
       },
       {
         "code_id": "DC-0012",
         "code": "ART-LAB-012",
-        "name": "UPC Error",
+        "name": "Label Defect",
         "deduction_type": "label_fine",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0007",
-        "code": "ART-LAT-007",
-        "name": "MABD Violation",
-        "deduction_type": "late_delivery",
-        "is_published": true
+        "is_published": false
       },
       {
         "code_id": "DC-0008",
@@ -1278,34 +1166,41 @@
       {
         "code_id": "DC-0009",
         "code": "ART-LAT-009",
-        "name": "Late Delivery",
+        "name": "MABD Violation",
         "deduction_type": "late_delivery",
         "is_published": true
       },
       {
         "code_id": "DC-0013",
         "code": "ART-PAL-013",
+        "name": "Ti-Hi Error",
+        "deduction_type": "pallet_fine",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0014",
+        "code": "ART-PAL-014",
         "name": "Pallet Violation",
         "deduction_type": "pallet_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0018",
-        "code": "ART-PRI-018",
-        "name": "Pricing Variance",
+        "code_id": "DC-0015",
+        "code": "ART-PAL-015",
+        "name": "Pallet Overhang",
+        "deduction_type": "pallet_fine",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0019",
+        "code": "ART-PRI-019",
+        "name": "Invoice Mismatch",
         "deduction_type": "pricing_error",
         "is_published": true
       },
       {
-        "code_id": "DC-0002",
-        "code": "ART-PRO-002",
-        "name": "Promo Billback",
-        "deduction_type": "promo_billback",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0003",
-        "code": "ART-PRO-003",
+        "code_id": "DC-0004",
+        "code": "ART-PRO-004",
         "name": "Scan Rebate",
         "deduction_type": "promo_billback",
         "is_published": true
@@ -1318,37 +1213,51 @@
         "is_published": true
       },
       {
-        "code_id": "DC-0004",
-        "code": "ART-SLO-004",
-        "name": "Shelf Placement",
-        "deduction_type": "slotting",
+        "code_id": "DC-0002",
+        "code": "ART-SHO-002",
+        "name": "Under-delivery",
+        "deduction_type": "short_ship",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0003",
+        "code": "ART-SHO-003",
+        "name": "Short Ship",
+        "deduction_type": "short_ship",
         "is_published": true
       },
       {
         "code_id": "DC-0005",
         "code": "ART-SLO-005",
-        "name": "New Item Fee",
+        "name": "Slotting Fee",
         "deduction_type": "slotting",
         "is_published": true
       },
       {
         "code_id": "DC-0006",
         "code": "ART-SLO-006",
-        "name": "Slotting Fee",
+        "name": "New Item Fee",
         "deduction_type": "slotting",
         "is_published": true
       },
       {
-        "code_id": "DC-0014",
-        "code": "ART-SPO-014",
-        "name": "Short Date",
+        "code_id": "DC-0007",
+        "code": "ART-SLO-007",
+        "name": "Shelf Placement",
+        "deduction_type": "slotting",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0016",
+        "code": "ART-SPO-016",
+        "name": "Expired Product",
         "deduction_type": "spoilage",
         "is_published": true
       },
       {
-        "code_id": "DC-0015",
-        "code": "ART-SPO-015",
-        "name": "Expired Product",
+        "code_id": "DC-0017",
+        "code": "ART-SPO-017",
+        "name": "Spoilage",
         "deduction_type": "spoilage",
         "is_published": true
       }
@@ -1356,22 +1265,22 @@
     "edi_requirements": [
       {
         "category": "ASN",
+        "requirement": "PO number required on ASN",
+        "penalty_if_violated": "vendor scorecard impact",
+        "is_verified": true,
+        "source_url": null
+      },
+      {
+        "category": "ASN",
         "requirement": "ASN must include SSCC-18",
-        "penalty_if_violated": "$250 chargeback",
-        "is_verified": false,
+        "penalty_if_violated": "$500 per violation",
+        "is_verified": true,
         "source_url": null
       },
       {
         "category": "ASN",
         "requirement": "Must send ASN within 24hrs of ship",
-        "penalty_if_violated": null,
-        "is_verified": false,
-        "source_url": null
-      },
-      {
-        "category": "Documentation",
-        "requirement": "Certificate of insurance",
-        "penalty_if_violated": "$500 per violation",
+        "penalty_if_violated": "vendor scorecard impact",
         "is_verified": false,
         "source_url": null
       },
@@ -1379,27 +1288,48 @@
         "category": "Documentation",
         "requirement": "BOL must accompany shipment",
         "penalty_if_violated": "$500 per violation",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "Documentation",
+        "requirement": "Certificate of insurance",
+        "penalty_if_violated": "vendor scorecard impact",
         "is_verified": true,
         "source_url": null
       },
       {
         "category": "Label",
         "requirement": "SSCC barcode on each pallet",
-        "penalty_if_violated": null,
+        "penalty_if_violated": "$250 chargeback",
         "is_verified": true,
         "source_url": null
       },
       {
         "category": "Label",
         "requirement": "Retailer-specific label template",
-        "penalty_if_violated": "shipment refused",
+        "penalty_if_violated": null,
+        "is_verified": true,
+        "source_url": null
+      },
+      {
+        "category": "Label",
+        "requirement": "GS1-128 label required",
+        "penalty_if_violated": "$250 chargeback",
+        "is_verified": true,
+        "source_url": null
+      },
+      {
+        "category": "Routing",
+        "requirement": "MABD compliance",
+        "penalty_if_violated": "$250 chargeback",
         "is_verified": false,
         "source_url": null
       },
       {
         "category": "Routing",
-        "requirement": "Must use approved carriers",
-        "penalty_if_violated": null,
+        "requirement": "Appointment scheduling required",
+        "penalty_if_violated": "shipment refused",
         "is_verified": true,
         "source_url": null
       }
@@ -1414,269 +1344,283 @@
     "notes": null,
     "rules": {
       "short_ship": {
-        "dispute_window_days": 90,
-        "auto_deduct": true,
-        "evidence_required": [
-          "invoice + ASN"
-        ],
-        "typical_recovery_rate": 0.4728,
-        "notes": null
-      },
-      "promo_billback": {
         "dispute_window_days": 45,
         "auto_deduct": false,
         "evidence_required": [
           "price confirmation"
         ],
-        "typical_recovery_rate": 0.5745,
+        "typical_recovery_rate": 0.6014,
         "notes": null
       },
-      "slotting": {
+      "promo_billback": {
         "dispute_window_days": 30,
-        "auto_deduct": false,
+        "auto_deduct": true,
         "evidence_required": [
           "all"
         ],
-        "typical_recovery_rate": 0.7307,
+        "typical_recovery_rate": 0.4884,
+        "notes": null
+      },
+      "slotting": {
+        "dispute_window_days": 90,
+        "auto_deduct": false,
+        "evidence_required": [
+          "price confirmation"
+        ],
+        "typical_recovery_rate": 0.4743,
         "notes": null
       },
       "late_delivery": {
         "dispute_window_days": 45,
         "auto_deduct": false,
         "evidence_required": [
-          "pack photo"
+          "BOL + POD"
         ],
-        "typical_recovery_rate": 0.303,
+        "typical_recovery_rate": 0.5636,
         "notes": null
       },
       "label_fine": {
-        "dispute_window_days": 30,
-        "auto_deduct": false,
+        "dispute_window_days": 60,
+        "auto_deduct": true,
         "evidence_required": [
           "BOL + POD"
         ],
-        "typical_recovery_rate": 0.6583,
+        "typical_recovery_rate": 0.4123,
         "notes": null
       },
       "pallet_fine": {
-        "dispute_window_days": 45,
-        "auto_deduct": true,
-        "evidence_required": [
-          "all"
-        ],
-        "typical_recovery_rate": 0.3763,
-        "notes": null
-      },
-      "spoilage": {
-        "dispute_window_days": 30,
+        "dispute_window_days": 60,
         "auto_deduct": false,
         "evidence_required": [
           "all"
         ],
-        "typical_recovery_rate": 0.2629,
+        "typical_recovery_rate": 0.5183,
         "notes": null
       },
-      "damaged": {
-        "dispute_window_days": 45,
+      "spoilage": {
+        "dispute_window_days": 90,
         "auto_deduct": false,
         "evidence_required": [
           "pack photo"
         ],
-        "typical_recovery_rate": 0.6717,
+        "typical_recovery_rate": 0.3458,
+        "notes": null
+      },
+      "damaged": {
+        "dispute_window_days": 90,
+        "auto_deduct": false,
+        "evidence_required": [
+          "price confirmation"
+        ],
+        "typical_recovery_rate": 0.3635,
         "notes": null
       },
       "pricing_error": {
-        "dispute_window_days": 60,
-        "auto_deduct": false,
+        "dispute_window_days": 90,
+        "auto_deduct": true,
         "evidence_required": [
-          "invoice + ASN"
+          "price confirmation"
         ],
-        "typical_recovery_rate": 0.1592,
+        "typical_recovery_rate": 0.5015,
         "notes": null
       }
     },
     "codes": [
       {
-        "code_id": "DC-0056",
-        "code": "ODS-DAM-056",
-        "name": "Damaged Goods",
+        "code_id": "DC-0051",
+        "code": "ODS-DAM-051",
+        "name": "Warehouse Damage",
         "deduction_type": "damaged",
-        "is_published": true
+        "is_published": false
       },
       {
-        "code_id": "DC-0057",
-        "code": "ODS-DAM-057",
+        "code_id": "DC-0052",
+        "code": "ODS-DAM-052",
         "name": "Transit Damage",
         "deduction_type": "damaged",
         "is_published": true
       },
       {
-        "code_id": "DC-0058",
-        "code": "ODS-DAM-058",
-        "name": "Warehouse Damage",
-        "deduction_type": "damaged",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0049",
-        "code": "ODS-LAB-049",
-        "name": "Label Defect",
-        "deduction_type": "label_fine",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0050",
-        "code": "ODS-LAB-050",
-        "name": "Label Non-Compliance",
-        "deduction_type": "label_fine",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0051",
-        "code": "ODS-LAB-051",
+        "code_id": "DC-0045",
+        "code": "ODS-LAB-045",
         "name": "UPC Error",
         "deduction_type": "label_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0047",
-        "code": "ODS-LAT-047",
-        "name": "MABD Violation",
-        "deduction_type": "late_delivery",
+        "code_id": "DC-0046",
+        "code": "ODS-LAB-046",
+        "name": "Label Defect",
+        "deduction_type": "label_fine",
         "is_published": true
       },
       {
-        "code_id": "DC-0048",
-        "code": "ODS-LAT-048",
+        "code_id": "DC-0047",
+        "code": "ODS-LAB-047",
+        "name": "Label Non-Compliance",
+        "deduction_type": "label_fine",
+        "is_published": false
+      },
+      {
+        "code_id": "DC-0043",
+        "code": "ODS-LAT-043",
         "name": "Late Delivery",
         "deduction_type": "late_delivery",
         "is_published": true
       },
       {
-        "code_id": "DC-0052",
-        "code": "ODS-PAL-052",
+        "code_id": "DC-0044",
+        "code": "ODS-LAT-044",
+        "name": "Appointment Miss",
+        "deduction_type": "late_delivery",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0048",
+        "code": "ODS-PAL-048",
         "name": "Pallet Overhang",
         "deduction_type": "pallet_fine",
-        "is_published": false
+        "is_published": true
       },
       {
         "code_id": "DC-0053",
-        "code": "ODS-PAL-053",
-        "name": "Pallet Violation",
-        "deduction_type": "pallet_fine",
-        "is_published": true
+        "code": "ODS-PRI-053",
+        "name": "Pricing Variance",
+        "deduction_type": "pricing_error",
+        "is_published": false
       },
       {
         "code_id": "DC-0054",
-        "code": "ODS-PAL-054",
-        "name": "Ti-Hi Error",
-        "deduction_type": "pallet_fine",
-        "is_published": true
+        "code": "ODS-PRI-054",
+        "name": "Cost Discrepancy",
+        "deduction_type": "pricing_error",
+        "is_published": false
       },
       {
-        "code_id": "DC-0059",
-        "code": "ODS-PRI-059",
+        "code_id": "DC-0055",
+        "code": "ODS-PRI-055",
         "name": "Invoice Mismatch",
         "deduction_type": "pricing_error",
-        "is_published": true
+        "is_published": false
       },
       {
-        "code_id": "DC-0060",
-        "code": "ODS-PRI-060",
-        "name": "Pricing Variance",
-        "deduction_type": "pricing_error",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0042",
-        "code": "ODS-PRO-042",
-        "name": "Scan Rebate",
+        "code_id": "DC-0039",
+        "code": "ODS-PRO-039",
+        "name": "Ad Allowance",
         "deduction_type": "promo_billback",
         "is_published": true
       },
       {
-        "code_id": "DC-0043",
-        "code": "ODS-PRO-043",
-        "name": "Promo Billback",
-        "deduction_type": "promo_billback",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0040",
-        "code": "ODS-SHO-040",
+        "code_id": "DC-0037",
+        "code": "ODS-SHO-037",
         "name": "Under-delivery",
         "deduction_type": "short_ship",
         "is_published": true
       },
       {
-        "code_id": "DC-0041",
-        "code": "ODS-SHO-041",
-        "name": "Quantity Variance",
+        "code_id": "DC-0038",
+        "code": "ODS-SHO-038",
+        "name": "Short Ship",
         "deduction_type": "short_ship",
         "is_published": true
       },
       {
-        "code_id": "DC-0044",
-        "code": "ODS-SLO-044",
-        "name": "New Item Fee",
-        "deduction_type": "slotting",
-        "is_published": true
-      },
-      {
-        "code_id": "DC-0045",
-        "code": "ODS-SLO-045",
+        "code_id": "DC-0040",
+        "code": "ODS-SLO-040",
         "name": "Slotting Fee",
         "deduction_type": "slotting",
         "is_published": true
       },
       {
-        "code_id": "DC-0046",
-        "code": "ODS-SLO-046",
-        "name": "Shelf Placement",
+        "code_id": "DC-0041",
+        "code": "ODS-SLO-041",
+        "name": "New Item Fee",
         "deduction_type": "slotting",
         "is_published": true
       },
       {
-        "code_id": "DC-0055",
-        "code": "ODS-SPO-055",
+        "code_id": "DC-0042",
+        "code": "ODS-SLO-042",
+        "name": "Shelf Placement",
+        "deduction_type": "slotting",
+        "is_published": false
+      },
+      {
+        "code_id": "DC-0049",
+        "code": "ODS-SPO-049",
+        "name": "Expired Product",
+        "deduction_type": "spoilage",
+        "is_published": true
+      },
+      {
+        "code_id": "DC-0050",
+        "code": "ODS-SPO-050",
         "name": "Spoilage",
         "deduction_type": "spoilage",
-        "is_published": false
+        "is_published": true
       }
     ],
     "edi_requirements": [
       {
         "category": "ASN",
-        "requirement": "PO number required on ASN",
-        "penalty_if_violated": "shipment refused",
+        "requirement": "ASN must include SSCC-18",
+        "penalty_if_violated": "$250 chargeback",
         "is_verified": false,
         "source_url": null
       },
       {
+        "category": "ASN",
+        "requirement": "PO number required on ASN",
+        "penalty_if_violated": "shipment refused",
+        "is_verified": true,
+        "source_url": null
+      },
+      {
+        "category": "ASN",
+        "requirement": "Must send ASN within 24hrs of ship",
+        "penalty_if_violated": "$500 per violation",
+        "is_verified": true,
+        "source_url": null
+      },
+      {
         "category": "Documentation",
-        "requirement": "Certificate of insurance",
+        "requirement": "Packing list required",
+        "penalty_if_violated": "shipment refused",
+        "is_verified": true,
+        "source_url": null
+      },
+      {
+        "category": "Documentation",
+        "requirement": "BOL must accompany shipment",
+        "penalty_if_violated": "$250 chargeback",
+        "is_verified": false,
+        "source_url": null
+      },
+      {
+        "category": "Label",
+        "requirement": "SSCC barcode on each pallet",
+        "penalty_if_violated": "$250 chargeback",
+        "is_verified": true,
+        "source_url": null
+      },
+      {
+        "category": "Label",
+        "requirement": "Retailer-specific label template",
         "penalty_if_violated": "vendor scorecard impact",
         "is_verified": true,
         "source_url": null
       },
       {
         "category": "Label",
-        "requirement": "SSCC barcode on each pallet",
-        "penalty_if_violated": "vendor scorecard impact",
-        "is_verified": false,
-        "source_url": null
-      },
-      {
-        "category": "Label",
-        "requirement": "Retailer-specific label template",
-        "penalty_if_violated": "shipment refused",
-        "is_verified": false,
+        "requirement": "GS1-128 label required",
+        "penalty_if_violated": "$500 per violation",
+        "is_verified": true,
         "source_url": null
       },
       {
         "category": "Routing",
         "requirement": "Must use approved carriers",
-        "penalty_if_violated": null,
+        "penalty_if_violated": "$500 per violation",
         "is_verified": true,
         "source_url": null
       }
