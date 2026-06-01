@@ -6,7 +6,7 @@ retailer deductions through five compounding operational failures
 and missed dispute windows -- and shows what is recoverable, what is
 preventable, and what each fix is worth.
 
-**[View the live tool →](https://retailer-deduction-recovery.pages.dev)**
+**[View the live tool →](https://deductions.lailarallc.com)**
 
 ## What this is
 
