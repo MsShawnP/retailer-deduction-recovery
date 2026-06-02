@@ -118,8 +118,8 @@ Each entry:
 - **Scope:** synthetic data generation
 
 ### 2026-05-10 — No Cinderhaven products require cold chain shipping
-- **Why:** All 50 SKUs are shelf-stable (Artisan Sauces, Specialty
-  Condiments, Pantry Staples). Spoilage deductions reference
+- **Why:** All 50 SKUs are shelf-stable (Artisan Sauces, Pantry
+  Staples, Specialty Condiments, Dried Goods, Snack Bites). Spoilage deductions reference
   shelf-life expiration and heat exposure, not cold-chain rejection.
   Temperature logs are not relevant evidence for Cinderhaven
   shipments.
