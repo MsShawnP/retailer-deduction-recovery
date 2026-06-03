@@ -536,7 +536,7 @@ off.
 ## 2026-05-08 15:56
 
 **What changed:** Phase 4 task 3 — deployed to Netlify, live at
-**https://retailer-deduction-recovery.netlify.app/**. Plus a Sankey
+**https://deductions.lailarallc.com/**. Plus a Sankey
 label-contrast fix riding along — dollar amounts on the darker teal
 bands now meet WCAG AA contrast.
 
@@ -741,7 +741,7 @@ JSON so git matches deployed state. Documented Fly.io Postgres as
 SSOT in CLAUDE.md and DECISIONS.md; marked local SQLite as stale
 reference.
 
-**State:** App live at retailer-deduction-recovery.pages.dev. JSON
+**State:** App live at deductions.lailarallc.com. JSON
 reconciled against Postgres. 0 npm vulnerabilities. Documentation
 reflects actual data pipeline (Fly.io Postgres, not SQLite). 4
 commits pushed to origin. Still blocked on friend preview.
