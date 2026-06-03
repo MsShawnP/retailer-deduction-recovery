@@ -66,7 +66,7 @@ switch chapters automatically.
   synthetic deduction data; a JSON export script transforms it into
   three static files the app consumes (summary, deductions, retailers)
 - **Data source** -- extends the
-  [cinderhaven-data](https://github.com/MsShawnP/cinderhaven-data)
+  cinderhaven-data
   shared database with 13 deduction-specific tables
 - **Hosting** -- Cloudflare Pages (static site, no backend)
 - **Testing** -- Vitest + React Testing Library (59 unit tests
@@ -110,7 +110,7 @@ Opens at `http://localhost:5173`. The app loads JSON from
 `frontend/public/json/`; no backend or database connection required.
 
 To regenerate the dataset from scratch, run the build pipeline in the
-[cinderhaven-data](https://github.com/MsShawnP/cinderhaven-data)
+cinderhaven-data
 repo, then:
 
 ```
