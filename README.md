@@ -94,6 +94,10 @@ frontend/           React app (Vite)
     origin/         Origin clustering
 ```
 
+## Data contract
+
+Canonical Cinderhaven conformance — 50 SKUs across 5 product lines and 6 contracted retailers.
+
 ## Run locally
 
 ```
