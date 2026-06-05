@@ -305,7 +305,7 @@ retailers ──┬─< retailer_rules
 
 ## Volume targets
 
-For the 18-month window (Dec 2024 → May 2026), aiming for:
+For the 36-month window (Jan 2024 → Jan 2027), aiming for:
 
 | Table | Target rows | Notes |
 |---|---|---|
@@ -316,9 +316,9 @@ For the 18-month window (Dec 2024 → May 2026), aiming for:
 | deductions | 3,000–6,000 | Roughly 35–55% of orders generate ≥1 deduction; deducted orders average ~2 deductions (short ship + label fine, etc.) |
 | disputes | 1,500–3,600 | Cinderhaven only files disputes when someone has time → 50–60% of deductions get a filing attempt |
 | dispute_evidence | 3,000–10,000 | 1–3 evidence items per dispute |
-| remittances | 200–400 | Weekly to biweekly per retailer × 18 months |
+| remittances | 200–400 | Weekly to biweekly per retailer × 36 months |
 | edi_requirements | 30–50 | 4–8 requirements per retailer |
-| post_audit_claims | 30–80 | Walmart APL + KeHE pass-throughs over 18 months |
+| post_audit_claims | 30–80 | Walmart APL + KeHE pass-throughs over 36 months |
 | retailer_rules | ~50 | 7 retailers × ~7 deduction types |
 | deduction_codes | 30–60 | Walmart 12, KeHE 8, others inferred placeholders |
 
