@@ -60,6 +60,17 @@ switch chapters automatically.
 | Retailer scorecard | Per-retailer comparison: deduction volume, recovery rate, deadline strictness, patterns |
 | Origin clustering | Deductions grouped by warehouse, packing line, carrier, and label decision |
 
+## Data Contract
+
+This tool uses a subset of the Cinderhaven canonical dataset, scoped to deduction-generating channels:
+
+- **50 SKUs** across 5 product lines (Artisan Sauces, Pantry Staples, Specialty Condiments, Dried Goods, Snack Bites)
+- **Retailers in scope:** Walmart, Costco, Whole Foods, and Regional Group (channels with documented deduction processes)
+- **Distributors in scope:** UNFI, KeHE (channels with documented deduction processes)
+- **Not in scope:** Sprouts, Kroger, DPI Northwest, Shopify DTC (no deduction data modelled for these channels)
+
+Canonical reference: 6 retailers, 3 distributors, 1 DTC. This tool intentionally covers the subset where deduction processes are modelled.
+
 ## Tech stack
 
 - **Frontend** -- React 19 (Vite), TypeScript, D3 + d3-sankey for
