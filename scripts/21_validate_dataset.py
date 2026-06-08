@@ -297,8 +297,8 @@ def main() -> int:
 
     # ===== Date ranges =====
     print("\nDate ranges:")
-    expected_min = date(2024, 11, 1)
-    expected_max = date(2026, 9, 30)
+    expected_min = date(2023, 11, 1)
+    expected_max = date(2025, 9, 30)
     deduction_min = cur.execute("SELECT MIN(deduction_date) FROM int_all_deductions").fetchone()[0]
     deduction_max = cur.execute("SELECT MAX(deduction_date) FROM int_all_deductions").fetchone()[0]
     if expected_min <= deduction_min and deduction_max <= expected_max:
