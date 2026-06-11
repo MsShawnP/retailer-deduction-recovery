@@ -123,6 +123,14 @@ export default function App() {
   const kpiDisputedCount = filteredKpis?.disputedCount ?? totals.disputes_filed;
 
   return (
+    <div className="lailara-page">
+      <header className="lailara-header">
+        <nav className="lailara-nav-inner">
+          <a href="https://lailarallc.com" className="lailara-wordmark" target="_blank" rel="noopener noreferrer">Lailara LLC</a>
+          <span className="lailara-tool-name">Retailer Deduction Recovery</span>
+        </nav>
+      </header>
+      <main className="lailara-main">
     <div className="app">
       <header>
         <h1>Cinderhaven Provisions — Retailer Deductions</h1>
@@ -280,6 +288,14 @@ export default function App() {
           />
         </>
       )}
+    </div>
+      </main>
+      <footer className="lailara-footer">
+        <div className="lailara-footer-inner">
+          <p>Built by <a href="https://lailarallc.com" target="_blank" rel="noopener noreferrer">Lailara LLC</a></p>
+          <p className="lailara-footer-note">Data: Cinderhaven Provisions synthetic dataset.</p>
+        </div>
+      </footer>
     </div>
   );
 }
