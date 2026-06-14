@@ -84,9 +84,9 @@ export const SLOTTING_TERMINAL_LABEL = "Not disputable — negotiated cost";
 export const DEMO_DATE = new Date("2026-05-31");
 
 export const WIN_PROB: Record<string, number> = {
-  digital_complete: 0.65,
-  digital_partial: 0.35,
-  handwritten_only: 0.12,
+  digital_complete: 0.644,
+  digital_partial: 0.271,
+  handwritten_only: 0.142,
   none: 0.05,
 };
 
