@@ -52,7 +52,7 @@ switch chapters automatically.
 | Sankey flow | All deductions split by type, dispute readiness, and outcome; click to zoom |
 | Deduction explorer | Six-card drill-down: the deduction, peer context, root cause, evidence quality, accessibility, timeliness |
 | Causation trace | One order's chronological chain: PO, pack, ship, delivery, deduction, dispute, outcome |
-| Recovery simulation | Toggle five operational fixes on/off; watch recovery rate shift from ~16% to 65% |
+| Recovery simulation | Toggle five operational fixes on/off. The company recovered roughly 16% of deduction dollars. Of the dollars actually contested, the win rate sat at 42%. With five evidence-quality fixes, that win rate rises to 65%. |
 | Cost-to-dispute triage | Per-deduction expected recovery vs. labour cost; fight / marginal / write-off buckets |
 | Dispute builder | Evidence readiness per retailer's rules: what exists, what is missing, what is inferable |
 | Timeline pressure | Deductions mapped against retailer-specific dispute deadlines; expired dollar exposure |
