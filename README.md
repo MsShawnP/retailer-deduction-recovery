@@ -17,7 +17,7 @@ scale. Staff is lean, disputes happen whenever someone can get to
 them, and deductions are treated as a cost of doing business rather
 than a fixable operational problem.
 
-This tool takes a $1.65M backlog of unresolved deductions and makes
+This tool takes a $1.59M backlog across 22,425 deductions and makes
 the problem visible. It traces each deduction from its type through
 root cause, evidence quality, evidence accessibility, and dispute
 timeliness to its outcome. Ten connected views let a user explore
@@ -139,7 +139,7 @@ distributions and relationships are intact.
 All data is synthetic. Cinderhaven Provisions is a fictional company.
 Retailer dispute processes, deadlines, and deduction codes are
 modelled on publicly documented policies but may not reflect current
-terms. The dataset contains ~15,900 deductions ($1.65M) across nine
+terms. The dataset contains ~15,900 deductions ($1.59M) across nine
 deduction types: short ship, labelling noncompliance, pallet
 noncompliance, damaged product, late delivery, promo disputes,
 vague/undecodable, spoilage, and slotting (negotiated,
