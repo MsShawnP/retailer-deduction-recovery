@@ -56,7 +56,7 @@ switch chapters automatically.
 | Cost-to-dispute triage | Per-deduction expected recovery vs. labour cost; fight / marginal / write-off buckets |
 | Dispute builder | Evidence readiness per retailer's rules: what exists, what is missing, what is inferable |
 | Timeline pressure | Deductions mapped against retailer-specific dispute deadlines; expired dollar exposure |
-| Post-audit risk | Forward-looking clawback exposure ($861K) by retailer and evidence quality |
+| Post-audit risk | Forward-looking clawback exposure ($974K in deductions went undisputed) by retailer and evidence quality |
 | Retailer scorecard | Per-retailer comparison: deduction volume, recovery rate, deadline strictness, patterns |
 | Origin clustering | Deductions grouped by warehouse, packing line, carrier, and label decision |
 
@@ -139,7 +139,7 @@ distributions and relationships are intact.
 All data is synthetic. Cinderhaven Provisions is a fictional company.
 Retailer dispute processes, deadlines, and deduction codes are
 modelled on publicly documented policies but may not reflect current
-terms. The dataset contains ~15,900 deductions ($1.59M) across nine
+terms. The dataset contains ~22,425 deductions ($1.59M) across nine
 deduction types: short ship, labelling noncompliance, pallet
 noncompliance, damaged product, late delivery, promo disputes,
 vague/undecodable, spoilage, and slotting (negotiated,
