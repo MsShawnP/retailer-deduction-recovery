@@ -176,9 +176,9 @@
 }
 
 .cost-shift {
-  background: var(--surface-success);
-  border: 1px solid var(--accent-green);
-  border-left-width: 3px;
+  background: var(--panel);
+  border: none;
+  border-left: 4px solid var(--accent-green);
   padding: 12px 18px;
   margin-bottom: 18px;
   font-size: 15px;

@@ -91,7 +91,8 @@
 
 .explorer-card {
   background: var(--panel);
-  border: 1px solid var(--rule);
+  border: none;
+  border-left: 4px solid var(--accent-red);
   padding: 18px 20px;
 }
 

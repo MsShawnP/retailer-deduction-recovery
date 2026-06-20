@@ -146,8 +146,9 @@
 }
 
 .audit-stat {
-  background: var(--surface);
-  border: 1px solid var(--rule);
+  background: var(--panel);
+  border: none;
+  border-left: 4px solid var(--accent-red);
   padding: 12px 14px;
 }
 

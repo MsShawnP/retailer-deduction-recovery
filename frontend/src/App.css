@@ -108,7 +108,8 @@ h2 {
 
 .kpi {
   background: var(--panel);
-  border: 1px solid var(--rule);
+  border: none;
+  border-left: 4px solid var(--accent-red);
   padding: 16px 18px;
   position: relative;
 }
@@ -132,6 +133,7 @@ h2 {
   font-family: var(--serif);
   line-height: 1.15;
   letter-spacing: -0.02em;
+  color: var(--accent-red);
 }
 
 .kpi-sub {
