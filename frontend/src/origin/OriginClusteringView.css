@@ -107,7 +107,7 @@
 
 .origin-cluster-table tr.active {
   background: var(--surface-danger);
-  outline: 2px solid var(--accent-red);
+  outline: 2px solid var(--ink);
   outline-offset: -2px;
 }
 

@@ -56,8 +56,8 @@
 }
 
 .builder-nav button:focus {
-  outline: 2px solid var(--accent-red);
-  outline-offset: 1px;
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .builder-filter {

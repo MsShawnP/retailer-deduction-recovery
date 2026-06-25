@@ -97,6 +97,7 @@ h2 {
   color: var(--ink-soft);
   line-height: 1.55;
   margin: -6px 0 18px;
+  max-width: 660px;
 }
 
 .kpi-row {
@@ -232,12 +233,12 @@ tr:last-child td { border-bottom: 0; }
 .filtered-tag {
   margin-left: 12px;
   padding: 3px 10px;
-  background: var(--accent-red);
-  color: #fff;
+  background: var(--surface-danger);
+  color: var(--accent-red);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 500;
+  font-weight: 700;
   vertical-align: middle;
   border-radius: 2px;
 }
@@ -332,8 +333,8 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .time-range-custom input[type="date"]:focus {
-  outline: 2px solid var(--accent-red);
-  outline-offset: 1px;
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .time-range-arrow {
@@ -361,8 +362,8 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .type-selector select:focus {
-  outline: 2px solid var(--accent-red);
-  outline-offset: 1px;
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .chapter-nav {
@@ -412,7 +413,7 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .chapter-tab.active .chapter-num {
-  background: var(--accent-red);
+  background: var(--accent-blue);
   color: #fff;
 }
 
