@@ -72,6 +72,74 @@ export default function CausationTraceView({
     onChange(sorted[Math.floor(Math.random() * total)].deduction_id);
   const clear = () => onChange(null);
 
+  if (!current.order && !current.shipment && !current.pack_record) {
+    return (
+      <section className="trace">
+        <header className="trace-header">
+          <div>
+            <h2>Causation trace</h2>
+            <p className="section-description">
+              Choose an order and see its full timeline from left to right: the
+              purchase order, how it was packed, what label was used, how it
+              shipped, what the retailer received, what deduction was taken,
+              whether a dispute was attempted, and the final outcome. Each step
+              shows what actually happened and flags where things went wrong.
+              This is different from the explorer — the explorer shows one
+              deduction's six failure layers in parallel, while this view shows
+              one order's life sequentially.
+            </p>
+            <p className="trace-context">
+              Trace <strong>{currentIdx + 1}</strong> of{" "}
+              <strong>{formatCount(total)}</strong> in the current cohort.
+            </p>
+          </div>
+          <div className="trace-nav">
+            <button onClick={goPrev} aria-label="Previous trace">
+              ← Prev
+            </button>
+            <button onClick={goRandom}>Random</button>
+            <button onClick={goNext} aria-label="Next trace">
+              Next →
+            </button>
+            <button
+              onClick={clear}
+              className="trace-clear"
+              aria-label="Clear trace"
+              title="Clear trace"
+            >
+              ×
+            </button>
+          </div>
+        </header>
+
+        <div className="trace-summary">
+          <span className="trace-summary-id">{current.deduction_id}</span>
+          <span className="trace-sep">·</span>
+          <span>{current.retailer.name}</span>
+          <span className="trace-sep">·</span>
+          <span className="trace-summary-type">
+            {current.deduction_type.replace(/_/g, " ")}
+          </span>
+          <span className="trace-sep">·</span>
+          <span className="trace-summary-amt">
+            {formatDollars(current.amount)}
+          </span>
+        </div>
+
+        <div className="trace-empty">
+          <p>
+            <strong>{current.deduction_id}</strong> has no linked order,
+            shipment, or pack record — there is no supply-chain path to
+            trace. This deduction was issued without a PO-to-delivery chain
+            in the system. Use <strong>← Prev</strong> or{" "}
+            <strong>Next →</strong> to find a deduction with a traceable
+            order.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
   const events = buildEvents(current);
 
   return (
