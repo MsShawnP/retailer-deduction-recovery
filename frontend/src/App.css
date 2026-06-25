@@ -97,7 +97,6 @@ h2 {
   color: var(--ink-soft);
   line-height: 1.55;
   margin: -6px 0 18px;
-  max-width: 660px;
 }
 
 .kpi-row {
