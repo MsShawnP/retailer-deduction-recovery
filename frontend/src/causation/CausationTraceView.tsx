@@ -128,12 +128,10 @@ export default function CausationTraceView({
 
         <div className="trace-empty">
           <p>
-            <strong>{current.deduction_id}</strong> has no linked order,
-            shipment, or pack record — there is no supply-chain path to
-            trace. This deduction was issued without a PO-to-delivery chain
-            in the system. Use <strong>← Prev</strong> or{" "}
-            <strong>Next →</strong> to find a deduction with a traceable
-            order.
+            No order, shipment, or pack records are linked to this
+            deduction — the causation chain cannot be reconstructed.
+            Use <strong>← Prev</strong> or <strong>Next →</strong> to
+            find a deduction with a traceable order.
           </p>
         </div>
       </section>

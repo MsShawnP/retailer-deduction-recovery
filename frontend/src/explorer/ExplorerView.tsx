@@ -93,7 +93,7 @@ export default function ExplorerView({
           <button onClick={goPrev} aria-label="Previous deduction">← Prev</button>
           <button onClick={goRandom}>Random</button>
           <button onClick={goNext} aria-label="Next deduction">Next →</button>
-          {onTrace && (
+          {onTrace && current.order && (
             <button
               onClick={() => onTrace(current.deduction_id)}
               className={

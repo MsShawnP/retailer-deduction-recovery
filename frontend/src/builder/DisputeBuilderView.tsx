@@ -505,14 +505,16 @@ export default function DisputeBuilderView({
                 : "Without digital pack records, this deduction cannot be defended on its current evidence."}
             </p>
           )}
-          <div className="builder-actions">
-            <button
-              className="builder-action-btn"
-              onClick={() => onTrace(item.d.deduction_id)}
-            >
-              View causation trace →
-            </button>
-          </div>
+          {item.d.order && (
+            <div className="builder-actions">
+              <button
+                className="builder-action-btn"
+                onClick={() => onTrace(item.d.deduction_id)}
+              >
+                View causation trace →
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
