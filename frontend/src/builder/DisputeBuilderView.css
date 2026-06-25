@@ -152,8 +152,8 @@
 }
 
 .builder-readiness-not_disputable {
-  background: var(--accent-red);
-  color: #fff;
+  background: var(--surface-danger);
+  color: var(--accent-red);
 }
 
 .builder-grid {
