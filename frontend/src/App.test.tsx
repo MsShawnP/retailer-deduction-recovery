@@ -122,9 +122,12 @@ vi.mock("./data", () => ({
 
 import App from "./App";
 
+function getChapterNav() {
+  return within(document.querySelector(".chapter-nav") as HTMLElement);
+}
+
 function clickTab(label: RegExp) {
-  const nav = screen.getByRole("navigation");
-  return within(nav).getByText(label);
+  return getChapterNav().getByText(label);
 }
 
 async function renderApp() {
@@ -139,8 +142,7 @@ async function renderApp() {
 describe("App chapter navigation", () => {
   it("defaults to chapter 1 on load", async () => {
     await renderApp();
-    const nav = screen.getByRole("navigation");
-    const activeTab = within(nav).getByText(/The Problem/).closest("button")!;
+    const activeTab = getChapterNav().getByText(/The Problem/).closest("button")!;
     expect(activeTab.className).toContain("active");
   });
 
@@ -158,8 +160,7 @@ describe("App chapter navigation", () => {
     const user = await renderApp();
     await user.click(clickTab(/Why This Happens/));
 
-    const nav = screen.getByRole("navigation");
-    const tab2 = within(nav).getByText(/Why This Happens/).closest("button")!;
+    const tab2 = getChapterNav().getByText(/Why This Happens/).closest("button")!;
     expect(tab2.className).toContain("active");
   });
 
