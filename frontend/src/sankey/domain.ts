@@ -81,7 +81,6 @@ export function isOperational(d: Deduction): boolean {
 
 export const SLOTTING_TERMINAL_LABEL = "Not disputable — negotiated cost";
 
-export const DEMO_DATE = new Date("2026-05-31");
 
 export const WIN_PROB: Record<string, number> = {
   digital_complete: 0.644,
@@ -169,7 +168,7 @@ export function disputeReadinessFor(d: Deduction): string {
 
   if (d.dispute_deadline) {
     const deadline = new Date(d.dispute_deadline);
-    if (deadline < DEMO_DATE) return "Can't dispute";
+    if (deadline < new Date()) return "Can't dispute";
   }
 
   const verification = d.pack_record?.pack_verification;

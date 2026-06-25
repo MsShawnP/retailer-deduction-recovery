@@ -9,7 +9,7 @@ import {
   rootCauseFor,
   selectionLabel,
   isOperational,
-  DEMO_DATE,
+
 } from "./domain";
 import { computeKpis } from "../computeKpis";
 
@@ -64,7 +64,7 @@ describe("disputeReadinessFor", () => {
     expect(disputeReadinessFor(d)).toBe("Never assessed");
   });
 
-  it("returns 'Can't dispute' when deadline is past DEMO_DATE", () => {
+  it("returns 'Can't dispute' when deadline is past today", () => {
     const d = makeDeduction({
       dispute_deadline: "2026-01-01",
       dispute: null,

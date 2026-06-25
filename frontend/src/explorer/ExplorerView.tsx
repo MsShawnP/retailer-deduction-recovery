@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Deduction, Evidence } from "../types";
-import { OUTCOME_COLORS, rootCauseFor, DEMO_DATE, readableOutcome } from "../sankey/domain";
+import { OUTCOME_COLORS, rootCauseFor, readableOutcome } from "../sankey/domain";
 import { formatCount, formatDollars, formatPercent } from "../data";
 import "./ExplorerView.css";
 
@@ -12,7 +12,7 @@ interface Props {
   focusedDeductionId?: string | null;
 }
 
-const TODAY = DEMO_DATE;
+const TODAY = new Date();
 
 export default function ExplorerView({
   cohort,

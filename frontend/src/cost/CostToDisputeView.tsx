@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars, formatPercent } from "../data";
-import { isOperational, DEMO_DATE, WIN_PROB } from "../sankey/domain";
+import { isOperational, WIN_PROB } from "../sankey/domain";
 import "./CostToDisputeView.css";
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   onTrace?: (id: string) => void;
 }
 
-const TODAY = DEMO_DATE;
+const TODAY = new Date();
 
 // Hours to assemble and file a dispute, by evidence quality. Digital
 // records pull straight from the system; handwritten records require
