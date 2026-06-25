@@ -192,7 +192,7 @@ export default function App() {
 
       {activeChapter === 1 && (
         <>
-          <SankeyView deductions={deductions} selection={selection} onSelect={setSelection} />
+          <SankeyView deductions={filteredDeductions ?? deductions} selection={selection} onSelect={setSelection} />
           <CohortTableView
             cohort={filteredDeductions ?? deductions}
             onSelectDeduction={focusAndNavigate}
