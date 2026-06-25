@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars } from "../data";
-import { isOperational, DEMO_DATE, evidenceCategoryFor, type EvidenceCategory } from "../sankey/domain";
+import { isOperational, evidenceCategoryFor, type EvidenceCategory } from "../sankey/domain";
 import "./TimelinePressureView.css";
 
 interface Props {
@@ -9,8 +9,8 @@ interface Props {
   onTrace: (id: string) => void;
 }
 
-const TODAY = DEMO_DATE;
-const TODAY_LABEL = "2026-05-31";
+const TODAY = new Date();
+const TODAY_LABEL = TODAY.toISOString().slice(0, 10);
 const DAY_MS = 86_400_000;
 
 type Bucket = "critical" | "expiring" | "active" | "expired" | "no_deadline";
