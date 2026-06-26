@@ -420,12 +420,14 @@ function buildStandardEvents(d: Deduction): TimelineEvent[] {
       });
     }
 
-    if (d.dispute.closed_date) {
+    if (d.dispute.closed_date || d.dispute.outcome !== "pending") {
       const recovered = d.dispute.recovered_amount > 0;
       const outcomeReadable = readableOutcome(d.dispute.outcome);
       events.push({
-        dateLabel: d.dispute.closed_date,
-        step: "Outcome",
+        dateLabel: d.dispute.closed_date
+          ?? d.dispute.filed_date
+          ?? d.deduction_date,
+        step: d.dispute.closed_date ? "Outcome" : "Outcome (date unknown)",
         detail: (
           <>
             <strong
