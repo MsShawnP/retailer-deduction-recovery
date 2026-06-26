@@ -751,3 +751,73 @@ coding work unless feedback generates it. Phase F polish gated on
 feedback.
 
 ---
+
+## 2026-06-25 — /wrap
+
+**Started from:** 6-step canonical reconciliation + design system
+audit arc defined from prior session. Steps 1–2 already complete
+(JSON re-export confirmed, DEMO_DATE replaced with live date).
+
+**Did:**
+1. README reconciled against CINDERHAVEN_CANONICAL.md — 9 deviations
+   fixed ($1.59M→$1.35M, 22,425→16,917, partner list expanded,
+   recovery phrasing corrected, post-audit $974K removed, pipeline
+   refs updated, duplicate data contract removed, type list updated,
+   footer matched template). Commit `5484699`.
+2. Deleted stale AUDIT.md. Commit `8c96246`.
+3. Design system audit — read all 14 CSS files against the full
+   Lailara Design System spec. Reported 14 deviations categorized
+   by severity (5 breaking, 5 drift, 4 cosmetic).
+4. Fixed 5 design system violations: Red-42 background fills replaced
+   with surface-danger/accent-blue, focus outlines changed from
+   accent-red to ink with 2px offset, border-radius added to tags.
+   Commit `f6f982a`.
+5. Removed 660px max-width from .section-description per user
+   direction (design system prose rule doesn't apply to dashboard
+   section descriptions). Commit `1387005`.
+6. Fixed Sankey not responding to time range filter — SankeyView was
+   receiving raw `deductions` instead of `filteredDeductions ??
+   deductions`. Every other view already used the filtered array.
+   Commit `0069baf`.
+
+All commits pushed and deployed to Cloudflare Pages via manual
+terminal deploy (`npx wrangler pages deploy dist
+--project-name=retailer-deduction-recovery`).
+
+**State:** App live at deductions.lailarallc.com. Working tree
+clean on main, up to date with origin. 59 tests pass. Build clean.
+GitHub Actions CI still broken — `CLOUDFLARE_API_TOKEN` secret
+expired; manual deploy is the workaround. No other known bugs.
+
+**Next:** Fix expired `CLOUDFLARE_API_TOKEN` in GitHub Actions
+(user mentioned "Lailara LLC custom token" but hasn't updated it
+yet). Phase E (friend preview) still pending. No other coding work
+unless feedback generates it.
+
+---
+
+## 2026-06-26 — /wrap
+
+**Started from:** All coding work complete. App deployed. Blocked on
+friend preview (Phase E).
+
+**Did:** Fixed three timeline rendering bugs found via full-dataset
+scan of 16,917 deductions: (1) hid trace buttons for chainless
+deductions and added CausationTraceView empty state (defensive —
+no current data triggers it); (2) post-audit timelines now include
+full order chain via shared `buildOrderChainEvents` helper (472
+deductions went from 2-3 events to 6-8); (3) resolved disputes with
+null `closed_date` now render outcome using `filed_date` as fallback
+(308 deductions fixed). Also fixed NOT DISPUTABLE badge to Red-95/
+Red-42 per design system. 5 commits pushed, deployed to Cloudflare
+Pages.
+
+**State:** App live at deductions.lailarallc.com. All timeline edge
+cases fixed. Build passes, zero console errors. Still blocked on
+friend preview.
+
+**Next:** Phase E — hand off live URL to friend for preview. No
+coding work unless feedback generates it. Phase F polish gated on
+feedback.
+
+---
