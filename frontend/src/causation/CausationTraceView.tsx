@@ -239,7 +239,7 @@ function buildEvents(d: Deduction): TimelineEvent[] {
   return buildStandardEvents(d);
 }
 
-function buildStandardEvents(d: Deduction): TimelineEvent[] {
+function buildOrderChainEvents(d: Deduction): TimelineEvent[] {
   const events: TimelineEvent[] = [];
 
   if (d.order) {
@@ -346,6 +346,12 @@ function buildStandardEvents(d: Deduction): TimelineEvent[] {
       });
     }
   }
+
+  return events;
+}
+
+function buildStandardEvents(d: Deduction): TimelineEvent[] {
+  const events = buildOrderChainEvents(d);
 
   // Deduction issued
   const dedFlags: string[] = [];
@@ -474,7 +480,7 @@ function buildStandardEvents(d: Deduction): TimelineEvent[] {
 }
 
 function buildPostAuditEvents(d: Deduction): TimelineEvent[] {
-  const events: TimelineEvent[] = [];
+  const events = buildOrderChainEvents(d);
   const pa = d.post_audit;
 
   if (pa) {
@@ -514,8 +520,8 @@ function buildPostAuditEvents(d: Deduction): TimelineEvent[] {
           "."
         )}{" "}
         <span className="muted">
-          No original pack/ship chain to defend against this — post-audit
-          claims need their own documentation.
+          Post-audit claims reference the original transaction but need
+          their own documentation chain to defend.
         </span>
       </>
     ),
