@@ -315,8 +315,10 @@ function buildOrderChainEvents(d: Deduction): TimelineEvent[] {
       detail: (
         <>
           Tendered to <strong>{d.shipment.carrier}</strong> —{" "}
-          {formatCount(d.shipment.units_shipped)} units,{" "}
-          {formatCount(d.shipment.pallets_shipped)} pallets.{" "}
+          {formatCount(d.shipment.units_shipped)} units
+          {d.shipment.pallets_shipped != null && (
+            <>, {formatCount(d.shipment.pallets_shipped)} pallets</>
+          )}.{" "}
           {asnMissing ? (
             <span className="bad">No ASN sent.</span>
           ) : asnLate ? (
