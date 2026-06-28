@@ -53,7 +53,7 @@ switch chapters automatically.
 | Sankey flow | All deductions split by type, dispute readiness, and outcome; click to zoom |
 | Deduction explorer | Six-card drill-down: the deduction, peer context, root cause, evidence quality, accessibility, timeliness |
 | Causation trace | One order's chronological chain: PO, pack, ship, delivery, deduction, dispute, outcome |
-| Recovery simulation | Toggle five operational fixes on/off. Of the dollars actually contested, the win rate is ~42%; with five evidence-quality fixes, that rises to ~65%. |
+| Recovery simulation | Toggle five operational fixes on/off. The win rate sits at ~42% per disputed dollar, but only ~35% of deductions are ever disputed; with five evidence-quality fixes, recovery on strong-evidence disputes rises to ~65%. |
 | Cost-to-dispute triage | Per-deduction expected recovery vs. labour cost; fight / marginal / write-off buckets |
 | Dispute builder | Evidence readiness per retailer's rules: what exists, what is missing, what is inferable |
 | Timeline pressure | Deductions mapped against retailer-specific dispute deadlines; expired dollar exposure |
@@ -140,8 +140,8 @@ terms. The dataset contains 16,917 deductions ($1.35M) across nine
 deduction types: short ship, labelling noncompliance, pallet
 noncompliance, damaged product, late delivery, promo disputes,
 pricing error, spoilage, and slotting (negotiated,
-non-disputable). ~16% of deduction dollars are recovered
-through disputes.
+non-disputable). ~15% of deduction dollars recovered -- not because
+disputes fail, but because most are never filed.
 
 ---
 
