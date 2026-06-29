@@ -8,15 +8,15 @@
     "deductions_count": 16917,
     "deductions_dollar": 1346814.55,
     "annualized_dollar": 436804.72,
-    "disputes_filed": 6565,
-    "disputes_recovered": 218198.83,
-    "recovery_rate": 0.162,
-    "labor_hours": 12094.8,
-    "fte_equivalent": 5.81,
+    "disputes_filed": 6011,
+    "disputes_recovered": 196694.71,
+    "recovery_rate": 0.146,
+    "labor_hours": 11206.2,
+    "fte_equivalent": 5.39,
     "orders_count": 54944,
     "orders_dollar": 74893256.16,
-    "deductions_no_dispute_count": 10352,
-    "deductions_no_dispute_dollar": 825916.46
+    "deductions_no_dispute_count": 10906,
+    "deductions_no_dispute_dollar": 877620.26
   },
   "by_type": [
     {
@@ -90,8 +90,8 @@
       "channel_type": "retailer",
       "deductions": 3487,
       "dollar": 238162.99,
-      "recovered": 33792.71,
-      "recovery_rate": 0.1419
+      "recovered": 32478.79,
+      "recovery_rate": 0.1364
     },
     {
       "partner_id": "RET-KROGER",
@@ -99,8 +99,8 @@
       "channel_type": "retailer",
       "deductions": 3083,
       "dollar": 222492.41,
-      "recovered": 37817.86,
-      "recovery_rate": 0.17
+      "recovered": 32300.49,
+      "recovery_rate": 0.1452
     },
     {
       "partner_id": "RET-WHOLEFOODS",
@@ -108,8 +108,8 @@
       "channel_type": "retailer",
       "deductions": 2484,
       "dollar": 210739.93,
-      "recovered": 35347.0,
-      "recovery_rate": 0.1677
+      "recovered": 33050.22,
+      "recovery_rate": 0.1568
     },
     {
       "partner_id": "RET-SPROUTS",
@@ -117,8 +117,8 @@
       "channel_type": "retailer",
       "deductions": 2299,
       "dollar": 181632.44,
-      "recovered": 29772.21,
-      "recovery_rate": 0.1639
+      "recovered": 25344.24,
+      "recovery_rate": 0.1395
     },
     {
       "partner_id": "RET-COSTCO",
@@ -126,8 +126,8 @@
       "channel_type": "retailer",
       "deductions": 2025,
       "dollar": 142490.79,
-      "recovered": 24377.17,
-      "recovery_rate": 0.1711
+      "recovered": 19458.96,
+      "recovery_rate": 0.1366
     },
     {
       "partner_id": "RET-REGIONAL",
@@ -135,8 +135,8 @@
       "channel_type": "retailer",
       "deductions": 1569,
       "dollar": 123163.36,
-      "recovered": 19379.92,
-      "recovery_rate": 0.1574
+      "recovered": 16350.05,
+      "recovery_rate": 0.1328
     },
     {
       "partner_id": "DIST-UNFI",
@@ -168,38 +168,38 @@
   ],
   "by_outcome": [
     {
+      "outcome": "partial",
+      "count": 1743,
+      "dollar": 72127.93
+    },
+    {
       "outcome": "lost",
-      "count": 1870,
+      "count": 1712,
       "dollar": 0.0
     },
     {
-      "outcome": "partial",
-      "count": 1837,
-      "dollar": 79680.99
-    },
-    {
       "outcome": "won",
-      "count": 1824,
-      "dollar": 138517.84
+      "count": 1595,
+      "dollar": 124566.78
     },
     {
       "outcome": "pending",
-      "count": 1034,
+      "count": 961,
       "dollar": null
     }
   ],
   "by_evidence_quality": [
     {
       "evidence_quality": "moderate",
-      "count": 2934
+      "count": 2690
     },
     {
       "evidence_quality": "strong",
-      "count": 2844
+      "count": 2604
     },
     {
       "evidence_quality": "weak",
-      "count": 787
+      "count": 717
     }
   ]
 }
