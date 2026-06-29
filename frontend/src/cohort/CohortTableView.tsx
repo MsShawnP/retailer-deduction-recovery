@@ -117,28 +117,28 @@ export default function CohortTableView({ cohort, onSelectDeduction, activeDeduc
           </colgroup>
           <thead>
             <tr>
-              <th tabIndex={0} role="button" aria-sort={ariaSort("deduction_id")} onClick={() => toggleSort("deduction_id")} onKeyDown={(e) => handleSortKey(e, "deduction_id")}>
+              <th tabIndex={0} role="columnheader" aria-sort={ariaSort("deduction_id")} onClick={() => toggleSort("deduction_id")} onKeyDown={(e) => handleSortKey(e, "deduction_id")}>
                 ID{sortIndicator("deduction_id")}
               </th>
-              <th tabIndex={0} role="button" aria-sort={ariaSort("date")} onClick={() => toggleSort("date")} onKeyDown={(e) => handleSortKey(e, "date")}>
+              <th tabIndex={0} role="columnheader" aria-sort={ariaSort("date")} onClick={() => toggleSort("date")} onKeyDown={(e) => handleSortKey(e, "date")}>
                 Date{sortIndicator("date")}
               </th>
-              <th tabIndex={0} role="button" aria-sort={ariaSort("retailer")} onClick={() => toggleSort("retailer")} onKeyDown={(e) => handleSortKey(e, "retailer")}>
+              <th tabIndex={0} role="columnheader" aria-sort={ariaSort("retailer")} onClick={() => toggleSort("retailer")} onKeyDown={(e) => handleSortKey(e, "retailer")}>
                 Retailer{sortIndicator("retailer")}
               </th>
-              <th tabIndex={0} role="button" aria-sort={ariaSort("type")} onClick={() => toggleSort("type")} onKeyDown={(e) => handleSortKey(e, "type")}>
+              <th tabIndex={0} role="columnheader" aria-sort={ariaSort("type")} onClick={() => toggleSort("type")} onKeyDown={(e) => handleSortKey(e, "type")}>
                 Type{sortIndicator("type")}
               </th>
-              <th className="num" tabIndex={0} role="button" aria-sort={ariaSort("amount")} onClick={() => toggleSort("amount")} onKeyDown={(e) => handleSortKey(e, "amount")}>
+              <th className="num" tabIndex={0} role="columnheader" aria-sort={ariaSort("amount")} onClick={() => toggleSort("amount")} onKeyDown={(e) => handleSortKey(e, "amount")}>
                 Amount{sortIndicator("amount")}
               </th>
-              <th tabIndex={0} role="button" aria-sort={ariaSort("readiness")} onClick={() => toggleSort("readiness")} onKeyDown={(e) => handleSortKey(e, "readiness")}>
+              <th tabIndex={0} role="columnheader" aria-sort={ariaSort("readiness")} onClick={() => toggleSort("readiness")} onKeyDown={(e) => handleSortKey(e, "readiness")}>
                 Readiness{sortIndicator("readiness")}
               </th>
-              <th tabIndex={0} role="button" aria-sort={ariaSort("outcome")} onClick={() => toggleSort("outcome")} onKeyDown={(e) => handleSortKey(e, "outcome")}>
+              <th tabIndex={0} role="columnheader" aria-sort={ariaSort("outcome")} onClick={() => toggleSort("outcome")} onKeyDown={(e) => handleSortKey(e, "outcome")}>
                 Outcome{sortIndicator("outcome")}
               </th>
-              <th className="num" tabIndex={0} role="button" aria-sort={ariaSort("retrieval_hours")} onClick={() => toggleSort("retrieval_hours")} onKeyDown={(e) => handleSortKey(e, "retrieval_hours")}>
+              <th className="num" tabIndex={0} role="columnheader" aria-sort={ariaSort("retrieval_hours")} onClick={() => toggleSort("retrieval_hours")} onKeyDown={(e) => handleSortKey(e, "retrieval_hours")}>
                 Retrieval hrs{sortIndicator("retrieval_hours")}
               </th>
             </tr>
