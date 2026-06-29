@@ -67,7 +67,7 @@
 
 .scorecard-sort-btn.active {
   background: var(--ink);
-  color: #fff;
+  color: var(--panel);
   border-color: var(--ink);
   font-weight: 700;
 }
@@ -137,12 +137,12 @@
 
 .scorecard-filter-btn:hover {
   background: var(--accent-red);
-  color: #fff;
+  color: var(--panel);
 }
 
 .scorecard-card.active .scorecard-filter-btn {
   background: var(--accent-red);
-  color: #fff;
+  color: var(--panel);
 }
 
 .scorecard-card-loss {

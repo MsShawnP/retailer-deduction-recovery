@@ -32,8 +32,8 @@
 .sankey-node-label {
   font-family: var(--sans);
   font-size: 14px;
-  fill: #0d0d0d;
-  stroke: #ffffff;
+  fill: var(--ink);
+  stroke: var(--panel);
   stroke-width: 3px;
   paint-order: stroke;
   pointer-events: none;

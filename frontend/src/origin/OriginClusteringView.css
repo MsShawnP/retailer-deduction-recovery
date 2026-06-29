@@ -169,7 +169,7 @@
 
 .origin-filter-btn:hover {
   background: var(--accent-red);
-  color: #fff;
+  color: var(--panel);
 }
 
 .origin-trace-btn {
@@ -179,7 +179,7 @@
 
 .origin-trace-btn:hover {
   background: var(--accent-red);
-  color: #fff;
+  color: var(--panel);
 }
 
 .origin-tabs {
@@ -210,7 +210,7 @@
 
 .origin-tab.active {
   background: var(--ink);
-  color: #fff;
+  color: var(--panel);
   font-weight: 700;
 }
 

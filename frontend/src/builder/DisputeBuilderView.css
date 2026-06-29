@@ -90,7 +90,7 @@
 
 .builder-filter-tab.active {
   background: var(--ink);
-  color: #fff;
+  color: var(--panel);
   font-weight: 700;
 }
 
@@ -143,7 +143,7 @@
 
 .builder-readiness-ready {
   background: var(--accent-green);
-  color: #fff;
+  color: var(--panel);
 }
 
 .builder-readiness-needs_work {
@@ -338,7 +338,7 @@
 
 .builder-action-btn:hover {
   background: var(--accent-red);
-  color: #fff;
+  color: var(--panel);
 }
 
 @media (max-width: 900px) {

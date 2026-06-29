@@ -74,13 +74,13 @@
 
 .explorer-trace-btn.active {
   background: var(--accent-red) !important;
-  color: #fff !important;
+  color: var(--panel) !important;
   border-color: var(--accent-red) !important;
 }
 
 .explorer-trace-btn.active:hover {
   background: var(--accent-red) !important;
-  color: #fff !important;
+  color: var(--panel) !important;
 }
 
 .explorer-grid {
