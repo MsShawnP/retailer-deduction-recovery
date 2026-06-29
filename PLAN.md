@@ -114,11 +114,11 @@ These fix credibility issues a data-curious CEO would discover.
 
 Prioritize based on friend feedback. Don't do preemptively.
 
-- [ ] CSS custom properties — promote 8+ hardcoded hex values
+- [x] CSS custom properties — promote 8+ hardcoded hex values
       (#F1F2F4, #eef0f2, etc.) to :root custom properties.
-- [ ] CSS pattern consolidation — extract shared table, section,
+- [x] CSS pattern consolidation — extract shared table, section,
       button, and tab patterns into App.css. ~465 LOC reduction.
-- [ ] Keyboard accessibility — add tabIndex, role, onKeyDown to
+- [x] Keyboard accessibility — add tabIndex, role, onKeyDown to
       Sankey interactive elements and sortable table headers.
 - [x] Domain logic tests — cover disputeReadinessFor,
       buildSankeyData, isOnSelectedPath, computeKpis.
