@@ -53,6 +53,12 @@
   transition: opacity 0.15s ease;
 }
 
+.sankey-node-rect:focus,
+.sankey-links path:focus {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
 .sankey-svg {
   cursor: default;
 }

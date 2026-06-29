@@ -186,6 +186,13 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
 
   const linkPath = sankeyLinkHorizontal();
 
+  function handleKey(e: React.KeyboardEvent, action: () => void) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      action();
+    }
+  }
+
   function clearSelection(e: React.MouseEvent) {
     if (e.target === e.currentTarget) onSelect(null);
   }
@@ -274,10 +281,13 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
                 strokeWidth={Math.max(1, link.width)}
                 fill="none"
                 opacity={opacity}
+                tabIndex={0}
+                role="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleLink(link.source.id, link.target.id);
                 }}
+                onKeyDown={(e) => handleKey(e, () => toggleLink(link.source.id, link.target.id))}
               >
                 <title>
                   {link.source.label} → {link.target.label}: {formatDollars(link.value)}
@@ -310,10 +320,13 @@ export default function SankeyView({ deductions, selection, onSelect }: Props) {
                   fill={nodeColor(node)}
                   stroke={isSelected ? "#1a1a1a" : "none"}
                   strokeWidth={isSelected ? 2 : 0}
+                  tabIndex={0}
+                  role="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleNode(node.id);
                   }}
+                  onKeyDown={(e) => handleKey(e, () => toggleNode(node.id))}
                   className="sankey-node-rect"
                 >
                   <title>
