@@ -185,7 +185,7 @@ export default function CostToDisputeView({ cohort, onTrace }: Props) {
 
   if (cohort.length === 0) {
     return (
-      <section className="cost">
+      <section className="cost section">
         <h2>Cost to dispute</h2>
         <p className="section-description">
           Every deduction is scored by whether it's worth disputing. The
@@ -196,13 +196,13 @@ export default function CostToDisputeView({ cohort, onTrace }: Props) {
           into three buckets: worth fighting, borderline, and don't bother.
           Use this to decide where limited staff time goes first.
         </p>
-        <p className="cost-empty">No deductions in the current cohort.</p>
+        <p className="cost-empty section-empty">No deductions in the current cohort.</p>
       </section>
     );
   }
   if (unresolved.length === 0) {
     return (
-      <section className="cost">
+      <section className="cost section">
         <h2>Cost to dispute</h2>
         <p className="section-description">
           Every deduction is scored by whether it's worth disputing. The
@@ -213,7 +213,7 @@ export default function CostToDisputeView({ cohort, onTrace }: Props) {
           into three buckets: worth fighting, borderline, and don't bother.
           Use this to decide where limited staff time goes first.
         </p>
-        <p className="cost-empty">
+        <p className="cost-empty section-empty">
           Nothing to triage — the cohort either holds only slotting
           (negotiated costs, not disputable) or every operational deduction
           is already resolved.
@@ -236,7 +236,7 @@ export default function CostToDisputeView({ cohort, onTrace }: Props) {
             sort into three buckets: worth fighting, borderline, and don't
             bother. Use this to decide where limited staff time goes first.
           </p>
-          <p className="cost-context">
+          <p className="cost-context section-context">
             For each unresolved deduction, expected recovery (amount × win
             probability) versus labor to assemble and file. Three buckets —
             fight, marginal, write off — driven by current evidence quality
@@ -358,8 +358,8 @@ export default function CostToDisputeView({ cohort, onTrace }: Props) {
             )}
           </span>
         </header>
-        <div className="cost-table-scroll">
-          <table className="cost-table">
+        <div className="cost-table-scroll table-scroll">
+          <table className="cost-table data-table">
             <thead>
               <tr>
                 <th>ID</th>
@@ -398,7 +398,7 @@ export default function CostToDisputeView({ cohort, onTrace }: Props) {
                   {onTrace && (
                     <td>
                       <button
-                        className="cost-trace-btn"
+                        className="cost-trace-btn trace-btn"
                         onClick={() => onTrace(d.deduction_id)}
                       >
                         Trace →

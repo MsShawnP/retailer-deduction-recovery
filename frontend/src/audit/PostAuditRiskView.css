@@ -1,32 +1,3 @@
-.audit {
-  margin-top: 36px;
-  padding-top: 8px;
-  border-top: 1px solid var(--rule);
-}
-
-.audit h2 {
-  border: none;
-  padding-bottom: 0;
-  margin-bottom: 4px;
-}
-
-.audit-context {
-  color: var(--ink-soft);
-  font-style: italic;
-  font-size: 16px;
-  margin: 0;
-}
-
-.audit-empty {
-  color: var(--ink-faint);
-  font-style: italic;
-  font-size: 16px;
-  padding: 32px;
-  text-align: center;
-  background: var(--panel);
-  border: 1px solid var(--rule);
-}
-
 .audit-header {
   margin-bottom: 18px;
 }
@@ -180,13 +151,6 @@
   font-weight: 700;
 }
 
-.audit-realized-table,
-.audit-retailer-table,
-.audit-evidence-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 15px;
-}
 
 .audit-realized-table th,
 .audit-realized-table td,
@@ -202,26 +166,8 @@
 .audit-realized-table th,
 .audit-retailer-table th,
 .audit-evidence-table th {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--ink-soft);
-  font-weight: 700;
   background: var(--surface);
   border-bottom: 1px solid var(--rule);
-}
-
-.audit-realized-table .num,
-.audit-retailer-table .num,
-.audit-evidence-table .num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-.audit-realized-table tr:last-child td,
-.audit-retailer-table tr:last-child td,
-.audit-evidence-table tr:last-child td {
-  border-bottom: none;
 }
 
 .audit-id {
@@ -271,21 +217,6 @@
 
 .evidence-missing {
   background: var(--surface-danger);
-}
-
-.audit-trace-btn {
-  font-size: 14px;
-  background: var(--panel);
-  border: 1px solid var(--accent-red);
-  color: var(--accent-red);
-  padding: 4px 10px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.audit-trace-btn:hover {
-  background: var(--accent-red);
-  color: var(--panel);
 }
 
 @media (max-width: 900px) {

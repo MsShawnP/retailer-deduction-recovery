@@ -40,7 +40,7 @@ export default function ExplorerView({
 
   if (sorted.length === 0) {
     return (
-      <section className="explorer">
+      <section className="explorer section">
         <h2>Deduction explorer</h2>
         <p className="section-description">
           Pick any deduction from the current view and see it broken into six
@@ -53,7 +53,7 @@ export default function ExplorerView({
           When you change the Sankey filter or dropdown, the explorer resets
           to the first deduction in the new group.
         </p>
-        <p className="explorer-empty">No deductions match the current filter.</p>
+        <p className="explorer-empty section-empty">No deductions match the current filter.</p>
       </section>
     );
   }
@@ -67,8 +67,8 @@ export default function ExplorerView({
   const goRandom = () => setIndex(Math.floor(Math.random() * total));
 
   return (
-    <section className="explorer">
-      <header className="explorer-header">
+    <section className="explorer section">
+      <header className="explorer-header section-header">
         <div>
           <h2>Deduction explorer</h2>
           <p className="section-description">
@@ -82,24 +82,24 @@ export default function ExplorerView({
             spot-check. When you change the Sankey filter or dropdown, the
             explorer resets to the first deduction in the new group.
           </p>
-          <p className="explorer-context">
+          <p className="explorer-context section-context">
             Showing <strong>{safeIndex + 1}</strong> of{" "}
             <strong>{formatCount(total)}</strong> in the current cohort,
             ranked by dollar amount. Use the arrows to step through the
             stack or pick one at random.
           </p>
         </div>
-        <div className="explorer-nav">
-          <button onClick={goPrev} aria-label="Previous deduction">← Prev</button>
-          <button onClick={goRandom}>Random</button>
-          <button onClick={goNext} aria-label="Next deduction">Next →</button>
+        <div className="explorer-nav nav-row">
+          <button className="nav-btn" onClick={goPrev} aria-label="Previous deduction">← Prev</button>
+          <button className="nav-btn" onClick={goRandom}>Random</button>
+          <button className="nav-btn" onClick={goNext} aria-label="Next deduction">Next →</button>
           {onTrace && current.order && (
             <button
               onClick={() => onTrace(current.deduction_id)}
               className={
                 tracedDeductionId === current.deduction_id
-                  ? "explorer-trace-btn active"
-                  : "explorer-trace-btn"
+                  ? "nav-btn explorer-trace-btn active"
+                  : "nav-btn explorer-trace-btn"
               }
               aria-label="Trace this order chronologically"
             >

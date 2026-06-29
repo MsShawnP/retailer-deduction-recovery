@@ -289,7 +289,7 @@ export default function DisputeBuilderView({
 
   if (sorted.length === 0) {
     return (
-      <section className="builder">
+      <section className="builder section">
         <h2>Dispute builder</h2>
         <p className="section-description">
           Pick a deduction and see two columns side by side: what evidence a
@@ -325,7 +325,7 @@ export default function DisputeBuilderView({
             variant="bad"
           />
         </div>
-        <p className="builder-empty">
+        <p className="builder-empty section-empty">
           {operationalCohort.length === 0 && cohort.length > 0
             ? "Current cohort is slotting only — negotiated costs aren't disputable, so the builder has nothing to assemble."
             : "No deductions match the current filter."}
@@ -343,7 +343,7 @@ export default function DisputeBuilderView({
 
   return (
     <section className="builder">
-      <header className="builder-header">
+      <header className="builder-header section-header">
         <div>
           <h2>Dispute builder</h2>
           <p className="section-description">
@@ -355,19 +355,19 @@ export default function DisputeBuilderView({
             dispute package — what it would look like if Cinderhaven had
             the records, versus what they can actually submit today.
           </p>
-          <p className="builder-context">
+          <p className="builder-context section-context">
             Evidence readiness for one deduction at a time. The retailer's
             requirements on the left, what Cinderhaven actually has on the
             right. The mock package shows what a properly assembled
             submission would include.
           </p>
         </div>
-        <div className="builder-nav">
-          <button onClick={goPrev} aria-label="Previous deduction">
+        <div className="builder-nav nav-row">
+          <button className="nav-btn" onClick={goPrev} aria-label="Previous deduction">
             ← Prev
           </button>
-          <button onClick={goRandom}>Random</button>
-          <button onClick={goNext} aria-label="Next deduction">
+          <button className="nav-btn" onClick={goRandom}>Random</button>
+          <button className="nav-btn" onClick={goNext} aria-label="Next deduction">
             Next →
           </button>
         </div>
@@ -441,7 +441,7 @@ export default function DisputeBuilderView({
               with no published bar to clear.
             </p>
           ) : (
-            <table className="builder-reqs">
+            <table className="builder-reqs data-table">
               <thead>
                 <tr>
                   <th>Required</th>

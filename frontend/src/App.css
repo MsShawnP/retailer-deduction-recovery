@@ -437,6 +437,129 @@ tr:last-child td { border-bottom: 0; }
   font-weight: 700;
 }
 
+/* ─── Shared section layout ─── */
+
+.section {
+  margin-top: 36px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+.section h2 {
+  border: none;
+  padding-bottom: 0;
+  margin-bottom: 4px;
+}
+
+.section-context {
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 16px;
+  margin: 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.section-empty {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 16px;
+  padding: 32px;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+}
+
+/* ─── Shared table styles ─── */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.data-table th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.data-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* ─── Shared button styles ─── */
+
+.nav-row {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-btn {
+  font-size: 16px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.nav-btn:focus {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.nav-btn:disabled {
+  color: var(--ink-faint);
+  cursor: not-allowed;
+}
+
+.trace-btn {
+  font-size: 14px;
+  background: var(--panel);
+  border: 1px solid var(--accent-red);
+  color: var(--accent-red);
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.trace-btn:hover {
+  background: var(--accent-red);
+  color: var(--panel);
+}
+
+.kpi-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
 @media (max-width: 800px) {
   .kpi-row { grid-template-columns: repeat(2, 1fr); }
 }
