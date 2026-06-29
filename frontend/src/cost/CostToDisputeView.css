@@ -313,7 +313,7 @@
 
 .cost-trace-btn:hover {
   background: var(--accent-red);
-  color: #fff;
+  color: var(--panel);
 }
 
 @media (max-width: 900px) {

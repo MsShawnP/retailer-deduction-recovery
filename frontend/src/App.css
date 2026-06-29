@@ -311,7 +311,7 @@ tr:last-child td { border-bottom: 0; }
 
 .time-range-buttons button.active {
   background: var(--ink);
-  color: #fff;
+  color: var(--panel);
   font-weight: 700;
 }
 
@@ -413,7 +413,7 @@ tr:last-child td { border-bottom: 0; }
 
 .chapter-tab.active .chapter-num {
   background: var(--accent-blue);
-  color: #fff;
+  color: var(--panel);
 }
 
 .empty {
