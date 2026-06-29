@@ -35,19 +35,19 @@ JSON_DIR = ROOT / "frontend" / "public" / "json"
 # Cross-channel tables (int_all_*) have widened ranges to cover
 # retailer + distributor rows; retailer-only tables keep original ranges.
 TARGETS = {
-    "int_all_orders":                 (5000, 12000),
-    "stg_retailer_order_lines":       (15000, 35000),
-    "int_all_shipments":              (5000, 12000),
-    "stg_retailer_pack_records":      (4000, 6500),
-    "int_all_deductions":             (4000, 10000),
-    "int_all_remittances":            (300, 1200),
-    "int_all_disputes":               (2000, 6000),
-    "stg_retailer_dispute_evidence":  (3000, 10000),
-    "stg_retailer_post_audit_claims": (30, 80),
-    "int_all_partners":               (12, 20),
-    "stg_retailer_rules":             (80, 100),
-    "stg_retailer_deduction_codes":   (70, 100),
-    "stg_retailer_edi_requirements":  (30, 50),
+    "int_all_orders":                 (45000, 65000),
+    "stg_retailer_order_lines":       (150000, 220000),
+    "int_all_shipments":              (45000, 65000),
+    "stg_retailer_pack_records":      (38000, 55000),
+    "int_all_deductions":             (14000, 20000),
+    "int_all_remittances":            (250, 500),
+    "int_all_disputes":               (5000, 7500),
+    "stg_retailer_dispute_evidence":  (18000, 28000),
+    "stg_retailer_post_audit_claims": (180, 280),
+    "int_all_partners":               (7, 12),
+    "stg_retailer_rules":             (40, 70),
+    "stg_retailer_deduction_codes":   (80, 120),
+    "stg_retailer_edi_requirements":  (30, 60),
 }
 
 ANNUAL_DOLLAR_TARGET = (750_000, 1_200_000)
