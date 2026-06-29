@@ -821,3 +821,29 @@ coding work unless feedback generates it. Phase F polish gated on
 feedback.
 
 ---
+
+## 2026-06-28 — /wrap
+
+**Started from:** 6-fix batch defined: 3 Phase F polish tasks
+(CSS tokens, CSS consolidation, keyboard accessibility), 2
+cinderhaven-data-platform pipeline fixes (slotting dispute_deadline,
+schema.md targets), 1 reseed/validate/re-export cycle.
+
+**Did:** All 6 fixes committed across both repos. Phase F fully
+checked off. Reseeded Fly.io Postgres (2.28M rows), dbt build
+(448/457 PASS, 1 calibration error), validator 32 PASS / 0 FAIL,
+JSON re-exported. CSS: 487 LOC reduction from consolidation, 47 hex
+values promoted to design system tokens, keyboard accessibility
+added to Sankey + 6 sortable tables.
+
+**State:** All Phase F tasks complete. JSON matches Fly.io Postgres
+SSOT (16,917 deductions). One known issue: dbt test
+`assert_dispute_recovery_rates_in_band` needs tolerance widened from
+±2pt to ±3pt in cinderhaven-data-platform (separate fix). 6 unpushed
+commits on retailer-deduction-recovery, 1 on cinderhaven-data-platform.
+
+**Next:** Phase E — friend preview handoff. All coding/polish work
+is done. Remaining PLAN.md items: friend preview + feedback
+incorporation. dbt calibration tolerance fix is a separate task.
+
+---
