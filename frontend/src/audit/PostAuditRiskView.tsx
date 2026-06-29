@@ -189,7 +189,7 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
 
   if (cohort.length === 0) {
     return (
-      <section className="audit">
+      <section className="audit section">
         <h2>Post-audit risk exposure</h2>
         <p className="section-description">
           Retailers like Walmart periodically audit suppliers' past
@@ -201,7 +201,7 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
           Orders with no digital records and noncompliant labels are the
           highest risk.
         </p>
-        <p className="audit-empty">No deductions in the current cohort.</p>
+        <p className="audit-empty section-empty">No deductions in the current cohort.</p>
       </section>
     );
   }
@@ -224,7 +224,7 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
             a retailer audited today. Orders with no digital records and
             noncompliant labels are the highest risk.
           </p>
-          <p className="audit-context">
+          <p className="audit-context section-context">
             Third-party auditors show up months after the original transaction
             and pull historical records. The supplier's defense is whatever
             evidence is on file. The number below: how much of the current
@@ -307,7 +307,7 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
               </p>
             )}
             {topRealized.length > 0 && (
-              <table className="audit-realized-table">
+              <table className="audit-realized-table data-table">
                 <thead>
                   <tr>
                     <th>ID</th>
@@ -336,7 +336,7 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
                       <td className="num">{formatDollars(d.amount)}</td>
                       <td>
                         <button
-                          className="audit-trace-btn"
+                          className="audit-trace-btn trace-btn"
                           onClick={() => onTrace(d.deduction_id)}
                         >
                           Trace →
@@ -361,7 +361,7 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
             its underlying retailers.
           </p>
         </header>
-        <table className="audit-retailer-table">
+        <table className="audit-retailer-table data-table">
           <thead>
             <tr>
               <th>Retailer</th>
@@ -419,7 +419,7 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
             paper records lose, missing records are gone on contact.
           </p>
         </header>
-        <table className="audit-evidence-table">
+        <table className="audit-evidence-table data-table">
           <thead>
             <tr>
               <th>Evidence</th>

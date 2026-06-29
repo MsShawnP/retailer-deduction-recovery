@@ -36,7 +36,7 @@ export default function CausationTraceView({
 
   if (!current) {
     return (
-      <section className="trace">
+      <section className="trace section">
         <h2>Causation trace</h2>
         <p className="section-description">
           Choose an order and see its full timeline from left to right: the
@@ -48,12 +48,12 @@ export default function CausationTraceView({
           deduction's six failure layers in parallel, while this view shows
           one order's life sequentially.
         </p>
-        <p className="trace-context">
+        <p className="trace-context section-context">
           The explorer shows one deduction's six failure layers in parallel;
           the trace shows the same order's story chronologically — what
           happened, in what sequence, and where things broke down.
         </p>
-        <div className="trace-empty">
+        <div className="trace-empty section-empty">
           <p>
             Pick a deduction in the explorer above and use{" "}
             <strong>Trace this order →</strong> to follow it from PO through
@@ -74,8 +74,8 @@ export default function CausationTraceView({
 
   if (!current.order && !current.shipment && !current.pack_record) {
     return (
-      <section className="trace">
-        <header className="trace-header">
+      <section className="trace section">
+        <header className="trace-header section-header">
           <div>
             <h2>Causation trace</h2>
             <p className="section-description">
@@ -88,22 +88,22 @@ export default function CausationTraceView({
               deduction's six failure layers in parallel, while this view shows
               one order's life sequentially.
             </p>
-            <p className="trace-context">
+            <p className="trace-context section-context">
               Trace <strong>{currentIdx + 1}</strong> of{" "}
               <strong>{formatCount(total)}</strong> in the current cohort.
             </p>
           </div>
-          <div className="trace-nav">
-            <button onClick={goPrev} aria-label="Previous trace">
+          <div className="trace-nav nav-row">
+            <button className="nav-btn" onClick={goPrev} aria-label="Previous trace">
               ← Prev
             </button>
-            <button onClick={goRandom}>Random</button>
-            <button onClick={goNext} aria-label="Next trace">
+            <button className="nav-btn" onClick={goRandom}>Random</button>
+            <button className="nav-btn" onClick={goNext} aria-label="Next trace">
               Next →
             </button>
             <button
               onClick={clear}
-              className="trace-clear"
+              className="nav-btn trace-clear"
               aria-label="Clear trace"
               title="Clear trace"
             >
@@ -126,7 +126,7 @@ export default function CausationTraceView({
           </span>
         </div>
 
-        <div className="trace-empty">
+        <div className="trace-empty section-empty">
           <p>
             No order, shipment, or pack records are linked to this
             deduction — the causation chain cannot be reconstructed.
@@ -141,7 +141,7 @@ export default function CausationTraceView({
   const events = buildEvents(current);
 
   return (
-    <section className="trace">
+    <section className="trace section">
       <header className="trace-header">
         <div>
           <h2>Causation trace</h2>
@@ -155,7 +155,7 @@ export default function CausationTraceView({
             deduction's six failure layers in parallel, while this view shows
             one order's life sequentially.
           </p>
-          <p className="trace-context">
+          <p className="trace-context section-context">
             Following one order chronologically — what happened, in what
             sequence, and where things broke down. Trace{" "}
             <strong>{currentIdx + 1}</strong> of{" "}

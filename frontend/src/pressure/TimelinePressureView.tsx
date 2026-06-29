@@ -137,7 +137,7 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
 
   if (cohort.length === 0) {
     return (
-      <section className="pressure">
+      <section className="pressure section">
         <h2>Timeline pressure</h2>
         <p className="section-description">
           Every open deduction is mapped on a horizontal timeline against
@@ -149,7 +149,7 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
           urgent. Use this to triage: file the ones about to expire before
           working on the ones with time left.
         </p>
-        <p className="pressure-empty">No deductions in the current cohort.</p>
+        <p className="pressure-empty section-empty">No deductions in the current cohort.</p>
       </section>
     );
   }
@@ -158,7 +158,7 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
   const urgentDollars = counts.critical.dollars + counts.expiring.dollars;
 
   return (
-    <section className="pressure">
+    <section className="pressure section">
       <header className="pressure-header">
         <div>
           <h2>Timeline pressure</h2>
@@ -172,7 +172,7 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
             urgent. Use this to triage: file the ones about to expire
             before working on the ones with time left.
           </p>
-          <p className="pressure-context">
+          <p className="pressure-context section-context">
             Today is <strong>{TODAY_LABEL}</strong>.{" "}
             <strong>{formatCount(items.length)}</strong> unfiled deductions
             still face dispute deadlines. What's actionable, what's expiring,
@@ -207,7 +207,7 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
             records — even filing on time wins very few of these.
           </p>
         </header>
-        <table className="pressure-crosstab-table">
+        <table className="pressure-crosstab-table data-table">
           <thead>
             <tr>
               <th>Bucket</th>
@@ -269,8 +269,8 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
             )}
           </span>
         </header>
-        <div className="pressure-table-scroll">
-          <table className="pressure-table">
+        <div className="pressure-table-scroll table-scroll">
+          <table className="pressure-table data-table">
             <thead>
               <tr>
                 <th>ID</th>
@@ -301,7 +301,7 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
                   </td>
                   <td>
                     <button
-                      className="pressure-trace-btn"
+                      className="pressure-trace-btn trace-btn"
                       onClick={() => onTrace(d.deduction_id)}
                     >
                       Trace →

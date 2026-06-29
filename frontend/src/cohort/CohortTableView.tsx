@@ -91,8 +91,8 @@ export default function CohortTableView({ cohort, onSelectDeduction, activeDeduc
         inspect it in the explorer below. Click a column header to sort.
       </p>
 
-      <div className="cohort-table-wrap">
-        <table className="cohort-table">
+      <div className="cohort-table-wrap table-scroll">
+        <table className="cohort-table data-table">
           <colgroup>
             <col className="col-id" />
             <col className="col-date" />

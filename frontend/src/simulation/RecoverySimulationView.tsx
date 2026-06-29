@@ -272,7 +272,7 @@ export default function RecoverySimulationView({ cohort }: Props) {
 
   if (operationalCohort.length === 0) {
     return (
-      <section className="sim">
+      <section className="sim section">
         <h2>Recovery simulation</h2>
         <p className="section-description">
           Each toggle represents one specific fix — like switching to
@@ -284,7 +284,7 @@ export default function RecoverySimulationView({ cohort }: Props) {
           toggles to see how fixes compound. The goal is to answer "if I
           could only do one thing, what's worth the most?"
         </p>
-        <p className="sim-empty">
+        <p className="sim-empty section-empty">
           {cohort.length === 0
             ? "No deductions in the current cohort."
             : "Current cohort is slotting only — negotiated costs aren't operational failures, so the simulation has nothing to model."}
@@ -294,8 +294,8 @@ export default function RecoverySimulationView({ cohort }: Props) {
   }
 
   return (
-    <section className="sim">
-      <header className="sim-header">
+    <section className="sim section">
+      <header className="sim-header section-header">
         <div>
           <h2>Recovery simulation</h2>
           <p className="section-description">
@@ -308,7 +308,7 @@ export default function RecoverySimulationView({ cohort }: Props) {
             toggles to see how fixes compound. The goal is to answer "if I
             could only do one thing, what's worth the most?"
           </p>
-          <p className="sim-context">
+          <p className="sim-context section-context">
             Toggle the operational and administrative fixes Cinderhaven could
             implement. Numbers update live — current outcomes on the left,
             projected on the right. Runs against the{" "}
@@ -326,9 +326,9 @@ export default function RecoverySimulationView({ cohort }: Props) {
             )}
           </p>
         </div>
-        <div className="sim-actions">
-          <button onClick={enableAll}>Enable all</button>
-          <button onClick={reset} disabled={!anyOn}>
+        <div className="sim-actions nav-row">
+          <button className="nav-btn" onClick={enableAll}>Enable all</button>
+          <button className="nav-btn" onClick={reset} disabled={!anyOn}>
             Reset
           </button>
         </div>

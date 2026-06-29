@@ -2,14 +2,8 @@
   margin-top: 36px;
 }
 
-.cohort-table-wrap {
-  overflow-x: auto;
-}
-
 .cohort-table {
-  width: 100%;
   table-layout: fixed;
-  border-collapse: collapse;
   font-size: 14px;
   background: var(--panel);
   border: 1px solid var(--rule);
@@ -18,12 +12,7 @@
 .cohort-table col { width: 12.5%; }
 
 .cohort-table th {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--ink-soft);
   background: var(--surface);
-  font-weight: 700;
   padding: 8px 12px;
   border-bottom: 1px solid var(--rule);
   cursor: pointer;
@@ -54,18 +43,9 @@
   font-weight: 600;
 }
 
-.cohort-table tr:last-child td {
-  border-bottom: 0;
-}
-
 .cohort-table .mono {
   font-family: "SF Mono", "Cascadia Code", "Fira Code", monospace;
   font-size: 13px;
-}
-
-.cohort-table .num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
 }
 
 .cohort-table-pagination {

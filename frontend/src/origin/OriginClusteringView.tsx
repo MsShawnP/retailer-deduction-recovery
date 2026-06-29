@@ -166,7 +166,7 @@ export default function OriginClusteringView({
 
   if (operationalCohort.length === 0) {
     return (
-      <section className="origin">
+      <section className="origin section">
         <h2>Origin clustering</h2>
         <p className="section-description">
           Instead of grouping deductions by retailer or type, this groups
@@ -177,7 +177,7 @@ export default function OriginClusteringView({
           is systemic. Click any cluster to see the individual deductions
           behind it.
         </p>
-        <p className="origin-empty">
+        <p className="origin-empty section-empty">
           {cohort.length === 0
             ? "No deductions in the current cohort."
             : "Current cohort is slotting only — negotiated costs have no operational origin (no shipment, no pack, no carrier)."}
@@ -187,7 +187,7 @@ export default function OriginClusteringView({
   }
 
   return (
-    <section className="origin">
+    <section className="origin section">
       <header className="origin-header">
         <div>
           <h2>Origin clustering</h2>
@@ -200,7 +200,7 @@ export default function OriginClusteringView({
             is spread evenly, the fix is systemic. Click any cluster to
             see the individual deductions behind it.
           </p>
-          <p className="origin-context">
+          <p className="origin-context section-context">
             Where the deductions come from operationally — by carrier,
             label decision, pack verification system, evidence format, and
             packer. Concentration scores show how much of the cohort flows
@@ -219,8 +219,8 @@ export default function OriginClusteringView({
             those resets most of the portfolio.
           </p>
         </header>
-        <div className="origin-table-scroll">
-          <table className="origin-summary-table">
+        <div className="origin-table-scroll table-scroll">
+          <table className="origin-summary-table data-table">
           <thead>
             <tr>
               <th>Dimension</th>
@@ -296,8 +296,8 @@ export default function OriginClusteringView({
             </button>
           ))}
         </div>
-        <div className="origin-table-scroll">
-          <table className="origin-cluster-table">
+        <div className="origin-table-scroll table-scroll">
+          <table className="origin-cluster-table data-table">
           <thead>
             <tr>
               <th>Cluster</th>
@@ -380,7 +380,7 @@ export default function OriginClusteringView({
                   <td>
                     {c.topDeductionId && (
                       <button
-                        className="origin-trace-btn"
+                        className="origin-trace-btn trace-btn"
                         onClick={() => onTrace(c.topDeductionId!)}
                       >
                         Trace top →

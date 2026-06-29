@@ -188,7 +188,7 @@ export default function RetailerScorecardView({
 
   if (cohort.length === 0) {
     return (
-      <section className="scorecard">
+      <section className="scorecard section">
         <h2>Retailer scorecard</h2>
         <p className="section-description">
           Each retailer gets a profile showing: total deduction dollars,
@@ -199,14 +199,14 @@ export default function RetailerScorecardView({
           feel that way because they're our biggest?" and "which retailer
           is most likely to accept a dispute if we file one?"
         </p>
-        <p className="scorecard-empty">No deductions in the current cohort.</p>
+        <p className="scorecard-empty section-empty">No deductions in the current cohort.</p>
       </section>
     );
   }
 
   return (
-    <section className="scorecard">
-      <header className="scorecard-header">
+    <section className="scorecard section">
+      <header className="scorecard-header section-header">
         <div>
           <h2>Retailer scorecard</h2>
           <p className="section-description">
@@ -218,7 +218,7 @@ export default function RetailerScorecardView({
             feel that way because they're our biggest?" and "which
             retailer is most likely to accept a dispute if we file one?"
           </p>
-          <p className="scorecard-context">
+          <p className="scorecard-context section-context">
             Comparative view across {formatCount(scorecards.length)} retailers
             in the current cohort. Each card pairs the dollar story (volume,
             recovery, net loss) with the behavioral one (top deduction type,
