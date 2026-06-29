@@ -305,22 +305,23 @@ retailers ──┬─< retailer_rules
 
 ## Volume targets
 
-For the 36-month window (Jan 2024 → Jan 2027), aiming for:
+For the 24-month window (Nov 2023 → Sep 2025), cross-channel pipeline output:
 
 | Table | Target rows | Notes |
 |---|---|---|
-| orders | 4,000–6,000 | ~250 POs/month across retailers, weighted to channel split (Walmart ~50%, UNFI ~18%, etc.) |
-| order_lines | 15,000–30,000 | 3–5 lines per order avg |
-| shipments | 4,000–6,000 | 1:1 with orders for V1 |
-| pack_records | 4,000–6,000 | 1:1 with orders |
-| deductions | 3,000–6,000 | Roughly 35–55% of orders generate ≥1 deduction; deducted orders average ~2 deductions (short ship + label fine, etc.) |
-| disputes | 1,500–3,600 | Cinderhaven only files disputes when someone has time → 50–60% of deductions get a filing attempt |
-| dispute_evidence | 3,000–10,000 | 1–3 evidence items per dispute |
-| remittances | 200–400 | Weekly to biweekly per retailer × 36 months |
-| edi_requirements | 30–50 | 4–8 requirements per retailer |
-| post_audit_claims | 30–80 | Walmart APL + KeHE pass-throughs over 36 months |
-| retailer_rules | ~50 | 7 retailers × ~7 deduction types |
-| deduction_codes | 30–60 | Walmart 12, KeHE 8, others inferred placeholders |
+| orders (int_all) | 45,000–65,000 | Retailer + distributor channels combined |
+| order_lines (retailer) | 150,000–220,000 | 3–4 lines per order avg |
+| shipments (int_all) | 45,000–65,000 | 1:1 with orders |
+| pack_records (retailer) | 38,000–55,000 | One per retailer shipment |
+| deductions (int_all) | 14,000–20,000 | Retailer + distributor deductions combined |
+| disputes (int_all) | 5,000–7,500 | ~35% dispute rate across channels |
+| dispute_evidence (retailer) | 18,000–28,000 | 2–4 evidence items per dispute |
+| remittances (int_all) | 250–500 | Weekly to biweekly per partner |
+| edi_requirements (retailer) | 30–60 | 4–8 requirements per retailer |
+| post_audit_claims (retailer) | 180–280 | Walmart APL + KeHE pass-throughs |
+| retailer_rules | 40–70 | 9 partners × ~6 deduction types |
+| deduction_codes (retailer) | 80–120 | Walmart 12, KeHE 8, plus distributor codes |
+| partners (int_all) | 7–12 | Retailers + distributors |
 
 Total deduction dollar volume target: **$750K–$1.2M annualized** (3–5% of $25M wholesale revenue, consistent with industry reports for specialty food brands). Materially larger than the base `chargebacks` table's $55–75K. This is intentional — the base captures defect-driven chargebacks only; this project models the full deduction picture (operational, compliance, OTIF, post-audit, vague). The base $55–75K should remain a recognizable subset of the new total.
 
