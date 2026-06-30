@@ -54,3 +54,7 @@ secrets.*
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# SQLite backups and filesystem artifacts
+*.db.bak
+.fuse_hidden*
