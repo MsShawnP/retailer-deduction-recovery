@@ -11,10 +11,8 @@ Canonical contract (target):
 Current state (this repo):
     - Exported JSON is canonical-current ($1,346,815 / 16,917 rows).
     - 9 trade partners in summary JSON (6 retailers + 3 distributors).
-    - KNOWN DRIFT: the baked SQLite product_master still holds 90 SKUs / 3 lines
-      (shared export from the velocity tool). It must be re-exported from the
-      50-SKU / 5-line canonical source. The two product_line tests below are
-      xfail until that re-export runs (requires the pipeline / live DB).
+    - Baked SQLite product_master re-exported from the 50-SKU / 5-line canonical
+      source; the product_line tests below assert the canonical taxonomy and pass.
 """
 
 from __future__ import annotations
