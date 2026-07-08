@@ -11,6 +11,14 @@
 
 import type { Deduction } from "../types";
 
+// The dataset is a fixed synthetic window that ends 2026-01-02. Deadline
+// and days-remaining math is pinned to this "as of" date rather than the
+// wall clock — otherwise every dispute window reads as long expired once
+// real time passes the window, forcing all deductions to write-off and
+// making the recoverable backlog vanish. Parsed as UTC midnight to match
+// how "YYYY-MM-DD" deadline strings parse via new Date(...).
+export const AS_OF_DATE = new Date("2026-01-02");
+
 export interface SankeyNode {
   id: string;
   layer: number;
@@ -168,7 +176,7 @@ export function disputeReadinessFor(d: Deduction): string {
 
   if (d.dispute_deadline) {
     const deadline = new Date(d.dispute_deadline);
-    if (deadline < new Date()) return "Can't dispute";
+    if (deadline < AS_OF_DATE) return "Can't dispute";
   }
 
   const verification = d.pack_record?.pack_verification;

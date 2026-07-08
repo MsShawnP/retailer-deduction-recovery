@@ -1,15 +1,13 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars, formatPercent } from "../data";
-import { isOperational, WIN_PROB } from "../sankey/domain";
+import { isOperational, WIN_PROB, AS_OF_DATE } from "../sankey/domain";
 import "./CostToDisputeView.css";
 
 interface Props {
   cohort: Deduction[];
   onTrace?: (id: string) => void;
 }
-
-const TODAY = new Date();
 
 // Hours to assemble and file a dispute, by evidence quality. Digital
 // records pull straight from the system; handwritten records require
@@ -59,7 +57,7 @@ function isPastDeadline(d: Deduction): boolean {
   }
   if (d.dispute) return false;
   if (!d.dispute_deadline) return false;
-  return new Date(d.dispute_deadline) < TODAY;
+  return new Date(d.dispute_deadline) < AS_OF_DATE;
 }
 
 function compute(

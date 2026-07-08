@@ -9,6 +9,7 @@ import {
   rootCauseFor,
   selectionLabel,
   isOperational,
+  AS_OF_DATE,
 
 } from "./domain";
 import { computeKpis } from "../computeKpis";
@@ -38,6 +39,24 @@ function makeDeduction(overrides: Partial<Deduction> = {}): Deduction {
     ...overrides,
   };
 }
+
+// ---- AS_OF_DATE ----
+
+describe("AS_OF_DATE", () => {
+  it("is pinned to the data window end (2026-01-02), not the wall clock", () => {
+    expect(AS_OF_DATE.toISOString().slice(0, 10)).toBe("2026-01-02");
+  });
+
+  it("treats a deadline before the as-of date as unable to dispute", () => {
+    const d = makeDeduction({ dispute_deadline: "2026-01-01", dispute: null });
+    expect(disputeReadinessFor(d)).toBe("Can't dispute");
+  });
+
+  it("treats a deadline after the as-of date as still open", () => {
+    const d = makeDeduction({ dispute_deadline: "2026-03-01", dispute: null });
+    expect(disputeReadinessFor(d)).not.toBe("Can't dispute");
+  });
+});
 
 // ---- disputeReadinessFor ----
 

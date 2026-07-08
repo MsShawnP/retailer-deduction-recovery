@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Deduction } from "../types";
 import { formatCount, formatDollars } from "../data";
-import { isOperational, evidenceCategoryFor, type EvidenceCategory } from "../sankey/domain";
+import { isOperational, evidenceCategoryFor, AS_OF_DATE, type EvidenceCategory } from "../sankey/domain";
 import "./TimelinePressureView.css";
 
 interface Props {
@@ -9,8 +9,7 @@ interface Props {
   onTrace: (id: string) => void;
 }
 
-const TODAY = new Date();
-const TODAY_LABEL = TODAY.toISOString().slice(0, 10);
+const AS_OF_LABEL = AS_OF_DATE.toISOString().slice(0, 10);
 const DAY_MS = 86_400_000;
 
 type Bucket = "critical" | "expiring" | "active" | "expired" | "no_deadline";
@@ -29,7 +28,7 @@ function isResolved(d: Deduction): boolean {
 function daysToDeadline(d: Deduction): number | null {
   if (!d.dispute_deadline) return null;
   return Math.floor(
-    (new Date(d.dispute_deadline).getTime() - TODAY.getTime()) / DAY_MS
+    (new Date(d.dispute_deadline).getTime() - AS_OF_DATE.getTime()) / DAY_MS
   );
 }
 
@@ -173,7 +172,7 @@ export default function TimelinePressureView({ cohort, onTrace }: Props) {
             before working on the ones with time left.
           </p>
           <p className="pressure-context section-context">
-            Today is <strong>{TODAY_LABEL}</strong>.{" "}
+            Data as of <strong>{AS_OF_LABEL}</strong>.{" "}
             <strong>{formatCount(items.length)}</strong> unfiled deductions
             still face dispute deadlines. What's actionable, what's expiring,
             what's already lost to the clock.
