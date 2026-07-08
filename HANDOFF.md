@@ -847,3 +847,25 @@ is done. Remaining PLAN.md items: friend preview + feedback
 incorporation. dbt calibration tolerance fix is a separate task.
 
 ---
+
+## 2026-07-08 16:26
+
+**What changed:** Removed unused off-brand `frontend/public/icons.svg` (a
+Vite scaffold leftover — six social/doc sprite symbols, two with
+off-palette `#aa3bff` strokes). Commit `d526524` on `audit-fixes-2026-07`.
+
+**Why:** Same off-brand template source as the favicon replaced in
+`f57fdfd`. Verified dead before deleting — no `icons.svg`, symbol-id, or
+`<use>`/`xlink:href` reference anywhere in frontend/src, index.html, or
+vite config; the footer is plain text. Vite was still copying it into
+dist/ on every build, so a design-system-violating asset shipped unused.
+
+**State:** File deleted and committed (1 file, 24 deletions). Working tree
+clean on `audit-fixes-2026-07`. Untracked `frontend/dist/icons.svg` is a
+gitignored build artifact that clears on the next `vite build`. Not
+pushed. Build/tests unaffected by this change.
+
+**Next:** Continue the audit-fixes-2026-07 batch (favicon + icons.svg done
+so far); push the branch and open a PR once the audit fixes are complete.
+
+---
