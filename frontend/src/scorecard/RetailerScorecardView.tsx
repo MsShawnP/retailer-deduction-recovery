@@ -182,6 +182,23 @@ export default function RetailerScorecardView({
     });
   }, [cohort, retailers, sort]);
 
+  // Portfolio win rate, shown both ways so the headline isn't inflated by
+  // partial recoveries: "won or partially recovered" counts partials as
+  // wins (the optimistic read); "won outright" counts only full wins.
+  const winStats = useMemo(() => {
+    let filed = 0;
+    let wonOrPartial = 0;
+    let wonOutright = 0;
+    for (const d of cohort) {
+      if (!d.dispute?.filed_date) continue;
+      filed++;
+      if (d.dispute.outcome === "won" || d.dispute.outcome === "partial")
+        wonOrPartial++;
+      if (d.dispute.outcome === "won") wonOutright++;
+    }
+    return { filed, wonOrPartial, wonOutright };
+  }, [cohort]);
+
   const totalNetLoss = scorecards.reduce((s, c) => s + c.netLoss, 0);
 
   if (cohort.length === 0) {
@@ -224,6 +241,21 @@ export default function RetailerScorecardView({
             <strong>Filter →</strong> on any retailer to scope the rest of
             the app to that relationship.
           </p>
+          {winStats.filed > 0 && (
+            <p className="scorecard-winrate section-context">
+              Across {formatCount(winStats.filed)} filed disputes,{" "}
+              <strong>
+                {formatPercent(winStats.wonOrPartial / winStats.filed)}
+              </strong>{" "}
+              were won or partially recovered — but only{" "}
+              <strong>
+                {formatPercent(winStats.wonOutright / winStats.filed)}
+              </strong>{" "}
+              were won outright. The per-card "Filed → won" rate counts
+              partial recoveries as wins; the gap between the two is the
+              partial-recovery tail.
+            </p>
+          )}
         </div>
         <div className="scorecard-sort">
           <span className="scorecard-sort-label">Sort by</span>
