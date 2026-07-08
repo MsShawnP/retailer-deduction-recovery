@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Deduction, Evidence } from "../types";
-import { OUTCOME_COLORS, rootCauseFor, readableOutcome } from "../sankey/domain";
+import { OUTCOME_COLORS, rootCauseFor, readableOutcome, AS_OF_DATE } from "../sankey/domain";
 import { formatCount, formatDollars, formatPercent } from "../data";
 import "./ExplorerView.css";
 
@@ -11,8 +11,6 @@ interface Props {
   tracedDeductionId?: string | null;
   focusedDeductionId?: string | null;
 }
-
-const TODAY = new Date();
 
 export default function ExplorerView({
   cohort,
@@ -396,7 +394,7 @@ function timelinessHeadline(d: Deduction): string {
   const deadline = new Date(d.dispute_deadline);
 
   if (!d.dispute) {
-    const days = Math.floor((deadline.getTime() - TODAY.getTime()) / 86_400_000);
+    const days = Math.floor((deadline.getTime() - AS_OF_DATE.getTime()) / 86_400_000);
     if (days < 0) return `Past deadline ${Math.abs(days)} days ago — never filed`;
     if (days === 0) return "Deadline is today — never filed";
     return `${days} days to deadline — never filed`;
@@ -416,7 +414,7 @@ function timelinessHeadline(d: Deduction): string {
 function timelinessColor(d: Deduction): string {
   if (!d.dispute_deadline) return "var(--ink-soft)";
   if (!d.dispute) {
-    return new Date(d.dispute_deadline) < TODAY ? "var(--accent-red)" : "var(--ink-soft)";
+    return new Date(d.dispute_deadline) < AS_OF_DATE ? "var(--accent-red)" : "var(--ink-soft)";
   }
   if (d.dispute.filed_date && new Date(d.dispute.filed_date) > new Date(d.dispute_deadline))
     return "var(--accent-red)";
