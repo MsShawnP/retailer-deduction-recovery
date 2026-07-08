@@ -40,7 +40,7 @@
   color: var(--ink);
 }
 .builder-filter-tab.variant-bad.active {
-  background: var(--accent-red);
+  background: var(--accent-rose);
 }
 
 .builder-summary {
@@ -260,7 +260,7 @@
 }
 
 .builder-action-btn:hover {
-  background: var(--accent-red);
+  background: var(--accent-rose);
   color: var(--panel);
 }
 

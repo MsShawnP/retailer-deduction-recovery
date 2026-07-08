@@ -74,6 +74,14 @@ header h1 {
   font-family: var(--serif);
 }
 
+.hero-lede {
+  color: var(--ink);
+  margin: 0 0 10px;
+  font-size: 17px;
+  line-height: 1.5;
+  max-width: 70ch;
+}
+
 .subtitle {
   color: var(--ink-soft);
   margin: 0;
@@ -548,7 +556,7 @@ tr:last-child td { border-bottom: 0; }
 }
 
 .trace-btn:hover {
-  background: var(--accent-red);
+  background: var(--accent-rose);
   color: var(--panel);
 }
 

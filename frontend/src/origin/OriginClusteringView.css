@@ -79,7 +79,7 @@
 .origin-share-fill {
   position: absolute;
   inset: 0 auto 0 0;
-  background: var(--accent-red);
+  background: var(--accent-rose);
 }
 
 .origin-share-pct {
@@ -111,7 +111,7 @@
 }
 
 .origin-filter-btn:hover {
-  background: var(--accent-red);
+  background: var(--accent-rose);
   color: var(--panel);
 }
 

@@ -98,12 +98,12 @@
 }
 
 .scorecard-filter-btn:hover {
-  background: var(--accent-red);
+  background: var(--accent-rose);
   color: var(--panel);
 }
 
 .scorecard-card.active .scorecard-filter-btn {
-  background: var(--accent-red);
+  background: var(--accent-rose);
   color: var(--panel);
 }
 
@@ -147,7 +147,7 @@
 .scorecard-loss-bar-fill {
   position: absolute;
   inset: 0 auto 0 0;
-  background: var(--accent-red);
+  background: var(--accent-rose);
 }
 
 .scorecard-metrics {

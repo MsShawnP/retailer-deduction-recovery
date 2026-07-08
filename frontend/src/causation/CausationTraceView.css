@@ -131,7 +131,7 @@
   background: var(--accent-gold);
 }
 .sev-fail .trace-dot {
-  background: var(--accent-red);
+  background: var(--accent-rose);
 }
 .sev-neutral .trace-dot {
   background: var(--ink-faint);

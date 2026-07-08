@@ -134,8 +134,14 @@ export default function App() {
     <div className="app">
       <header>
         <h1>Cinderhaven Provisions — Retailer Deductions</h1>
+        <p className="hero-lede">
+          Trace each retailer deduction through five compounding failures —
+          no visibility, process gaps, weak evidence, inaccessible records,
+          and missed dispute windows — to see what is recoverable, what is
+          preventable, and what each operational fix is worth.
+        </p>
         <p className="subtitle">
-          Window {summary.window.start} to {summary.window.end} ({summary.window.months} months)
+          Synthetic dataset · window {summary.window.start} to {summary.window.end} ({summary.window.months} months)
         </p>
       </header>
 
