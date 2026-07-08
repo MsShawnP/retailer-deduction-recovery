@@ -27,18 +27,16 @@ const EVIDENCE_LABEL: Record<EvidenceCategory, string> = {
 };
 
 // Retailer audit profiles — short, research-grounded notes that explain
-// why the exposure sits where it sits. Keyed by retailer id. Anything
-// not listed gets a generic note.
+// why the exposure sits where it sits. Keyed by retailer.id as it appears
+// in the data (RET-*/DIST-*). Anything not listed gets a generic note.
 const AUDIT_PROFILE: Record<string, string> = {
-  walmart:
+  "RET-WALMART":
     "Third-party email-based audits, 12–24 month lookback, large dollar averages.",
-  costco:
+  "RET-COSTCO":
     "Regular GFSI compliance audits; chargebacks deducted from future payments.",
-  unfi: "Audit deductions can be pulled directly from future invoices.",
-  kehe: "Pass-through audits from the underlying retailers.",
-  whole_foods: "Amazon-backed audit capabilities; strict quality program.",
-  southside_market: "Less formal but accepted as long as records exist.",
-  green_basket: "Sprouts-style buyer relationship; informal audit posture.",
+  "DIST-UNFI": "Audit deductions can be pulled directly from future invoices.",
+  "DIST-KEHE": "Pass-through audits from the underlying retailers.",
+  "RET-WHOLEFOODS": "Amazon-backed audit capabilities; strict quality program.",
 };
 
 interface RetailerRow {
@@ -195,11 +193,11 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
           Retailers like Walmart periodically audit suppliers' past
           shipments. If labels, pack records, or documentation don't match
           their specs, they can deduct money retroactively — even on orders
-          that were originally accepted. This view looks at every order in
-          the past 12 months, checks what evidence Cinderhaven has on file,
-          and calculates the dollar exposure if a retailer audited today.
-          Orders with no digital records and noncompliant labels are the
-          highest risk.
+          that were originally accepted. This view looks at every open
+          deduction in the current cohort, checks what evidence Cinderhaven
+          has on file, and calculates the dollar exposure if a retailer
+          audited today. Deductions with no digital records and noncompliant
+          labels are the highest risk.
         </p>
         <p className="audit-empty section-empty">No deductions in the current cohort.</p>
       </section>
@@ -219,10 +217,10 @@ export default function PostAuditRiskView({ cohort, onTrace }: Props) {
             shipments. If labels, pack records, or documentation don't
             match their specs, they can deduct money retroactively — even
             on orders that were originally accepted. This view looks at
-            every order in the past 12 months, checks what evidence
-            Cinderhaven has on file, and calculates the dollar exposure if
-            a retailer audited today. Orders with no digital records and
-            noncompliant labels are the highest risk.
+            every open deduction in the current cohort, checks what
+            evidence Cinderhaven has on file, and calculates the dollar
+            exposure if a retailer audited today. Deductions with no
+            digital records and noncompliant labels are the highest risk.
           </p>
           <p className="audit-context section-context">
             Third-party auditors show up months after the original transaction

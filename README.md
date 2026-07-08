@@ -23,7 +23,7 @@ Ten connected views are organized into four narrative chapters: **The Problem** 
 | Timeline pressure | Deductions mapped against retailer-specific dispute deadlines; expired dollar exposure |
 | Post-audit risk | Forward-looking clawback exposure by retailer and evidence quality, paired with realized post-audit claims |
 | Retailer scorecard | Per-retailer comparison: deduction volume, recovery rate, deadline strictness, patterns |
-| Origin clustering | Deductions grouped by warehouse, packing line, carrier, and label decision |
+| Origin clustering | Deductions grouped by carrier, label decision, pack verification, and evidence format |
 
 ## Why it matters
 

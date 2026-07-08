@@ -33,22 +33,20 @@ interface Scorecard {
 
 // Research-grounded retailer-specific narrative (sourced from
 // research/retailers/). Hardcoded because the JSON schema doesn't
-// carry a "behavioral profile" field.
+// carry a "behavioral profile" field. Keyed by retailer.id as it
+// appears in the data (RET-*/DIST-*); retailers without a profile
+// render no note.
 const RETAILER_PROFILE: Record<string, string> = {
-  walmart:
+  "RET-WALMART":
     "APDP portal accepts most disputes; OTIF (3% of COGS) is the bigger lever; third-party email-based post-audit team months later.",
-  costco:
+  "RET-COSTCO":
     "Cross-dock receiving leaves no room for fixes; ASN/label compliance dominates the chargeback mix; refused deliveries on missed appointment windows.",
-  whole_foods:
+  "RET-WHOLEFOODS":
     "Manual Excel + Smartsheet dispute process; strict quality program; double layer of deductions when paired with UNFI distribution.",
-  unfi:
+  "DIST-UNFI":
     "Two parallel systems (Natural / Conventional); Excel-only dispute forms by email; deductions can pull directly from future invoices.",
-  kehe:
+  "DIST-KEHE":
     "Distributor — pass-through audits from underlying retailers add complexity; granular per-incident compliance fines.",
-  southside_market:
-    "Less formal but expects records to exist; buyer relationship matters more than a portal process.",
-  green_basket_market:
-    "Sprouts-style buyer relationship; informal but documentable; promo deductions often vague.",
 };
 
 type Sort = "net_loss" | "dollars" | "worst_recovery";

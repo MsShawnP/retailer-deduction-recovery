@@ -170,12 +170,13 @@ export default function OriginClusteringView({
         <h2>Origin clustering</h2>
         <p className="section-description">
           Instead of grouping deductions by retailer or type, this groups
-          them by where in Cinderhaven's operation they came from — which
-          warehouse, which packing line, which carrier, which shift. If
-          one packing line generates 60% of the labeling fines, the fix
-          is specific and cheap. If the problem is spread evenly, the fix
-          is systemic. Click any cluster to see the individual deductions
-          behind it.
+          them by where in Cinderhaven's operation they came from — the
+          carrier that moved the shipment, whether the label was scannable,
+          how the pack was verified, and what format the evidence took. If
+          one carrier or one pack-verification gap generates most of the
+          labeling fines, the fix is specific and cheap. If the problem is
+          spread evenly, the fix is systemic. Click any cluster to see the
+          individual deductions behind it.
         </p>
         <p className="origin-empty section-empty">
           {cohort.length === 0
@@ -194,18 +195,19 @@ export default function OriginClusteringView({
           <p className="section-description">
             Instead of grouping deductions by retailer or type, this
             groups them by where in Cinderhaven's operation they came
-            from — which warehouse, which packing line, which carrier,
-            which shift. If one packing line generates 60% of the
-            labeling fines, the fix is specific and cheap. If the problem
-            is spread evenly, the fix is systemic. Click any cluster to
-            see the individual deductions behind it.
+            from — the carrier that moved the shipment, whether the label
+            was scannable, how the pack was verified, and what format the
+            evidence took. If one carrier or one pack-verification gap
+            generates most of the labeling fines, the fix is specific and
+            cheap. If the problem is spread evenly, the fix is systemic.
+            Click any cluster to see the individual deductions behind it.
           </p>
           <p className="origin-context section-context">
             Where the deductions come from operationally — by carrier,
-            label decision, pack verification system, evidence format, and
-            packer. Concentration scores show how much of the cohort flows
-            through a single cluster: high concentration means a targeted
-            fix, low concentration means a systemic one.
+            label decision, pack verification system, and evidence format.
+            Concentration scores show how much of the cohort flows through
+            a single cluster: high concentration means a targeted fix, low
+            concentration means a systemic one.
           </p>
         </div>
       </header>
