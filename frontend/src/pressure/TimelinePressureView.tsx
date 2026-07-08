@@ -21,8 +21,8 @@ function isUnfiled(d: Deduction): boolean {
 
 function isResolved(d: Deduction): boolean {
   return (
-    d.dispute?.outcome === "won_full" ||
-    d.dispute?.outcome === "won_partial"
+    d.dispute?.outcome === "won" ||
+    d.dispute?.outcome === "partial"
   );
 }
 

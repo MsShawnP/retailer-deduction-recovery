@@ -97,8 +97,8 @@ function compute(
       if (d.dispute.filed_date) {
         s.filed++;
         if (
-          d.dispute.outcome === "won_full" ||
-          d.dispute.outcome === "won_partial"
+          d.dispute.outcome === "won" ||
+          d.dispute.outcome === "partial"
         ) {
           s.won++;
         }
