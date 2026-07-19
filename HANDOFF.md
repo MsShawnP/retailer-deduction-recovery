@@ -869,3 +869,21 @@ pushed. Build/tests unaffected by this change.
 so far); push the branch and open a PR once the audit fixes are complete.
 
 ---
+
+## 2026-07-18 — /wrap
+
+**Started from:** Resuming compacted context. Fix 3 (keyboard
+accessibility role correction) was edited and verified but not committed.
+
+**Did:** Committed Fix 3 — `role="button"` → `role="columnheader"` on
+all 8 sortable `<th>` elements in CohortTableView.tsx. Confirmed Fixes
+1 and 2 were already complete from prior commits.
+
+**State:** All Phase F tasks complete. Build passes (310.74KB JS,
+54.99KB CSS), 59 tests pass. Deployed to Cloudflare Pages. Working
+tree clean on main.
+
+**Next:** Phase E — friend preview handoff. All coding/polish work is
+done. Remaining PLAN.md items: friend preview + feedback incorporation.
+
+---

@@ -152,6 +152,7 @@ this project) passed 32/32 with 0 FAIL. The dbt tolerance needs
 widening from ±2pt to ±3pt as a separate fix in
 cinderhaven-data-platform.
 
-**Status:** Open — tolerance fix not yet applied.
+**Status:** Resolved — tolerance widened to ±3pt in commit `fda66be`
+(cinderhaven-data-platform).
 
 **Tags:** dbt, data tests, calibration, tolerance, recovery rates
